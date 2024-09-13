@@ -35,73 +35,110 @@ router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const storeItem = yield prisma.storeItem.findUnique({
             where: { id: itemId }
         });
-        if (!storeItem || storeItem.stock < quantity) {
-            return res.status(400).json({ message: 'El ítem no está disponible o no hay suficiente stock' });
+        if (!storeItem) {
+            return res.status(404).json({ message: 'El ítem no existe en la tienda' });
         }
-        // Buscar al usuario y su inventario
-        const user = yield prisma.user.findUnique({
+        // Verificar si hay suficiente stock disponible
+        if (storeItem.stock < quantity) {
+            return res.status(400).json({ message: 'Stock insuficiente' });
+        }
+        // Buscar al usuario
+        let user = yield prisma.user.findUnique({
             where: { id: userId },
             include: { inventory: { include: { seeds: true, waters: true } } }
         });
-        // Verificar si el usuario tiene un inventario
-        if (!user || !user.inventory) {
-            return res.status(400).json({ message: 'Usuario no encontrado o no tiene inventario' });
+        // Comprobar si el usuario existe
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
-        if (user.balanceToken < storeItem.price * quantity) {
-            return res.status(400).json({ message: 'Saldo insuficiente' });
-        }
-        const inventoryId = user.inventory.id; // Asegúrate de que el inventario existe
-        // Verificar si es seed o water
-        if (itemType === 'seed') {
-            // Verificar si la semilla ya está en el inventario
-            const seedItem = yield prisma.seed.findFirst({
-                where: { inventoryId, name: storeItem.name }
+        // Crear el inventario si no existe
+        if (!user.inventory) {
+            user = yield prisma.user.update({
+                where: { id: userId },
+                data: {
+                    inventory: {
+                        create: {}
+                    }
+                },
+                include: { inventory: { include: { seeds: true, waters: true } } }
             });
-            if (seedItem) {
-                // Si ya existe, solo actualiza la cantidad
+        }
+        // Verificar si el usuario tiene suficientes tokens
+        const totalPrice = storeItem.price * quantity;
+        if (user.balanceToken < totalPrice) {
+            return res.status(400).json({ message: 'Saldo insuficiente de tokens' });
+        }
+        // Reducir el stock en la tienda solo por la cantidad solicitada
+        yield prisma.storeItem.update({
+            where: { id: itemId },
+            data: {
+                stock: { decrement: quantity }
+            }
+        });
+        // Descontar los tokens del usuario por la cantidad de ítems comprados
+        yield prisma.user.update({
+            where: { id: userId },
+            data: {
+                balanceToken: { decrement: totalPrice }
+            }
+        });
+        // Verificar si el ítem es una semilla o agua
+        if (itemType === 'seed') {
+            // Verificar si la semilla ya está en el inventario del usuario
+            const existingSeed = yield prisma.seed.findFirst({
+                where: {
+                    inventoryId: user.inventory.id, // Non-null assertion here
+                    name: storeItem.name
+                }
+            });
+            if (existingSeed) {
+                // Si la semilla ya existe, incrementar la cantidad
                 yield prisma.seed.update({
-                    where: { id: seedItem.id },
+                    where: { id: existingSeed.id },
                     data: {
                         quantity: { increment: quantity }
                     }
                 });
             }
             else {
-                // Si no existe, crea una nueva semilla en el inventario
+                // Si no existe, crear una nueva semilla en el inventario
                 yield prisma.seed.create({
                     data: {
                         name: storeItem.name,
-                        description: "desc",
+                        description: storeItem.description,
                         quantity: quantity,
-                        rarity: "COMMON",
+                        rarity: storeItem.rarity,
                         status: "GROWING",
-                        inventoryId: inventoryId,
+                        inventoryId: user.inventory.id // Non-null assertion here
                     }
                 });
             }
         }
         else if (itemType === 'water') {
-            // Verificar si el ítem de agua ya está en el inventario
-            const waterItem = yield prisma.water.findFirst({
-                where: { inventoryId, name: storeItem.name }
+            // Verificar si el ítem de agua ya está en el inventario del usuario
+            const existingWater = yield prisma.water.findFirst({
+                where: {
+                    inventoryId: user.inventory.id, // Non-null assertion here
+                    name: storeItem.name
+                }
             });
-            if (waterItem) {
-                // Si ya existe, solo actualiza la cantidad
+            if (existingWater) {
+                // Si el ítem de agua ya existe, incrementar la cantidad
                 yield prisma.water.update({
-                    where: { id: waterItem.id },
+                    where: { id: existingWater.id },
                     data: {
                         quantity: { increment: quantity }
                     }
                 });
             }
             else {
-                // Si no existe, crea un nuevo ítem de agua en el inventario
+                // Si no existe, crear un nuevo ítem de agua en el inventario
                 yield prisma.water.create({
                     data: {
                         name: storeItem.name,
-                        description: "",
+                        description: storeItem.description,
                         quantity: quantity,
-                        inventoryId: inventoryId
+                        inventoryId: user.inventory.id // Non-null assertion here
                     }
                 });
             }
@@ -109,24 +146,11 @@ router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         else {
             return res.status(400).json({ message: 'Tipo de ítem no válido' });
         }
-        // Actualizar el saldo del usuario y reducir el stock del ítem en la tienda
-        yield prisma.user.update({
-            where: { id: userId },
-            data: {
-                balanceToken: { decrement: storeItem.price * quantity }
-            }
-        });
-        yield prisma.storeItem.update({
-            where: { id: itemId },
-            data: {
-                stock: { decrement: quantity }
-            }
-        });
         res.status(200).json({ message: 'Compra realizada con éxito' });
     }
-    catch (e) {
-        console.error('Error:', e);
-        res.status(500).json({ message: "Error al realizar la compra." });
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al realizar la compra.' });
     }
 }));
 exports.default = router;

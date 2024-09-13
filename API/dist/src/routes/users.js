@@ -100,6 +100,29 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ message: "Error al crear usuario" });
     }
 }));
+//update tokens del usuario por body
+router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, tokensToAdd } = req.body;
+    try {
+        const user = yield prisma.user.findUnique({
+            where: { id: userId }
+        });
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        yield prisma.user.update({
+            where: { id: userId },
+            data: {
+                balanceToken: { increment: tokensToAdd }
+            }
+        });
+        return res.status(200).json({ message: 'Tokens agregados con exito', newBalance: user.balanceToken + tokensToAdd });
+    }
+    catch (e) {
+        console.log(e);
+        res.status(500).json({ message: "Error al agregar tokens al usuario" });
+    }
+}));
 router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {

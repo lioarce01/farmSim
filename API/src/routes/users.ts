@@ -106,6 +106,35 @@ router.post('/', async (req, res) => {
     }
 })
 
+//update tokens del usuario por body
+
+router.post('/addTokens', async (req, res) => {
+    const { userId, tokensToAdd } = req.body
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        })
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" })
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                balanceToken: { increment: tokensToAdd }
+            }
+        })
+
+        return res.status(200).json({ message: 'Tokens agregados con exito', newBalance: user.balanceToken + tokensToAdd })
+
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ message: "Error al agregar tokens al usuario"})
+    }
+})
+
 router.delete('/:id', async (req,res) => {
     const { id } = req.params;
 

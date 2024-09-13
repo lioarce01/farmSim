@@ -9,6 +9,6 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
   },
-  "include": ["src/**/*.ts", "seedsGeneration.js"],
+  "include": ["src/**/*.ts", "utils/seedsGeneration.js", "utils/waterGeneration.js"],
   "exclude": ["node_modules"]
 }

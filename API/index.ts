@@ -1,7 +1,7 @@
 import app from './src/index';
 import * as dotenv from 'dotenv';
 import cron from 'node-cron';
-import { updateStoreWithNewSeeds } from './seedsGeneration.js'
+import { updateStoreWithNewSeeds } from './utils/seedsGeneration.js'
 dotenv.config();
 
 const PORT = process.env.PORT || 3002;
@@ -10,6 +10,8 @@ app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
+
+//se actualiza cada 1 minuto actualmente, cambiarlo mas adelante.
 cron.schedule('* * * * *', async () => {
   try {
     console.log('Actualizando la tienda con nuevas semillas y aguas...');

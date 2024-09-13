@@ -60,12 +60,10 @@ async function seedStoreWithRandomSeeds() {
   const createdSeeds = [];
 
   for (let i = 0; i < seedsToCreate; i++) {
-    // Generar rareza y nombre único
     const rarity = getRandomRarity();
     let uniqueName;
     let isUnique = false;
 
-    // Asegurarse de que el nombre es único
     while (!isUnique) {
       uniqueName = createUniqueSeedName(rarity);
 
@@ -78,18 +76,16 @@ async function seedStoreWithRandomSeeds() {
       }
     }
 
-    // Obtener el precio basado en la rareza
     const price = getPriceByRarity(rarity);
 
-    // Crear el ítem en la tienda con el precio generado y un stock aleatorio
     const storeSeed = await prisma.storeItem.create({
       data: {
         name: uniqueName,
         description: `A ${rarity.toLowerCase()} seed of ${uniqueName}`,
-        price: price,                  // Asignar precio acorde a la rareza
-        stock: Math.floor(Math.random() * 16) + 5,  // Stock aleatorio entre 5 y 20 unidades
-        itemType: 'SEED',              // Definir tipo de ítem como 'seed'
-        rarity: rarity                 // Asignar rareza
+        price: price,
+        stock: Math.floor(Math.random() * 16) + 5,
+        itemType: 'SEED',
+        rarity: rarity
       }
     });
 
@@ -99,17 +95,14 @@ async function seedStoreWithRandomSeeds() {
   console.log(`Created ${createdSeeds.length} random unique seeds in the store.`);
 }
 
-// Ejecutar el seeding
-async function main() {
-  console.log("Seeding the store with random seeds...");
-
-  try {
-    await seedStoreWithRandomSeeds();
-  } catch (error) {
-    console.error("Error seeding the store:", error);
-  } finally {
-    await prisma.$disconnect();
-  }
+// Función para actualizar la tienda con nuevas semillas
+async function updateStoreWithNewSeeds() {
+  console.log("Updating store with new seeds...");
+  await prisma.storeItem.deleteMany({ where: { itemType: 'SEED' } }); // Elimina semillas existentes
+  await seedStoreWithRandomSeeds(); // Añade nuevas semillas
 }
 
-main();
+// Exportar funciones para su uso en el cron job
+module.exports = {
+  updateStoreWithNewSeeds
+};

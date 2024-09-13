@@ -4,6 +4,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.20.0",
+    "node-cron": "^3.0.3",
     "nodemon": "^3.1.4"
   },
   "devDependencies": {
@@ -17,7 +18,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon ./src/index.ts && npm run seed",
+    "dev": "nodemon ./src/index.ts",
     "seed": "node ./prisma/seed.js"
   }
 }

@@ -15,5 +15,7 @@ app.use(body_parser_1.default.urlencoded({ extended: true, limit: '50mb' }));
 app.use(body_parser_1.default.json({ limit: '50mb' }));
 app.use((0, cors_1.default)());
 app.use('/', index_1.default);
+app.get('/test', (req, res) => {
+    res.send('server running');
+});
 exports.default = app;
-//# sourceMappingURL=index.js.map

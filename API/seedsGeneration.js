@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 // Modificadores para los nombres de las semillas
 const modifiers = [
-  'Golden', 'Mystic', 'Radiant', 'Enchanted', 'Glowing', 'Ancient', 'Vibrant', 'Shadow', 'Luminous',
+  'Mystic', 'Radiant', 'Enchanted', 'Glowing', 'Ancient', 'Vibrant', 'Shadow', 'Luminous',
   'Celestial', 'Blazing', 'Twilight', 'Ethereal', 'Crystalline', 'Stormborn', 'Frosted', 'Shimmering',
   'Arcane', 'Solar', 'Moonlit', 'Emerald', 'Phantom', 'Flourishing', 'Infernal'
 ];
@@ -29,8 +29,8 @@ const priceRangesByRarity = {
 // Probabilidades de aparición para cada rareza
 const rarityProbabilities = {
   COMMON: 50,   // 50% probabilidad
-  UNCOMMON: 40, // 30% probabilidad
-  RARE: 5,     // 15% probabilidad
+  UNCOMMON: 40, // 40% probabilidad
+  RARE: 5,     // 5% probabilidad
   EPIC: 4,      // 4% probabilidad
   LEGENDARY: 1  // 1% probabilidad
 };
@@ -112,6 +112,25 @@ async function seedStoreWithRandomSeeds() {
 
     const stock = getStockByRarity(rarity)
 
+    function getTokensByRarity(rarity) {
+      switch (rarity) {
+        case 'COMMON':
+          return Math.floor(Math.random() * 10) + 1; // Entre 1 y 10 tokens
+        case 'UNCOMMON':
+          return Math.floor(Math.random() * 20) + 10; // Entre 10 y 20 tokens
+        case 'RARE':
+          return Math.floor(Math.random() * 50) + 20; // Entre 20 y 50 tokens
+        case 'EPIC':
+          return Math.floor(Math.random() * 100) + 50; // Entre 50 y 100 tokens
+        case 'LEGENDARY':
+          return Math.floor(Math.random() * 200) + 100; // Entre 100 y 200 tokens
+        default:
+          return 0;
+      }
+    }
+
+    const tokensGenerated = getTokensByRarity(rarity)
+
     const storeSeed = await prisma.storeItem.create({
       data: {
         name: uniqueName,
@@ -119,7 +138,8 @@ async function seedStoreWithRandomSeeds() {
         price: price,
         stock: stock,
         itemType: 'SEED',
-        rarity: rarity
+        rarity: rarity,
+        tokensGenerated: tokensGenerated
       }
     });
 

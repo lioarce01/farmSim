@@ -109,7 +109,7 @@ router.post('/buy', async (req, res) => {
             description: storeItem.description,
             quantity: quantity,
             rarity: storeItem.rarity,
-            status: "GROWING",
+            status: "NONE",
             inventoryId: user.inventory!.id // Non-null assertion here
           }
         });

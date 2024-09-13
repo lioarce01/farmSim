@@ -34,11 +34,12 @@ model Seed {
   description String
   inventoryId String @db.ObjectId
   inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  plantedTime DateTime @default(now())
+  plantedTime DateTime?
   wateredCount Int @default(0)
   quantity Int @default(0)
   rarity Rarity
   status seedStatus
+  tokensGenerated Int @default(0)
 }
 
 model Water {
@@ -74,9 +75,10 @@ enum ItemType {
 }
 
 enum seedStatus {
-  PLANTED
+  NONE
   GROWING
   READY_TO_HARVEST
+  HARVESTED
   WITHERED
   INFECTED
   WATER_NEEDED

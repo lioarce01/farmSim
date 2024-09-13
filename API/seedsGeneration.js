@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+import { seedStoreWithRandomWaters } from './waterGeneration.js'
 
 // Modificadores para los nombres de las semillas
 const modifiers = [
@@ -150,15 +151,22 @@ async function seedStoreWithRandomSeeds() {
 }
 
 // Función para actualizar la tienda con nuevas semillas
-async function updateStoreWithNewSeeds() {
+export async function updateStoreWithNewSeeds() {
   console.log("Updating store with new seeds...");
   
   // Elimina las semillas existentes
   const deleteResult = await prisma.storeItem.deleteMany({ where: { itemType: 'SEED' } });
   console.log(`Deleted ${deleteResult.count} existing seeds.`);
 
+  // Elimina las water existentes
+  const deleteWatersResult = await prisma.storeItem.deleteMany({
+    where: { itemType: 'WATER'}
+  })
+  console.log(`Deleted ${deleteWatersResult.count} existing waters.`);
+
   // Añade nuevas semillas
   await seedStoreWithRandomSeeds();
+  await seedStoreWithRandomWaters();
 }
 
 module.exports = {

@@ -10,9 +10,9 @@ app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
-cron.schedule('0 */8 * * *', async () => {
+cron.schedule('* * * * *', async () => {
   try {
-    console.log('Actualizando la tienda con nuevas semillas...');
+    console.log('Actualizando la tienda con nuevas semillas y aguas...');
     await updateStoreWithNewSeeds();
     console.log('Tienda actualizada con éxito.');
   } catch (error) {

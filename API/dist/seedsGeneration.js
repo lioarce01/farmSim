@@ -8,8 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateStoreWithNewSeeds = updateStoreWithNewSeeds;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const waterGeneration_js_1 = require("./waterGeneration.js");
 // Modificadores para los nombres de las semillas
 const modifiers = [
     'Mystic', 'Radiant', 'Enchanted', 'Glowing', 'Ancient', 'Vibrant', 'Shadow', 'Luminous',
@@ -145,8 +148,14 @@ function updateStoreWithNewSeeds() {
         // Elimina las semillas existentes
         const deleteResult = yield prisma.storeItem.deleteMany({ where: { itemType: 'SEED' } });
         console.log(`Deleted ${deleteResult.count} existing seeds.`);
+        // Elimina las water existentes
+        const deleteWatersResult = yield prisma.storeItem.deleteMany({
+            where: { itemType: 'WATER' }
+        });
+        console.log(`Deleted ${deleteWatersResult.count} existing waters.`);
         // Añade nuevas semillas
         yield seedStoreWithRandomSeeds();
+        yield (0, waterGeneration_js_1.seedStoreWithRandomWaters)();
     });
 }
 module.exports = {

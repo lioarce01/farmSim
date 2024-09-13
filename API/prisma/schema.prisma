@@ -39,14 +39,14 @@ model Seed {
   quantity Int @default(0)
   rarity Rarity
   status seedStatus
-  tokensGenerated Int @default(0)
+  tokensGenerated Int? @default(0)
 }
 
 model Water {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
-  quantity Int @default(0)
+  quantity Int? @default(0)
   inventoryId String @db.ObjectId
   inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
 }
@@ -57,8 +57,10 @@ model StoreItem {
   description String
   price Int
   itemType ItemType
-  rarity Rarity
+  rarity Rarity?
   stock Int
+  tokensGenerated Int?
+  quantity Int?
 }
 
 enum Rarity {

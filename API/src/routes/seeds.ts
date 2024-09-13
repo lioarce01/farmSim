@@ -17,34 +17,39 @@ router.get("/", async (req, res) => {
 })
 
 router.post('/harvest', async (req, res) => {
-    const { seedId, userId } = req.body;
-  
-    try {
-      const seed = await prisma.seed.findUnique({ where: { id: seedId } });
-  
-      if (seed && seed.status === 'READY_TO_HARVEST') {
-        const tokens = seed.tokensGenerated;
-  
-        // Añadir tokens al balance del usuario
-        await prisma.user.update({
-          where: { id: userId },
-          data: { balanceToken: { increment: tokens } }
-        });
-  
-        // Cambiar el estado de la semilla a cosechada o eliminarla
-        await prisma.seed.update({
-          where: { id: seedId },
-          data: { status: 'HARVESTED' } // O cambiarlo como prefieras
-        });
-  
-        res.send(`Harvested and received ${tokens} tokens.`);
-      } else {
-        res.status(400).send('Seed not ready to harvest.');
-      }
-    } catch (error) {
-      res.status(500).send('Error harvesting seed.');
+  const { seedId, userId } = req.body;
+
+  try {
+    // Buscar la semilla
+    const seed = await prisma.seed.findUnique({ where: { id: seedId } });
+
+    // Verificar que la semilla existe y está lista para cosechar
+    if (seed && seed.status === 'READY_TO_HARVEST') {
+      // Obtener tokens generados
+      const tokens = seed.tokensGenerated ?? 0; // Usa 0 si tokensGenerated es null
+
+      // Añadir tokens al balance del usuario
+      await prisma.user.update({
+        where: { id: userId },
+        data: { balanceToken: { increment: tokens } }
+      });
+
+      // Cambiar el estado de la semilla a cosechada
+      await prisma.seed.update({
+        where: { id: seedId },
+        data: { status: 'HARVESTED' } // Puedes ajustar este estado si es necesario
+      });
+
+      res.status(200).send(`Harvested and received ${tokens} tokens.`);
+    } else {
+      res.status(400).send('Seed not ready to harvest or not found.');
     }
-  });
+  } catch (error) {
+    console.error('Error harvesting seed:', error);
+    res.status(500).send('Error harvesting seed.');
+  }
+});
+
 
   router.put('/plant-seed', async (req, res) => {
     const { seedId, inventoryId } = req.body;

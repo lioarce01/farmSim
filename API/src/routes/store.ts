@@ -1,5 +1,5 @@
 import express from 'express';
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Rarity } from "@prisma/client";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -108,7 +108,7 @@ router.post('/buy', async (req, res) => {
             name: storeItem.name,
             description: storeItem.description,
             quantity: quantity,
-            rarity: storeItem.rarity,
+            rarity: storeItem.rarity as Rarity,
             status: "NONE",
             inventoryId: user.inventory!.id // Non-null assertion here
           }

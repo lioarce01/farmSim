@@ -27,28 +27,33 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.post('/harvest', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { seedId, userId } = req.body;
     try {
+        // Buscar la semilla
         const seed = yield prisma.seed.findUnique({ where: { id: seedId } });
+        // Verificar que la semilla existe y está lista para cosechar
         if (seed && seed.status === 'READY_TO_HARVEST') {
-            const tokens = seed.tokensGenerated;
+            // Obtener tokens generados
+            const tokens = (_a = seed.tokensGenerated) !== null && _a !== void 0 ? _a : 0; // Usa 0 si tokensGenerated es null
             // Añadir tokens al balance del usuario
             yield prisma.user.update({
                 where: { id: userId },
                 data: { balanceToken: { increment: tokens } }
             });
-            // Cambiar el estado de la semilla a cosechada o eliminarla
+            // Cambiar el estado de la semilla a cosechada
             yield prisma.seed.update({
                 where: { id: seedId },
-                data: { status: 'HARVESTED' } // O cambiarlo como prefieras
+                data: { status: 'HARVESTED' } // Puedes ajustar este estado si es necesario
             });
-            res.send(`Harvested and received ${tokens} tokens.`);
+            res.status(200).send(`Harvested and received ${tokens} tokens.`);
         }
         else {
-            res.status(400).send('Seed not ready to harvest.');
+            res.status(400).send('Seed not ready to harvest or not found.');
         }
     }
     catch (error) {
+        console.error('Error harvesting seed:', error);
         res.status(500).send('Error harvesting seed.');
     }
 }));

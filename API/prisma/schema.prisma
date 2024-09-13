@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  username  String @unique
+  inventory Inventory?
+  balanceToken Int @default(200)
+}
+
+model Inventory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seeds Seed[]
+  waters Water[]
+}
+
+model Seed {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String
+  inventoryId String @db.ObjectId
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  plantedTime DateTime @default(now())
+  wateredCount Int @default(0)
+  quantity Int
+  rarity Rarity
+  status seedStatus
+}
+
+model Water {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String
+  quantity Int
+  inventoryId String @db.ObjectId
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+}
+
+model StoreItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId 
+  name String
+  description String
+  price Int
+  itemType ItemType
+  stock Int @default(10)
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum ItemType {
+  SEED
+  WATER
+}
+
+enum seedStatus {
+  PLANTED
+  GROWING
+  READY_TO_HARVEST
+  WITHERED
+  INFECTED
+  WATER_NEEDED
+}
+
+// model Tool {
+//   id        String @id @default(auto()) @map("_id") @db.ObjectId
+//   name      String
+//   quantity  Int
+//   inventoryId String @db.ObjectId
+//   inventory   Inventory @relation(fields: [inventoryId], references: [id])
+// }
+
+// model Token {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+//   amount String @default("0")
+//   tokenOwner User @relation(fields: [tokenOwnerId], references: [id])
+//   tokenOwnerId String @unique @db.ObjectId
+// }

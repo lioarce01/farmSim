@@ -36,7 +36,7 @@ model Seed {
   inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   plantedTime DateTime @default(now())
   wateredCount Int @default(0)
-  quantity Int
+  quantity Int @default(0)
   rarity Rarity
   status seedStatus
 }
@@ -45,7 +45,7 @@ model Water {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
-  quantity Int
+  quantity Int @default(0)
   inventoryId String @db.ObjectId
   inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
 }

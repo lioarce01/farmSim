@@ -36,6 +36,7 @@ model Seed {
   inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   plantedTime DateTime?
   wateredCount Int @default(0)
+  lastWatered DateTime?
   quantity Int @default(0)
   rarity Rarity
   status seedStatus

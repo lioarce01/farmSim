@@ -88,4 +88,53 @@ router.post('/harvest', async (req, res) => {
     }
   });
 
+  router.post('/water-seed', async (req, res) => {
+    const { seedId, userId, waterId } = req.body
+
+    try {
+      const seed = await prisma.seed.findFirst({
+        where: {
+          id: seedId,
+          inventory: { userId },
+          status: "WATER_NEEDED"
+        }
+      })
+
+      if (!seed) {
+        return res.status(404).json({ message: 'Seed not found or does not need water.'})
+      }
+
+      //Encontrar el inventario del usuario para obtener agua
+      const userInventory = await prisma.inventory.findUnique({
+        where: { userId },
+        include: { waters: true }
+      })
+
+      if (!userInventory) {
+        return res.status(404).json({ message: 'Inventory not found' })
+      }
+
+      const waterItem = userInventory.waters.find(water => water.id === waterId)
+
+      if (!waterItem || waterItem.quantity === null || waterItem.quantity <= 0) {
+        return res.status(400).json({ message: 'Not enough water available.' })
+      } 
+
+      //actualizar el estado a growing despues de aplicar agua
+      const updatedSeed = await prisma.seed.update({
+        where: { id: seedId },  // Aquí seedId debe ser una string válida
+        data: { 
+          status: "GROWING",
+          lastWatered: new Date() // Se actualiza la última vez regada
+        },
+      });
+      
+      return res.status(200).json({ message: 'Seed watered successfully', seed: updatedSeed})
+      
+    } catch (e) {
+      console.log('Error watering seed', e)
+      res.status(500).json({ message: 'Error watering seed.'})
+    }
+  })
+
 export default router;

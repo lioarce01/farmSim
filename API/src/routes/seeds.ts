@@ -1,10 +1,11 @@
 import express from 'express';
 import { PrismaClient } from "@prisma/client";
+import authMiddleware from '../middleware/auth'
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const allSeeds = await prisma.seed.findMany()
 

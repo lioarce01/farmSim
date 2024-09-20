@@ -3,17 +3,25 @@
 import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../store/store'; // Ajusta la ruta según tu estructura de carpetas
-import './globals.css'
+import Navbar from 'src/components/Navbar';
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import './globals.css'; // Asegúrate de que esta ruta sea correcta
+import AuthWrapper from 'src/components/authWrapper';
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
       <body>
-        <main>
+        <UserProvider>
           <Provider store={store}>
-            {children}
+            <AuthWrapper>
+              <Navbar />
+              <div className='bg-[#FFF5D1] min-h-screen'>
+                {children}
+              </div>
+            </AuthWrapper>
           </Provider>
-        </main>
+        </UserProvider>
       </body>
     </html>
   );

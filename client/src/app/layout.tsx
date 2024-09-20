@@ -4,24 +4,29 @@ import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store/store'; // Ajusta la ruta según tu estructura de carpetas
 import Navbar from 'src/components/Navbar';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
 import './globals.css'; // Asegúrate de que esta ruta sea correcta
-import AuthWrapper from 'src/components/authWrapper';
+import { Auth0Provider } from '@auth0/auth0-react';
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
+  const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
+
   return (
     <html lang="en">
       <body>
-        <UserProvider>
-          <Provider store={store}>
-            <AuthWrapper>
-              <Navbar />
-              <div className='bg-[#FFF5D1] min-h-screen'>
-                {children}
-              </div>
-            </AuthWrapper>
-          </Provider>
-        </UserProvider>
+        <Provider store={store}>
+          <Auth0Provider
+            domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN!}
+            clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!}
+            authorizationParams={{
+              redirect_uri: redirectUri
+            }}
+          >
+            <Navbar />
+            <div className='bg-[#FFF5D1] min-h-screen'>
+              {children}
+            </div>
+          </Auth0Provider>
+        </Provider>
       </body>
     </html>
   );

@@ -1,32 +1,25 @@
 'use client'
 
-import { useUser } from '@auth0/nextjs-auth0/client';
-import Link from 'next/link';
+import { useAuth0 } from "@auth0/auth0-react";
 
-interface ButtonProps {
-  children: React.ReactNode
-  onClick?: () => void;
-}
+const LoginButton = () => {
+  const { loginWithPopup } = useAuth0()
 
-const LoginButton: React.FC<ButtonProps> = ({children, onClick}) => {
-  const { user, error, isLoading } = useUser();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  if (user) {
-    return (
-      <Link href="/api/auth/logout">
-        <button onClick={onClick} className="px-4 py-2 bg-red-500 text-white rounded">{children}</button>
-      </Link>
-    );
-  }
-
-  return (
-    <Link href="/api/auth/login">
-      <button onClick={onClick} className="px-4 py-2 bg-blue-500 text-white rounded">{children}</button>
-    </Link>
-  );
+  const handleLogin = async () => {
+    try {
+      await loginWithPopup();
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+  };
+	
+	return (
+		<div className="items-center px-4 py-2 mr-4 text-white bg-[#d6635f] rounded-2xl hover:bg-[#e76b67] transition duration-300">
+			<button onClick={handleLogin} className="px-2 font-bold">
+				Login
+			</button>
+		</div>
+	)
 };
 
 export default LoginButton;

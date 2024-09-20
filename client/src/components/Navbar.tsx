@@ -24,7 +24,7 @@ const Navbar = () => {
                 <li>
                 {user ? (
                   <>
-                    <span>{user.name}</span>
+                    <span>{user.username}</span>
                       <LogoutButton>Logout</LogoutButton>
                   </>
                     ) : (

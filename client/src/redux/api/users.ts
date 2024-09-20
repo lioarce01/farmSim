@@ -3,7 +3,7 @@ import { RootState } from '../store/store';
 import { Seed, User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 
-export const api = createApi({
+export const usersApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
@@ -23,4 +23,4 @@ export const api = createApi({
   }),
 });
 
-export const { useGetUsersQuery } = api;
+export const { useGetUsersQuery } = usersApi;

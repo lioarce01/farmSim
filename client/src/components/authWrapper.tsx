@@ -10,7 +10,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     if (user) {
       dispatch(setUser({
-        user: { name: user.name || 'guest', 
+        user: { username: user.name || 'guest', 
           email: user.email || 'no email'
         },
         token: typeof user?.token === 'string' ? user.token : '', // Proporciona un valor por defecto ('') cuando el token es undefined o null

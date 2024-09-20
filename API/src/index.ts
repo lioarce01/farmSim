@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './routes/index';
-// import authMiddleware from './middleware/auth';
-// import 'types/express'
+import { auth } from 'express-openid-connect';
 
 const app = express();
 
@@ -14,21 +13,24 @@ app.use(cors());
 
 app.use('/', routes);
 
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  });
+
+app.use(
+    auth({
+      issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
+      baseURL: 'http://localhost:3002', // Cambia esto a la URL de tu aplicación
+      clientID: process.env.AUTH0_CLIENT_ID,
+      secret: process.env.AUTH0_CLIENT_SECRET,
+      authRequired: false, // Establece esto a true si quieres que todas las rutas estén protegidas
+      auth0Logout: true,   // Habilita el logout
+    })
+  )
+
 app.get('/test', (req, res) => {
     res.send('server running');
 });
-
-// app.get('/api/auth/me', authMiddleware, (req, res) => {
-//     if (!req.user) {
-//       return res.status(401).json({ message: 'Unauthorized' });
-//     }
-  
-//     res.json({
-//       id: req.user.id,
-//       username: req.user.username,
-//       inventory: req.user.inventory,
-//       balanceToken: req.user.balanceToken
-//     });
-//   });
 
 export default app;

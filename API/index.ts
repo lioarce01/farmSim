@@ -1,8 +1,8 @@
 import app from './src/index';
 import * as dotenv from 'dotenv';
 import cron from 'node-cron';
-import { updateStoreWithNewSeeds } from './utils/seedsGeneration.js'
-import { updateSeedStatus } from './utils/updateSeedStatus.js';
+import { updateStoreWithNewSeeds } from './src/utils/seedsGeneration.js'
+import { updateSeedStatus } from './src/utils/updateSeedStatus.js';
 import { auth } from 'express-openid-connect'
 import express, { NextFunction, Request, Response } from 'express';
 dotenv.config();
@@ -23,14 +23,6 @@ app.use(
     auth0Logout: true,   // Habilita el logout
   })
 )
-
-app.get('/api/auth/me', (req, res) => {
-  if (req.oidc.isAuthenticated()) {
-    res.json(req.oidc.user);
-  } else {
-    res.status(401).json({ error: 'Not authenticated' });
-  }
-});
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

@@ -8,7 +8,19 @@
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "baseUrl": "src",
+    "paths": {
+      "*": ["*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["express"]
   },
-  "include": ["src/**/*.ts", "utils/seedsGeneration.js", "utils/waterGeneration.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*",
+    "src/types/express.d.ts",
+    "src/utils/seedsGeneration.js",
+    "src/utils/waterGeneration.js",
+    "src/utils/updateSeedStatus.js"
+  ],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

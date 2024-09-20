@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { api } from '../services/api'; // Ajusta la ruta según tu estructura de carpetas
-import authReducer from '../services/auth/authSlice'
+import { api } from '../api'; // Ajusta la ruta según tu estructura de carpetas
+import authReducer from '../slices/authSlice'
 
 export const store = configureStore({
   reducer: {

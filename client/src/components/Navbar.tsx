@@ -1,10 +1,10 @@
 'use client'
 
 import Link from "next/link"
-import LogoutButton from "src/services/auth/logout";
-import LoginButton from "src/services/auth/login";
+import LogoutButton from "src/components/logout";
+import LoginButton from "src/components/login";
 import { useSelector } from "react-redux";
-import { RootState } from "src/store/store";
+import { RootState } from "src/redux/store/store";
 
 const Navbar = () => {
   const { user } = useSelector((state: RootState) => state.auth);

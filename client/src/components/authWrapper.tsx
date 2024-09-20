@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../services/auth/authSlice';
+import { setUser } from '../redux/slices/authSlice';
 
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, error, isLoading } = useUser();

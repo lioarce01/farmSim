@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { store } from '../store/store'; // Ajusta la ruta según tu estructura de carpetas
+import { store } from '../redux/store/store'; // Ajusta la ruta según tu estructura de carpetas
 import Navbar from 'src/components/Navbar';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import './globals.css'; // Asegúrate de que esta ruta sea correcta

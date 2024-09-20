@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetUsersQuery } from '../../services/api';
+import { useGetUsersQuery } from '../../redux/api';
 import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 const UsersPage = () => {

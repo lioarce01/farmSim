@@ -1,5 +1,6 @@
 import express from 'express';
 import { PrismaClient } from "@prisma/client";
+import axios from 'axios';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -75,12 +76,31 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const { username } = req.body;
+    const { username, email, password } = req.body;
 
     try {
+        // Llamada a la API de Auth0 para crear el usuario
+        const response = await axios.post(`https://dev-i4w5z51mxsf01wcx.us.auth0.com/api/v2/users`, {
+            email: email,
+            password: password,
+            connection: 'Username-Password-Authentication',
+            username: username
+        }, {
+            headers: {
+                Authorization: `Bearer ${process.env.AUTH0_API_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Obtener el ID del usuario creado en Auth0
+        const auth0UserId = response.data.user_id;
+
+        // Crear el usuario en la base de datos con Prisma
         const newUser = await prisma.user.create({
             data: {
+                id: auth0UserId,  // Usa el ID de Auth0 como ID
                 username: username,
+                email: email,
                 inventory: {
                     create: {
                         seeds: {},
@@ -96,13 +116,13 @@ router.post('/', async (req, res) => {
                     }
                 }
             }
-        })
+        });
 
-        res.status(201).json(newUser)
+        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
 
     } catch (e) {
-        console.error ("Error al crear usuario:", e)
-        res.status(500).json({ message: "Error al crear usuario"})
+        console.error("Error al crear usuario:", e);
+        res.status(500).json({ message: "Error al crear usuario" });
     }
 })
 

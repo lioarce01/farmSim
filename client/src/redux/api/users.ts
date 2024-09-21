@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { Seed, User } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 
 export const usersApi = createApi({
@@ -19,8 +19,15 @@ export const usersApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<User[], void>({
       query: () => 'users',
+    }),
+    registerUser: builder.mutation({
+      query: (userData) => ({
+        url: '/users/register',
+        method: 'POST',
+        body: userData,
+      })
     })
   }),
 });
 
-export const { useGetUsersQuery } = usersApi;
+export const { useGetUsersQuery, useRegisterUserMutation } = usersApi

@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 interface AuthState {
   user: null | {
-    username: ReactNode; email: string 
+    nickname: ReactNode; email: string 
 };
   token: null | string;
   loading: boolean;

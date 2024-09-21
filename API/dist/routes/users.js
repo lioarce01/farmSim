@@ -71,33 +71,39 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ message: "Error" });
     }
 }));
-router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username } = req.body;
+router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { nickname, email, auth0Id } = req.body;
+    console.log('data:', req.body);
+    // Validación de entradas
+    if (!email || !nickname || !auth0Id) {
+        return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
     try {
+        // Verificar si el usuario ya existe
+        const existingUser = yield prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return res.status(409).json({ message: 'Usuario ya existe' });
+        }
+        // Crear el usuario en la base de datos
         const newUser = yield prisma.user.create({
             data: {
-                username: username,
+                id: auth0Id,
+                nickname,
+                email,
                 inventory: {
                     create: {
                         seeds: {},
                         waters: {},
-                    }
-                }
+                    },
+                },
             },
-            include: {
-                inventory: {
-                    include: {
-                        seeds: true,
-                        waters: true,
-                    }
-                }
-            }
         });
-        res.status(201).json(newUser);
+        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
     }
-    catch (e) {
-        console.error("Error al crear usuario:", e);
-        res.status(500).json({ message: "Error al crear usuario" });
+    catch (error) {
+        const e = error;
+        console.error("Error al crear usuario:", e.message);
+        return res.status(500).json({ message: 'error al crear usuario', error: e.message });
     }
 }));
 //update tokens del usuario por body

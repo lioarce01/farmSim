@@ -1,17 +1,21 @@
-import Link from 'next/link';
+import { useAuth0 } from "@auth0/auth0-react";
 
-interface ButtonProps {
-  children: React.ReactNode
-  onClick?: () => void;
-}
-const LogoutButton: React.FC<ButtonProps> = ({children, onClick}) => {
+const LogoutButton = () => {
+  const { logout } = useAuth0();
 
-
+  const handleLogout = () => {
+    // Asegúrate de que returnTo sea correcto y que esté definido
+    logout({
+      returnTo: window.location.origin, // Asegúrate de que esto sea lo que necesitas
+    } as any); // Forzar el tipo como una solución temporal
+  };
 
   return (
-    <Link href="/api/auth/logout">
-      <button onClick={onClick} className="px-4 py-2 bg-red-500 text-white rounded">{children}</button>
-    </Link>
+    <div className="items-center px-4 py-2 text-white bg-[#d6635f] rounded-2xl hover:bg-[#e76b67] transition duration-300">
+      <button onClick={handleLogout} className="px-2 font-bold">
+        Logout
+      </button>
+    </div>
   );
 };
 

@@ -6,13 +6,14 @@ import { store } from '../redux/store/store'; // Ajusta la ruta según tu estruc
 import Navbar from 'src/components/Navbar';
 import './globals.css'; // Asegúrate de que esta ruta sea correcta
 import { Auth0Provider } from '@auth0/auth0-react';
+import AuthWrapper from 'src/components/authWrapper'; // Importa el AuthWrapper
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
 
   return (
     <html lang="en">
-      <body>
+      <body className='text-gray-800'>
         <Provider store={store}>
           <Auth0Provider
             domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN!}
@@ -22,9 +23,11 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
             }}
           >
             <Navbar />
-            <div className='bg-[#FFF5D1] min-h-screen'>
-              {children}
-            </div>
+            <AuthWrapper>
+              <div className='bg-[#FFF5D1] min-h-screen'>
+                {children}
+              </div>
+            </AuthWrapper>
           </Auth0Provider>
         </Provider>
       </body>

@@ -1,40 +1,50 @@
-'use client'
+'use client';
 
-import Link from "next/link";
-import LogoutButton from "src/components/logout";
-import LoginButton from "src/components/login";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store/store";
+import Link from 'next/link';
+import UserMenu from './UserMenu';
+import LoginButton from './login';
+import { useAuth0 } from '@auth0/auth0-react';
 
-const Navbar = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+const Navbar: React.FC = () => {
+  const { isAuthenticated } = useAuth0();
 
-  console.log("User state:", user)
   return (
-    <nav className="bg-[#B5EAD7] p-4">
-      <ul className="flex justify-end p-2 items-center">
-        <li className="mx-4">
-          <Link href="/" className="text-black">Home</Link>
-        </li>
-        <li className="mx-4">
-          <Link href="/about" className="text-black">About</Link>
-        </li>
-        <li className="mx-4">
-          <Link href="/contact" className="text-black">Contact</Link>
-        </li>
-        <li>
-          {user && user.nickname ? (
-            <>
-              <span className="mr-4">{user.nickname}</span>
-              <LogoutButton />
-            </>
-          ) : (
-            <LoginButton />
-          )}
-        </li>
-      </ul>
+    <nav className="bg-[#BCE6EB] p-4 shadow-md fixed w-full top-0 z-10">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo or brand name */}
+        <div className="text-2xl font-bold hover:text-[#FFC1A1] transition duration-300">
+          <Link href="/">FarmSim</Link>
+        </div>
+
+        {/* Links */}
+        <ul className="flex space-x-6 items-center">
+          <li>
+            <Link href="/" className="hover:text-[#FFD3B6] transition duration-300">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link href="/about" className="hover:text-[#FFD3B6] transition duration-300">
+              About
+            </Link>
+          </li>
+          <li>
+            <Link href="/contact" className="hover:text-[#FFD3B6] transition duration-300">
+              Contact
+            </Link>
+          </li>
+          {/* Authentication: Show either UserMenu or LoginButton */}
+          <li>
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <LoginButton />
+            )}
+          </li>
+        </ul>
+      </div>
     </nav>
   );
-}
+};
 
 export default Navbar;

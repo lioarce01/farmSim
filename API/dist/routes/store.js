@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
-const seedsGeneration_1 = require("utils/seedsGeneration");
+const storeController_1 = require("../controllers/storeController");
+const node_cron_1 = __importDefault(require("node-cron"));
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -29,16 +30,50 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
     }
 }));
-router.post('/refreshStore', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, seedsGeneration_1.updateStoreWithNewSeeds)(); // Llama al controlador para actualizar la tienda
-        res.status(200).json({ message: 'Store refreshed successfully!' });
-    }
-    catch (error) {
-        console.error('Error refreshing store:', error);
-        res.status(500).json({ error: 'An error occurred while refreshing the store.' });
-    }
+let lastUpdateTime = null;
+// Configurar el cron job para que se ejecute cada 5 minutos
+node_cron_1.default.schedule('* * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, storeController_1.updateStoreWithNewSeeds)();
+    lastUpdateTime = Date.now();
 }));
+function formatTimeRemaining(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes} minutos y ${seconds} segundos`;
+}
+router.get('/refreshStore', (req, res) => {
+    const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
+    const currentTime = Date.now();
+    if (lastUpdateTime) {
+        const timeSinceLastUpdate = currentTime - lastUpdateTime;
+        const timeRemaining = updateInterval - timeSinceLastUpdate;
+        if (timeRemaining > 0) {
+            // Devuelve el tiempo restante en un formato legible
+            res.status(200).json({
+                message: 'Tiempo hasta la próxima actualización',
+                timeRemaining: formatTimeRemaining(timeRemaining),
+                timeRemainingInMs: timeRemaining, // Puedes incluir también el tiempo en milisegundos si es necesario
+            });
+        }
+        else {
+            // Si el tiempo restante es negativo, significa que se puede actualizar
+            res.status(200).json({
+                message: 'La tienda puede ser actualizada ahora.',
+                timeRemaining: '0 minutos y 0 segundos',
+                timeRemainingInMs: 0,
+            });
+        }
+    }
+    else {
+        // Si no hay tiempo de actualización, devolver que puede actualizarse
+        res.status(200).json({
+            message: 'La tienda puede ser actualizada ahora.',
+            timeRemaining: '0 minutos y 0 segundos',
+            timeRemainingInMs: 0,
+        });
+    }
+});
 router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, itemId, quantity, itemType } = req.body;
     try {

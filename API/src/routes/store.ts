@@ -40,7 +40,7 @@ function formatTimeRemaining(ms: number): string {
   return `${minutes} minutos y ${seconds} segundos`;
 }
 
-router.get('/refresh-store', (req, res) => {
+router.get('/refreshStore', (req, res) => {
   const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
   const currentTime = Date.now();
 

@@ -7,6 +7,7 @@ import Navbar from 'src/components/Navbar';
 import './globals.css'; // Asegúrate de que esta ruta sea correcta
 import { Auth0Provider } from '@auth0/auth0-react';
 import AuthWrapper from 'src/components/authWrapper'; // Importa el AuthWrapper
+import { useRouter } from 'next/router';
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
@@ -22,7 +23,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
               redirect_uri: redirectUri
             }}
           >
-            <Navbar />
             <AuthWrapper>
               <div className='bg-[#FFF5D1] min-h-screen'>
                 {children}

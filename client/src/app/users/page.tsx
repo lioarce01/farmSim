@@ -1,5 +1,6 @@
 'use client'
 
+import Navbar from '../../components/Navbar';
 import { useGetUsersQuery } from '../../redux/api/users';
 import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
@@ -15,13 +16,36 @@ const UsersPage = () => {
   }
 
   return (
-    <div>
-      <h1>Users</h1>
-      <ul>
-        {data?.map((user: User) => (
-          <li key={user.id}>{user.username}</li>
-        ))}
-      </ul>
+    <div className='w-full'>
+      <Navbar />
+      <div className="pt-24 px-4"> {/* Añadir espaciado superior para evitar superposición con la navbar */}
+        <h1 className="text-2xl font-bold text-[#A8D5BA] mb-4 text-center">Users</h1>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+            <thead>
+              <tr className="bg-[#B5EAD7]">
+                <th className="py-2 px-4 border-b">Nickname</th>
+                <th className="py-2 px-4 border-b">Balance Tokens</th>
+                <th className="py-2 px-4 border-b">Inventory Items</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.map((user: User) => (
+                <tr key={user.id} className="hover:bg-gray-100">
+                  <td className="py-2 px-4 border-b">{user.nickname}</td>
+                  <td className="py-2 px-4 border-b">{user.balanceToken}</td>
+                  <td className="py-2 px-4 border-b">
+                    {/* Verificación para evitar TypeError */}
+                    {user.inventory && user.inventory.seeds && user.inventory.waters 
+                      ? user.inventory.seeds.length + user.inventory.waters.length 
+                      : 0}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

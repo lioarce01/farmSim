@@ -19,18 +19,18 @@ const Navbar: React.FC = () => {
         {/* Links */}
         <ul className="flex space-x-6 items-center">
           <li>
-            <Link href="/" className="hover:text-[#FFD3B6] transition duration-300">
+            <Link href="/Home" className="hover:text-[#FFD3B6] transition duration-300">
               Home
             </Link>
           </li>
           <li>
-            <Link href="/about" className="hover:text-[#FFD3B6] transition duration-300">
-              About
+            <Link href="/Users" className="hover:text-[#FFD3B6] transition duration-300">
+              Users
             </Link>
           </li>
           <li>
-            <Link href="/contact" className="hover:text-[#FFD3B6] transition duration-300">
-              Contact
+            <Link href="/Store" className="hover:text-[#FFD3B6] transition duration-300">
+              Store
             </Link>
           </li>
           {/* Authentication: Show either UserMenu or LoginButton */}

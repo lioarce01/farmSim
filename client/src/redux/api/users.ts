@@ -4,7 +4,7 @@ import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 
 export const usersApi = createApi({
-  reducerPath: 'api',
+  reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
     prepareHeaders: (headers, { getState }) => {

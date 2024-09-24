@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import {usersApi } from '../api/users'; // Ajusta la ruta según tu estructura de carpetas
+import { usersApi } from '../api/users'; // Ajusta la ruta según tu estructura de carpetas
 import authReducer from '../slices/authSlice'
+import { storeItemsApi } from '../api/store';
 
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(usersApi.middleware),
+    getDefaultMiddleware().concat(usersApi.middleware, storeItemsApi.middleware),
   reducer: {
     auth: authReducer,
+    [storeItemsApi.reducerPath]: storeItemsApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer,
   },
 });

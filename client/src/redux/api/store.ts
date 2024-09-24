@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { Seed, User } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 
-export const seedsApi = createApi({
-  reducerPath: 'api',
+export const storeItemsApi = createApi({
+  reducerPath: 'storeApi',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
     prepareHeaders: (headers, { getState }) => {
@@ -17,10 +17,10 @@ export const seedsApi = createApi({
    }),
 
   endpoints: (builder) => ({
-    getSeeds: builder.query<Seed[], void>({
-      query: () => 'seeds',
+    getStoreItems: builder.query<StoreItem[], void>({
+      query: () => 'store',
     }),
   }),
 });
 
-export const { useGetSeedsQuery } = seedsApi;
+export const { useGetStoreItemsQuery } = storeItemsApi;

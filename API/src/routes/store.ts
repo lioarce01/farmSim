@@ -24,12 +24,18 @@ router.get("/", async (req, res) => {
   }
 })
 
+
 let lastUpdateTime: number | null = null;
+const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
 
 // Configurar el cron job para que se ejecute cada 5 minutos
 cron.schedule('* * * * *', async () => {
-  await updateStoreWithNewSeeds();
-  lastUpdateTime = Date.now();
+  try {
+    await updateStoreWithNewSeeds();
+    lastUpdateTime = Date.now(); // Actualizar la hora de la última actualización
+  } catch (error) {
+    console.error("Error updating store:", error);
+  }
 });
 
 function formatTimeRemaining(ms: number): string {
@@ -41,7 +47,6 @@ function formatTimeRemaining(ms: number): string {
 }
 
 router.get('/refreshStore', (req, res) => {
-  const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
   const currentTime = Date.now();
 
   if (lastUpdateTime) {
@@ -49,18 +54,18 @@ router.get('/refreshStore', (req, res) => {
     const timeRemaining = updateInterval - timeSinceLastUpdate;
 
     if (timeRemaining > 0) {
-      // Devuelve el tiempo restante en un formato legible
       res.status(200).json({
         message: 'Tiempo hasta la próxima actualización',
         timeRemaining: formatTimeRemaining(timeRemaining),
-        timeRemainingInMs: timeRemaining, // Puedes incluir también el tiempo en milisegundos si es necesario
+        timeRemainingInMs: timeRemaining, // Incluye el tiempo en milisegundos
+        canUpdate: false, // Indica que no se puede actualizar aún
       });
     } else {
-      // Si el tiempo restante es negativo, significa que se puede actualizar
       res.status(200).json({
         message: 'La tienda puede ser actualizada ahora.',
         timeRemaining: '0 minutos y 0 segundos',
         timeRemainingInMs: 0,
+        canUpdate: true, // Indica que se puede actualizar
       });
     }
   } else {
@@ -69,6 +74,7 @@ router.get('/refreshStore', (req, res) => {
       message: 'La tienda puede ser actualizada ahora.',
       timeRemaining: '0 minutos y 0 segundos',
       timeRemainingInMs: 0,
+      canUpdate: true, // Indica que se puede actualizar
     });
   }
 });

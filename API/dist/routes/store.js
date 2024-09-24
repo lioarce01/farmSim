@@ -31,10 +31,16 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 let lastUpdateTime = null;
+const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
 // Configurar el cron job para que se ejecute cada 5 minutos
 node_cron_1.default.schedule('* * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, storeController_1.updateStoreWithNewSeeds)();
-    lastUpdateTime = Date.now();
+    try {
+        yield (0, storeController_1.updateStoreWithNewSeeds)();
+        lastUpdateTime = Date.now(); // Actualizar la hora de la última actualización
+    }
+    catch (error) {
+        console.error("Error updating store:", error);
+    }
 }));
 function formatTimeRemaining(ms) {
     const totalSeconds = Math.floor(ms / 1000);
@@ -43,25 +49,24 @@ function formatTimeRemaining(ms) {
     return `${minutes} minutos y ${seconds} segundos`;
 }
 router.get('/refreshStore', (req, res) => {
-    const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
     const currentTime = Date.now();
     if (lastUpdateTime) {
         const timeSinceLastUpdate = currentTime - lastUpdateTime;
         const timeRemaining = updateInterval - timeSinceLastUpdate;
         if (timeRemaining > 0) {
-            // Devuelve el tiempo restante en un formato legible
             res.status(200).json({
                 message: 'Tiempo hasta la próxima actualización',
                 timeRemaining: formatTimeRemaining(timeRemaining),
-                timeRemainingInMs: timeRemaining, // Puedes incluir también el tiempo en milisegundos si es necesario
+                timeRemainingInMs: timeRemaining, // Incluye el tiempo en milisegundos
+                canUpdate: false, // Indica que no se puede actualizar aún
             });
         }
         else {
-            // Si el tiempo restante es negativo, significa que se puede actualizar
             res.status(200).json({
                 message: 'La tienda puede ser actualizada ahora.',
                 timeRemaining: '0 minutos y 0 segundos',
                 timeRemainingInMs: 0,
+                canUpdate: true, // Indica que se puede actualizar
             });
         }
     }
@@ -71,6 +76,7 @@ router.get('/refreshStore', (req, res) => {
             message: 'La tienda puede ser actualizada ahora.',
             timeRemaining: '0 minutos y 0 segundos',
             timeRemainingInMs: 0,
+            canUpdate: true, // Indica que se puede actualizar
         });
     }
 });

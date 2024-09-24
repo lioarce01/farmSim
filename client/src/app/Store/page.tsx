@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetStoreItemsQuery, useGetRemainingTimeQuery } from '../../redux/api/store';
 import { RootState } from '../../redux/store/store';
 import { setTimeRemaining, decrementTime } from '../../redux/slices/timerSlice';
+import Navbar from 'src/components/Navbar';
+import { StoreItem } from 'src/types';
 
 const rarityColors: { [key: string]: string } = {
   common: '#6DBE45',
@@ -54,31 +56,44 @@ const StorePage: React.FC = () => {
   if (!storeItems) return <div>Loading...</div>;
 
   return (
-    <div className="w-full p-4">
-      <h1 className="text-4xl font-bold text-[#A8D5BA] mb-8 text-center">Store Items</h1>
-      <p className="text-lg text-center mb-4">Refreshing in {timeRemaining > 0 ? timeRemaining : 0} seconds...</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {storeItems.map((item) => (
-          <div key={item.id} className="bg-[#FFFAE3] border border-[#FFD700] rounded-lg shadow-lg flex flex-col p-4 transition-shadow duration-300">
-            <h2 className="text-xl font-semibold text-[#333]">{item.name}</h2>
-            <p className="mt-2 text-gray-700">{item.description}</p>
-            <p className="mt-2 text-lg font-bold text-[#398b5a]">Price: {item.price} tokens</p>
-            <p className="mt-2 mb-2 text-sm text-[#333]">Type: {item.itemType}</p>
-            {item.rarity && (
-              <p className=" mb-2 mt-2 text-sm font-bold" style={{ color: rarityColors[item.rarity.toLowerCase()] }}>
-                Rarity: {item.rarity}
+    <>
+      <Navbar /> {/* Navbar fija */}
+      <div className="pt-24 w-full p-4"> {/* Ajuste de padding-top */}
+        <h1 className="text-4xl font-bold text-[#A8D5BA] mb-8 text-center">Store Items</h1>
+        <p className="text-lg text-center mb-4">
+          Refreshing in {timeRemaining > 0 ? timeRemaining : 0} seconds...
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {storeItems?.map((item: StoreItem) => (
+            <div
+              key={item.id}
+              className="bg-[#FFFAE3] border border-[#FFD700] rounded-lg shadow-lg flex flex-col p-4 transition-shadow duration-300"
+            >
+              <h2 className="text-xl font-semibold text-[#333]">{item.name}</h2>
+              <p className="mt-2 text-gray-700">{item.description}</p>
+              <p className="mt-2 text-lg font-bold text-[#398b5a]">
+                Price: {item.price} tokens
               </p>
-            )}
-            <div className="mt-auto">
-              <button className="w-full bg-[#FFC1A1] text-white py-2 rounded-md hover:bg-[#FFB385] transition duration-300">
-                Buy
-              </button>
+              <p className="mt-2 mb-2 text-sm text-[#333]">Type: {item.itemType}</p>
+              {item.itemType as unknown as string !== 'seeds' && item.rarity ? (
+                <p
+                  className="mb-2 mt-2 text-sm font-bold"
+                  style={{ color: rarityColors[item.rarity.toLowerCase()] }}
+                >
+                  Rarity: {item.rarity}
+                </p>
+              ) : null}
+              <div className="mt-auto">
+                <button className="w-full bg-[#FFC1A1] text-white py-2 rounded-md hover:bg-[#FFB385] transition duration-300">
+                  Buy
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default StorePage;

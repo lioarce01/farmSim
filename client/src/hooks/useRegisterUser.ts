@@ -18,7 +18,13 @@ const useRegisterUser = () => {
             email: user.email,
           }).unwrap();
 
-          dispatch(setUser(newUser));
+          dispatch(setUser({
+            user: {
+              nickname: newUser.nickname,
+              email: newUser.email,
+            },
+            token: newUser.token || '', // Asegúrate de que este token esté presente
+          }));
         } catch (error) {
           console.error('Error registrando el usuario:', error);
         }

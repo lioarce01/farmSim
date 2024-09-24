@@ -20,7 +20,11 @@ export const storeItemsApi = createApi({
     getStoreItems: builder.query<StoreItem[], void>({
       query: () => 'store',
     }),
+    getRemainingTime: builder.query<{ timeRemaining: string; timeRemainingInMs: number }, void>({
+      query: () => 'store/refreshStore',
+    }),
   }),
+  
 });
 
-export const { useGetStoreItemsQuery } = storeItemsApi;
+export const { useGetStoreItemsQuery, useGetRemainingTimeQuery } = storeItemsApi;

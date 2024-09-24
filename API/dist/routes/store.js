@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
+const seedsGeneration_1 = require("utils/seedsGeneration");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -26,6 +27,16 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(500).json({
                 message: "Error al obtener los items de la tienda."
             });
+    }
+}));
+router.post('/refreshStore', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, seedsGeneration_1.updateStoreWithNewSeeds)(); // Llama al controlador para actualizar la tienda
+        res.status(200).json({ message: 'Store refreshed successfully!' });
+    }
+    catch (error) {
+        console.error('Error refreshing store:', error);
+        res.status(500).json({ error: 'An error occurred while refreshing the store.' });
     }
 }));
 router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

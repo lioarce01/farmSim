@@ -19,14 +19,14 @@ function getRandomStock() {
   return Math.floor(Math.random() * (2 - 1 + 1)) + 1;
 }
 
-// Función para generar una quantity aleatoria entre 1 y 2
+// Función para generar una cantidad aleatoria entre 1 y 2
 function getRandomQuantity() {
   return Math.floor(Math.random() * (2 - 1 + 1)) + 1;
 }
 
-// Función para generar waters aleatorios y asegurarse de que los nombres sean únicos
+// Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 async function seedStoreWithRandomWaters() {
-  const watersToCreate = 2; // Número de waters a generar
+  const watersToCreate = 2; // Número de aguas a generar
   const createdWaters = [];
 
   for (let i = 0; i < watersToCreate; i++) {
@@ -70,4 +70,4 @@ async function seedStoreWithRandomWaters() {
 
 module.exports = {
   seedStoreWithRandomWaters
-}
+};

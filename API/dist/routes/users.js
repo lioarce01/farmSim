@@ -72,10 +72,10 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 }));
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { nickname, email, auth0Id } = req.body;
+    const { nickname, email } = req.body;
     console.log('data:', req.body);
     // Validación de entradas
-    if (!email || !nickname || !auth0Id) {
+    if (!email || !nickname) {
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
@@ -87,7 +87,6 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
         // Crear el usuario en la base de datos
         const newUser = yield prisma.user.create({
             data: {
-                id: auth0Id,
                 nickname,
                 email,
                 inventory: {

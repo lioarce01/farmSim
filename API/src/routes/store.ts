@@ -1,13 +1,18 @@
 import express from 'express';
 import { PrismaClient, Rarity } from "@prisma/client";
+import { updateStoreWithNewSeeds } from '../controllers/storeController';
+import cron from 'node-cron'
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
 
 router.get("/", async (req, res) => {
 
   try {
     const storeItems = await prisma.storeItem.findMany()
+
+    
     
     res.status(200).json(storeItems)
 
@@ -18,6 +23,55 @@ router.get("/", async (req, res) => {
     })
   }
 })
+
+let lastUpdateTime: number | null = null;
+
+// Configurar el cron job para que se ejecute cada 5 minutos
+cron.schedule('* * * * *', async () => {
+  await updateStoreWithNewSeeds();
+  lastUpdateTime = Date.now();
+});
+
+function formatTimeRemaining(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes} minutos y ${seconds} segundos`;
+}
+
+router.get('/refresh-store', (req, res) => {
+  const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
+  const currentTime = Date.now();
+
+  if (lastUpdateTime) {
+    const timeSinceLastUpdate = currentTime - lastUpdateTime;
+    const timeRemaining = updateInterval - timeSinceLastUpdate;
+
+    if (timeRemaining > 0) {
+      // Devuelve el tiempo restante en un formato legible
+      res.status(200).json({
+        message: 'Tiempo hasta la próxima actualización',
+        timeRemaining: formatTimeRemaining(timeRemaining),
+        timeRemainingInMs: timeRemaining, // Puedes incluir también el tiempo en milisegundos si es necesario
+      });
+    } else {
+      // Si el tiempo restante es negativo, significa que se puede actualizar
+      res.status(200).json({
+        message: 'La tienda puede ser actualizada ahora.',
+        timeRemaining: '0 minutos y 0 segundos',
+        timeRemainingInMs: 0,
+      });
+    }
+  } else {
+    // Si no hay tiempo de actualización, devolver que puede actualizarse
+    res.status(200).json({
+      message: 'La tienda puede ser actualizada ahora.',
+      timeRemaining: '0 minutos y 0 segundos',
+      timeRemainingInMs: 0,
+    });
+  }
+});
 
 router.post('/buy', async (req, res) => {
   const { userId, itemId, quantity, itemType } = req.body;

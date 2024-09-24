@@ -45,6 +45,12 @@ export interface User {
   inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
 }
 
+export interface RemainingTimeData {
+  timeRemaining: string;
+  timeRemainingInMs: number;
+  canUpdate: boolean; // Asegúrate de incluir esta propiedad
+}
+
 // Enum para Rarity
 export enum Rarity {
   COMMON = 'COMMON',

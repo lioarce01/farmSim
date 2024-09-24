@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { RemainingTimeData, StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
 
 export const storeItemsApi = createApi({
@@ -20,7 +20,7 @@ export const storeItemsApi = createApi({
     getStoreItems: builder.query<StoreItem[], void>({
       query: () => 'store',
     }),
-    getRemainingTime: builder.query<{ timeRemaining: string; timeRemainingInMs: number }, void>({
+    getRemainingTime: builder.query<RemainingTimeData, void>({
       query: () => 'store/refreshStore',
     }),
   }),

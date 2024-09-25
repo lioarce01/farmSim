@@ -23,16 +23,22 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; }>) => {
+      console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;
+      state.loading = false;
+      state.error = null
+      // localStorage.setItem('user', JSON.stringify(state))
     },
-    clearUser: (state) => {
+    clearUser(state) {
       state.nickname = null;
       state.email = null;
       state.token = null;
-      state.loading = false; // Limpiar loading al cerrar sesión
-      state.error = null; // Limpiar el error
+      state.loading = false;
+      state.error = null;
+      // localStorage.removeItem('user')
+
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

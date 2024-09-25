@@ -62,7 +62,9 @@ export const store = configureStore({
 
 store.subscribe(() => {
   const state = store.getState();
-  console.log('current state:', state);
+  if (state.user.nickname) {
+    console.log('User state in localStorage:', state.user);
+  }
 });
 
 export const persistor = persistStore(store);

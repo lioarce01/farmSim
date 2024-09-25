@@ -1,38 +1,31 @@
-import { useAuth0 } from '@auth0/auth0-react';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/slices/authSlice';
+'use client'
+
 import { useRegisterUserMutation } from '../redux/api/users';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/slices/userSlice'; // Asegúrate de que la ruta es correcta
 
 const useRegisterUser = () => {
-  const { user, isAuthenticated } = useAuth0();
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser] = useRegisterUserMutation(); // Obtén el hook de mutación
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const sendUserData = async () => {
-        try {
-          const newUser = await registerUser({
-            nickname: user.nickname,
-            email: user.email,
-          }).unwrap();
-
-          dispatch(setUser({
-            user: {
-              nickname: newUser.nickname,
-              email: newUser.email,
-            },
-            token: newUser.token || '', // Asegúrate de que este token esté presente
-          }));
-        } catch (error) {
-          console.error('Error registrando el usuario:', error);
-        }
-      };
-
-      sendUserData();
+  const register = async (userData: any) => {
+    try {
+      const result = await registerUser(userData).unwrap(); // Llama a la mutación
+      
+      // Solo despachar setUser aquí si la mutación fue exitosa
+      if (result) {
+        dispatch(setUser({
+          nickname: result.nickname,
+          email: result.email,
+          token: result.token,
+        }));
+      }
+    } catch (error) {
+      console.error('Error registrando el usuario:', error);
     }
-  }, [isAuthenticated, user, registerUser, dispatch]);
+  };
+
+  return { register };
 };
 
-export default useRegisterUser;
+export default useRegisterUser

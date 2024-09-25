@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuth0 } from "@auth0/auth0-react";
-import { registerUserInBackend } from "src/services/auth";
 
 const LoginButton = () => {
   const { loginWithPopup, user, isAuthenticated, isLoading } = useAuth0();

@@ -1,12 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ReactNode } from 'react';
 
 interface AuthState {
-  user: null | {
-    nickname: ReactNode;
-    email: string;
-  };
-  token: null | string;
+  user: { 
+    nickname: string | null; 
+    email: string | null; 
+  } | null;
+  token: string | null | undefined; // Acepta también undefined
   loading: boolean;
   error: string | null;
 }
@@ -29,12 +28,8 @@ const authSlice = createSlice({
       state.loading = false; // Establecer loading a false al establecer el usuario
       state.error = null; // Limpiar el error
     },
-    clearUser: (state) => {
-      state.user = null;
-      state.token = null;
-      state.loading = false; // También limpiar loading al cerrar sesión
-      state.error = null; // Limpiar el error
-    },
+    clearUser: () => initialState,
+
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },

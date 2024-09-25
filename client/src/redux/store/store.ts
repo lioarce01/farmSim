@@ -29,13 +29,13 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 
 const persistConfig = {
   key: 'root',
-  storage, // Asegúrate de usar `storage` adecuado para el lado del cliente
-  whitelist: ['user'], // Ahora solo persistimos el user slice
+  storage,
+  whitelist: ['user'], 
 };
 
 // Combinamos todos los reducers
 const rootReducer = combineReducers({
-  user: userReducer, // Asegúrate de incluir solo el userSlice aquí
+  user: userReducer, 
   [storeItemsApi.reducerPath]: storeItemsApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
   timer: timerReducer,

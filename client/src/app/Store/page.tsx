@@ -57,8 +57,8 @@ const StorePage: React.FC = () => {
 
   return (
     <>
-      <Navbar /> {/* Navbar fija */}
-      <div className="pt-24 w-full p-4"> {/* Ajuste de padding-top */}
+      <Navbar /> 
+      <div className="pt-24 w-full p-4"> 
         <h1 className="text-4xl font-bold text-[#A8D5BA] mb-8 text-center">Store Items</h1>
         <p className="text-lg text-center mb-4">
           Refreshing in {timeRemaining > 0 ? timeRemaining : 0} seconds...

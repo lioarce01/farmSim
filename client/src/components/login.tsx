@@ -3,7 +3,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 
 const LoginButton = () => {
-  const { loginWithPopup, user, isAuthenticated, isLoading } = useAuth0();
+  const { loginWithPopup } = useAuth0();
 
   const handleLogin = async () => {
     try {

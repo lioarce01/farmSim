@@ -2,14 +2,13 @@
 
 import Navbar from '../../components/Navbar';
 import { useGetUsersQuery } from '../../redux/api/users';
-import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { User } from '../../types'; 
 
 const UsersPage = () => {
   const { data, error, isLoading } = useGetUsersQuery();
 
   if (isLoading) return <div>Loading...</div>;
 
-  // Verifica si el error es un objeto y maneja el tipo de error adecuadamente
   if (error) {
     const errorMessage = 'status' in error ? `Error: ${error.status} - ${error.data}` : 'Unknown Error';
     return <div>{errorMessage}</div>;
@@ -18,7 +17,7 @@ const UsersPage = () => {
   return (
     <div className='w-full'>
       <Navbar />
-      <div className="pt-24 px-4"> {/* Añadir espaciado superior para evitar superposición con la navbar */}
+      <div className="pt-24 px-4">
         <h1 className="text-2xl font-bold text-[#A8D5BA] mb-4 text-center">Users</h1>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">

@@ -2,10 +2,10 @@
 
 import { useRegisterUserMutation } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/slices/userSlice'; // Asegúrate de que la ruta es correcta
+import { setUser } from '../redux/slices/userSlice';
 
 const useRegisterUser = () => {
-  const [registerUser] = useRegisterUserMutation(); // Obtén el hook de mutación
+  const [registerUser] = useRegisterUserMutation();
   const dispatch = useDispatch();
 
   const register = async (userData: any) => {

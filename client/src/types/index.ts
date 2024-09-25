@@ -48,7 +48,7 @@ export interface User {
 export interface RemainingTimeData {
   timeRemaining: string;
   timeRemainingInMs: number;
-  canUpdate: boolean; // Asegúrate de incluir esta propiedad
+  canUpdate: boolean;
 }
 
 // Enum para Rarity

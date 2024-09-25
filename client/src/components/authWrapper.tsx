@@ -11,10 +11,10 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, error, isLoading } = useAuth0();
   const dispatch = useDispatch();
   
-  // Usamos useSelector para obtener el estado del usuario
+  // Obtencion del user
   const currentUser = useSelector((state: RootState) => state.user);
 
-  useRegisterUser(); // Llama al hook aquí
+  useRegisterUser();
 
   // Función para verificar si el usuario ya existe en el estado de Redux
   const userExistsInRedux = (user: any) => {

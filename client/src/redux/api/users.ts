@@ -21,8 +21,8 @@ export const usersApi = createApi({
       query: () => 'users',
     }),
 
-    getUserById: builder.query<User, string>({
-      query: (id) => `/users/${id}`,
+    getUserBySub: builder.query<User, string>({
+      query: (sub) => `/users/${sub}`,
     }),
 
     registerUser: builder.mutation({
@@ -35,4 +35,4 @@ export const usersApi = createApi({
   }),
 });
 
-export const { useGetUsersQuery, useRegisterUserMutation, useGetUserByIdQuery } = usersApi
+export const { useGetUsersQuery, useRegisterUserMutation, useGetUserBySubQuery } = usersApi

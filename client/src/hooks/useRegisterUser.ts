@@ -27,7 +27,8 @@ const useRegisterUser = () => {
           nickname: user.nickname || '', // Usa el nickname de Auth0
           email: user.email || '', // Usa el email de Auth0
           token: user.sub || '', // Usa el sub de Auth0 como token (puedes ajustar según sea necesario)
-          sub: user.sub || ''
+          sub: user.sub || '',
+          balanceToken: result.balanceToken || 0
         }));
         
       } else {

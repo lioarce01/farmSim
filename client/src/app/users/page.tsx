@@ -7,34 +7,33 @@ import { User } from '../../types';
 const UsersPage = () => {
   const { data, error, isLoading } = useGetUsersQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen text-[#B5EAD7] text-lg">Loading...</div>;
 
   if (error) {
     const errorMessage = 'status' in error ? `Error: ${error.status} - ${error.data}` : 'Unknown Error';
-    return <div>{errorMessage}</div>;
+    return <div className="flex justify-center items-center h-screen text-red-600 text-lg">{errorMessage}</div>;
   }
 
   return (
-    <div className='w-full'>
+    <div className="w-full min-h-screen bg-[#FFF5D1] text-gray-800">
       <Navbar />
-      <div className="pt-24 px-4">
-        <h1 className="text-2xl font-bold text-[#A8D5BA] mb-4 text-center">Users</h1>
+      <div className="pt-24 px-6">
+        <h1 className="text-3xl font-bold text-center text-[#A8D5BA] mb-6">Users</h1>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+          <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg overflow-hidden">
             <thead>
-              <tr className="bg-[#B5EAD7]">
-                <th className="py-2 px-4 border-b">Nickname</th>
-                <th className="py-2 px-4 border-b">Balance Tokens</th>
-                <th className="py-2 px-4 border-b">Inventory Items</th>
+              <tr className="bg-[#B5EAD7] text-left">
+                <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Nickname</th>
+                <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Balance Tokens</th>
+                <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Inventory Items</th>
               </tr>
             </thead>
             <tbody>
               {data?.map((user: User) => (
-                <tr key={user.sub} className="hover:bg-gray-100">
-                  <td className="py-2 px-4 border-b">{user.nickname}</td>
-                  <td className="py-2 px-4 border-b">{user.balanceToken}</td>
-                  <td className="py-2 px-4 border-b">
-                    {/* Verificación para evitar TypeError */}
+                <tr key={user.sub} className="hover:bg-[#FFB385] transition-colors duration-300 ease-in-out">
+                  <td className="py-4 px-6 border-b text-[#17271e]">{user.nickname}</td>
+                  <td className="py-4 px-6 border-b text-[#17271e]">{user.balanceToken}</td>
+                  <td className="py-4 px-6 border-b text-[#17271e]">
                     {user.inventory && user.inventory.seeds && user.inventory.waters 
                       ? user.inventory.seeds.length + user.inventory.waters.length 
                       : 0}

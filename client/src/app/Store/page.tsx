@@ -71,6 +71,7 @@ const StorePage: React.FC = () => {
             >
               <h2 className="text-xl font-semibold text-[#333]">{item.name}</h2>
               <p className="mt-2 text-gray-700">{item.description}</p>
+              <p className="mt-2 text-gray-700">Stock: {item.stock}</p>
               <p className="mt-2 text-lg font-bold text-[#398b5a]">
                 Price: {item.price} tokens
               </p>

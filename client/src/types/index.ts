@@ -42,7 +42,7 @@ export interface User {
   sub: string;
   nickname: string;
   email: string; // Agregado ya que está en tu modelo
-  balanceToken: number; // Cambiado de Int a number
+  balanceToken?: number; // Cambiado de Int a number
   inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
 }
 

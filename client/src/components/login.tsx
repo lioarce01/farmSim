@@ -17,7 +17,7 @@ const LoginButton = () => {
   return (
     <button 
       onClick={handleLogin}
-      className="px-4 py-2 bg-[#FFC1A1] text-[#333] rounded-full hover:bg-[#FFB385] transition duration-300 shadow-md font-semibold"
+      className="px-6 py-2 bg-[#FDE8C9] text-[#333] rounded-md hover:bg-[#FFC1A1] transition duration-300 shadow-md font-semibold"
     >
       Login
     </button>

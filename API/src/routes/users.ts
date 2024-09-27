@@ -76,7 +76,7 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const { nickname, email } = req.body;
+    const { nickname, email, sub } = req.body;
     console.log('data:', req.body)
   
     // Validación de entradas
@@ -86,7 +86,7 @@ router.post('/register', async (req, res) => {
   
     try {
       // Verificar si el usuario ya existe
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findUnique({ where: { sub } });
       if (existingUser) {
         return res.status(409).json({ message: 'Usuario ya existe' });
       }
@@ -96,6 +96,7 @@ router.post('/register', async (req, res) => {
         data: {
             nickname,
             email,
+            sub,
             inventory: {
                 create: {
                 seeds: {},
@@ -105,7 +106,7 @@ router.post('/register', async (req, res) => {
         },
       });
   
-      res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
+      res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
     } catch (error) {
         const e = error as Error
       console.error("Error al crear usuario:", e.message);
@@ -151,11 +152,11 @@ router.delete('/:id', async (req,res) => {
             where: {id}
         })
 
-        deletedUser ? res.status(200).send("User deleted successfully") 
-        : res.status(404).send("ID Could not be found")
+        deletedUser ? res.status(200).send({ message: "User deleted successfully"}) 
+        : res.status(404).send({message: "ID Could not be found"})
 
     } catch (e) {
-        res.status(400).send('ERROR: unexpected error')
+        res.status(400).send({message: 'ERROR: unexpected error'})
         console.log(e)
     }
 })

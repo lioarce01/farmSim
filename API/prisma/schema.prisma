@@ -15,6 +15,7 @@ datasource db {
 
 model User {
   id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  sub String @unique
   nickname  String? @unique
   email String @unique
   inventory Inventory?

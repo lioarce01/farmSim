@@ -72,7 +72,7 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 }));
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { nickname, email } = req.body;
+    const { nickname, email, sub } = req.body;
     console.log('data:', req.body);
     // Validación de entradas
     if (!email || !nickname) {
@@ -80,7 +80,7 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     try {
         // Verificar si el usuario ya existe
-        const existingUser = yield prisma.user.findUnique({ where: { email } });
+        const existingUser = yield prisma.user.findUnique({ where: { sub } });
         if (existingUser) {
             return res.status(409).json({ message: 'Usuario ya existe' });
         }
@@ -89,6 +89,7 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
             data: {
                 nickname,
                 email,
+                sub,
                 inventory: {
                     create: {
                         seeds: {},
@@ -97,7 +98,7 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                 },
             },
         });
-        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
+        res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
     }
     catch (error) {
         const e = error;

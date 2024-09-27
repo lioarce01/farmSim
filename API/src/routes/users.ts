@@ -50,13 +50,13 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.get('/:id', async (req, res) => {
-    const {id} = req.params
+router.get('/:sub', async (req, res) => {
+    const {sub} = req.params
 
     try {
 
         const user = await prisma.user.findUnique({
-            where: { id },
+            where: { sub },
             include: {
                 inventory: {
                     include: {

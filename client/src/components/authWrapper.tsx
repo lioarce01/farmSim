@@ -19,6 +19,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           nickname: user.nickname || 'Default Nickname',
           email: user.email || 'default@example.com',
           token: user.sub || '',
+          sub: user.sub || ''
         };
 
         // Registra el usuario en el backend

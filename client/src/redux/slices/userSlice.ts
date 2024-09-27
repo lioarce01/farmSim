@@ -6,6 +6,7 @@ interface UserState {
   nickname: string | null;
   email: string | null;
   token: string | null;
+  sub: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -14,6 +15,7 @@ const initialState: UserState = {
   nickname: null,
   email: null,
   token: null,
+  sub: null,
   loading: false,
   error: null,
 };
@@ -22,11 +24,12 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; }>) => {
+    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; }>) => {
       console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;
+      state.sub = action.payload.sub;
       state.loading = false;
       state.error = null
       // localStorage.setItem('user', JSON.stringify(state))
@@ -35,6 +38,7 @@ const userSlice = createSlice({
       state.nickname = null;
       state.email = null;
       state.token = null;
+      state.sub = null;
       state.loading = false;
       state.error = null;
       // localStorage.removeItem('user')
@@ -52,6 +56,7 @@ const userSlice = createSlice({
         state.nickname = action.payload.nickname || null;
         state.email = action.payload.email || null;
         state.token = action.payload.token || null;
+        state.sub = action.payload.sub || null;
         state.loading = action.payload.loading;
         state.error = action.payload.error;
       }

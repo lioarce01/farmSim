@@ -30,7 +30,7 @@ const UsersPage = () => {
             </thead>
             <tbody>
               {data?.map((user: User) => (
-                <tr key={user.id} className="hover:bg-gray-100">
+                <tr key={user.sub} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b">{user.nickname}</td>
                   <td className="py-2 px-4 border-b">{user.balanceToken}</td>
                   <td className="py-2 px-4 border-b">

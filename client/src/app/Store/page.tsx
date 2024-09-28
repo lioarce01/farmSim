@@ -96,6 +96,7 @@ const StorePage: React.FC = () => {
                   itemType={item.itemType}
                   stock={item.stock}
                   refetchStoreItems={refetchStoreItems}
+                  price={item.price}
                 />
               </div>
             </div>

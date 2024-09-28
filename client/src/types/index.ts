@@ -38,6 +38,7 @@ export interface PurchaseButtonProps {
   quantity: number;
   itemType: ItemType
   stock: number;
+  price: number;
   refetchStoreItems: () => void;
 }
 

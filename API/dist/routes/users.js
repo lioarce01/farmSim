@@ -134,25 +134,26 @@ router.put('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function*
     const { sub } = req.body;
     try {
         const convertedUser = yield prisma.user.findUnique({
-            where: { sub }
+            where: { sub },
         });
         if ((convertedUser === null || convertedUser === void 0 ? void 0 : convertedUser.role) === 'USER') {
             yield prisma.user.update({
-                where: { sub: sub },
+                where: { sub },
                 data: {
-                    role: 'ADMIN'
-                }
+                    role: 'ADMIN',
+                },
             });
+            return res.status(200).json({ message: 'User successfully converted to ADMIN' });
         }
         else {
             yield prisma.user.update({
-                where: { sub: sub },
+                where: { sub },
                 data: {
-                    role: 'USER'
-                }
+                    role: 'USER',
+                },
             });
+            return res.status(200).json({ message: 'User successfully converted to USER' });
         }
-        res.status(200).json({ message: 'User successfully converted' });
     }
     catch (e) {
         res.status(400).json({ message: 'Error: User cannot be converted.' });

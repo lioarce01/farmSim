@@ -144,36 +144,36 @@ router.post('/addTokens', async (req, res) => {
     }
 })
 
-router.put('/convert', async (req,res) => {
-    const {sub} = req.body
+router.put('/convert', async (req, res) => {
+    const { sub } = req.body;
 
     try {
         const convertedUser = await prisma.user.findUnique({
-            where: {sub}
-        })
+            where: { sub },
+        });
 
-        if(convertedUser?.role === 'USER') {
+        if (convertedUser?.role === 'USER') {
             await prisma.user.update({
-                where: {sub: sub},
+                where: { sub },
                 data: {
-                    role: 'ADMIN'
-                }
-            })
+                    role: 'ADMIN',
+                },
+            });
+            return res.status(200).json({ message: 'User successfully converted to ADMIN' });
         } else {
             await prisma.user.update({
-                where: {sub: sub},
+                where: { sub },
                 data: {
-                    role: 'USER'
-                }
-            })
+                    role: 'USER',
+                },
+            });
+            return res.status(200).json({ message: 'User successfully converted to USER' });
         }
-
-        res.status(200).json({message: 'User successfully converted'})
-        
-    } catch(e) {
-        res.status(400).json({message: 'Error: User cannot be converted.'})
+    } catch (e) {
+        res.status(400).json({ message: 'Error: User cannot be converted.' });
     }
-})
+});
+
 
 router.delete('/:sub', async (req,res) => {
     const { sub } = req.params;

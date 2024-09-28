@@ -90,6 +90,7 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                 nickname,
                 email,
                 sub,
+                role: 'USER',
                 inventory: {
                     create: {
                         seeds: {},
@@ -127,6 +128,34 @@ router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (e) {
         console.log(e);
         res.status(500).json({ message: "Error al agregar tokens al usuario" });
+    }
+}));
+router.put('/convert/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sub } = req.body;
+    try {
+        const convertedUser = yield prisma.user.findUnique({
+            where: { sub }
+        });
+        if ((convertedUser === null || convertedUser === void 0 ? void 0 : convertedUser.role) === 'USER') {
+            yield prisma.user.update({
+                where: { sub: sub },
+                data: {
+                    role: 'ADMIN'
+                }
+            });
+        }
+        else {
+            yield prisma.user.update({
+                where: { sub: sub },
+                data: {
+                    role: 'USER'
+                }
+            });
+        }
+        res.status(200).json({ message: 'User successfully converted' });
+    }
+    catch (e) {
+        res.status(400).json({ message: 'Error: User cannot be converted.' });
     }
 }));
 router.delete('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

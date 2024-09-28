@@ -97,6 +97,7 @@ router.post('/register', async (req, res) => {
             nickname,
             email,
             sub,
+            role: 'USER',
             inventory: {
                 create: {
                 seeds: {},
@@ -140,6 +141,37 @@ router.post('/addTokens', async (req, res) => {
     } catch (e) {
         console.log(e)
         res.status(500).json({ message: "Error al agregar tokens al usuario"})
+    }
+})
+
+router.put('/convert', async (req,res) => {
+    const {sub} = req.body
+
+    try {
+        const convertedUser = await prisma.user.findUnique({
+            where: {sub}
+        })
+
+        if(convertedUser?.role === 'USER') {
+            await prisma.user.update({
+                where: {sub: sub},
+                data: {
+                    role: 'ADMIN'
+                }
+            })
+        } else {
+            await prisma.user.update({
+                where: {sub: sub},
+                data: {
+                    role: 'USER'
+                }
+            })
+        }
+
+        res.status(200).json({message: 'User successfully converted'})
+        
+    } catch(e) {
+        res.status(400).json({message: 'Error: User cannot be converted.'})
     }
 })
 

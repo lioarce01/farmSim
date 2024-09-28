@@ -20,6 +20,7 @@ model User {
   email String @unique
   inventory Inventory?
   balanceToken Int @default(200)
+  role String
 }
 
 model Inventory {
@@ -77,6 +78,11 @@ enum Rarity {
 enum ItemType {
   seed
   water
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 enum seedStatus {

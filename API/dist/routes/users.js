@@ -130,7 +130,7 @@ router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Error al agregar tokens al usuario" });
     }
 }));
-router.put('/convert/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sub } = req.body;
     try {
         const convertedUser = yield prisma.user.findUnique({

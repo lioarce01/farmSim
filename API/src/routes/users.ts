@@ -1,6 +1,5 @@
 import express from 'express';
 import { PrismaClient } from "@prisma/client";
-import axios from 'axios';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -57,7 +56,8 @@ router.get('/:sub', async (req, res) => {
 
         const user = await prisma.user.findUnique({
             where: { sub },
-            include: {
+            include: 
+            {
                 inventory: {
                     include: {
                         seeds: true,

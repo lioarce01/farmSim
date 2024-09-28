@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './routes/index';
 import { auth } from 'express-openid-connect';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 
@@ -29,7 +30,12 @@ app.use(
     })
   )
 
-  app.get('/api/auth/me', (req, res) => {
+  const authRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  });
+
+  app.get('/api/auth/me', authRateLimiter, (req, res) => {
     if (req.oidc.isAuthenticated()) {
       res.json(req.oidc.user);
     } else {

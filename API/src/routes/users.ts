@@ -117,11 +117,11 @@ router.post('/register', async (req, res) => {
 //update tokens del usuario por body
 
 router.post('/addTokens', async (req, res) => {
-    const { userId, tokensToAdd } = req.body
+    const { userSub, tokensToAdd } = req.body
 
     try {
         const user = await prisma.user.findUnique({
-            where: { id: userId }
+            where: { sub: userSub }
         })
 
         if (!user) {
@@ -129,7 +129,7 @@ router.post('/addTokens', async (req, res) => {
         }
 
         await prisma.user.update({
-            where: { id: userId },
+            where: { sub: userSub },
             data: {
                 balanceToken: { increment: tokensToAdd }
             }
@@ -143,13 +143,13 @@ router.post('/addTokens', async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req,res) => {
-    const { id } = req.params;
+router.delete('/:sub', async (req,res) => {
+    const { sub } = req.params;
 
     try {
 
         const deletedUser = await prisma.user.delete({
-            where: {id}
+            where: {sub}
         })
 
         deletedUser ? res.status(200).send({ message: "User deleted successfully"}) 

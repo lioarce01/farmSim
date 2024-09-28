@@ -11,8 +11,6 @@ router.get("/", async (req, res) => {
 
   try {
     const storeItems = await prisma.storeItem.findMany()
-
-    
     
     res.status(200).json(storeItems)
 
@@ -80,7 +78,7 @@ router.get('/refreshStore', (req, res) => {
 });
 
 router.post('/buy', async (req, res) => {
-  const { userId, itemId, quantity, itemType } = req.body;
+  const { userSub, itemId, quantity, itemType } = req.body;
 
   try {
     // Buscar el ítem en la tienda
@@ -99,7 +97,7 @@ router.post('/buy', async (req, res) => {
 
     // Buscar al usuario
     let user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { sub: userSub },
       include: { inventory: { include: { seeds: true, waters: true } } }
     });
 
@@ -111,7 +109,7 @@ router.post('/buy', async (req, res) => {
     // Crear el inventario si no existe
     if (!user.inventory) {
       user = await prisma.user.update({
-        where: { id: userId },
+        where: { sub: userSub },
         data: {
           inventory: {
             create: {}
@@ -137,7 +135,7 @@ router.post('/buy', async (req, res) => {
 
     // Descontar los tokens del usuario por la cantidad de ítems comprados
     await prisma.user.update({
-      where: { id: userId },
+      where: { sub: userSub },
       data: {
         balanceToken: { decrement: totalPrice }
       }

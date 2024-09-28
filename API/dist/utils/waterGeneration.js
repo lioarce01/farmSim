@@ -58,7 +58,7 @@ function seedStoreWithRandomWaters() {
                     price: price,
                     stock: stock,
                     quantity: quantity,
-                    itemType: 'WATER'
+                    itemType: 'water'
                 }
             });
             createdWaters.push(storeWater);

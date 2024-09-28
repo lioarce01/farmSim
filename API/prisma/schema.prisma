@@ -75,8 +75,8 @@ enum Rarity {
 }
 
 enum ItemType {
-  SEED
-  WATER
+  seed
+  water
 }
 
 enum seedStatus {

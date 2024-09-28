@@ -50,11 +50,11 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).send({ error: "Error al obtener usuarios" });
     }
 }));
-router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
+router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sub } = req.params;
     try {
         const user = yield prisma.user.findUnique({
-            where: { id },
+            where: { sub },
             include: {
                 inventory: {
                     include: {
@@ -135,11 +135,11 @@ router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const deletedUser = yield prisma.user.delete({
             where: { id }
         });
-        deletedUser ? res.status(200).send("User deleted successfully")
-            : res.status(404).send("ID Could not be found");
+        deletedUser ? res.status(200).send({ message: "User deleted successfully" })
+            : res.status(404).send({ message: "ID Could not be found" });
     }
     catch (e) {
-        res.status(400).send('ERROR: unexpected error');
+        res.status(400).send({ message: 'ERROR: unexpected error' });
         console.log(e);
     }
 }));

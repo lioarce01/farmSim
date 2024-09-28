@@ -131,7 +131,7 @@ function seedStoreWithRandomSeeds() {
                     description: `A ${rarity === null || rarity === void 0 ? void 0 : rarity.toLowerCase()} seed of ${uniqueName}`,
                     price: price,
                     stock: stock,
-                    itemType: 'SEED',
+                    itemType: 'seed',
                     rarity: rarity,
                     tokensGenerated: tokensGenerated
                 }

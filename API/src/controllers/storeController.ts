@@ -111,7 +111,7 @@ async function seedStoreWithRandomSeeds() {
         description: `A ${rarity.toLowerCase()} seed of ${uniqueName}`,
         price: price,
         stock: stock,
-        itemType: 'SEED',
+        itemType: 'seed',
         rarity: rarity,
         tokensGenerated: tokensGenerated
       }
@@ -161,12 +161,12 @@ export async function updateStoreWithNewSeeds() {
   console.log("Updating store with new seeds...");
 
   // Elimina las semillas existentes
-  const deleteResult = await prisma.storeItem.deleteMany({ where: { itemType: 'SEED' } });
+  const deleteResult = await prisma.storeItem.deleteMany({ where: { itemType: 'seed' } });
   console.log(`Deleted ${deleteResult.count} existing seeds.`);
 
   // Elimina las waters existentes
   const deleteWatersResult = await prisma.storeItem.deleteMany({
-    where: { itemType: 'WATER' }
+    where: { itemType: 'water' }
   });
   console.log(`Deleted ${deleteWatersResult.count} existing waters.`);
 

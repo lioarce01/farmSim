@@ -138,7 +138,7 @@ async function seedStoreWithRandomSeeds() {
         description: `A ${rarity?.toLowerCase()} seed of ${uniqueName}`,
         price: price,
         stock: stock,
-        itemType: 'SEED',
+        itemType: 'seed',
         rarity: rarity,
         tokensGenerated: tokensGenerated
       }

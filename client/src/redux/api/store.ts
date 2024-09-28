@@ -1,10 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { RemainingTimeData, StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { PurchaseData, RemainingTimeData, StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
+type UserTag = { type: 'User'; sub: string }
 
 export const storeItemsApi = createApi({
   reducerPath: 'storeApi',
+  tagTypes: ['User'],
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
     prepareHeaders: (headers, { getState }) => {
@@ -23,8 +25,16 @@ export const storeItemsApi = createApi({
     getRemainingTime: builder.query<RemainingTimeData, void>({
       query: () => 'store/refreshStore',
     }),
+    getStoreBuy: builder.mutation<void, PurchaseData>({
+      query: (purchaseData) => ({
+        url: 'store/buy',
+        method: 'POST',
+        body: purchaseData,
+      }),
+      invalidatesTags: (result, error, { userSub }) => [{ type: 'User', sub: userSub }] as UserTag[],
+    }),
   }),
   
 });
 
-export const { useGetStoreItemsQuery, useGetRemainingTimeQuery } = storeItemsApi;
+export const { useGetStoreItemsQuery, useGetRemainingTimeQuery, useGetStoreBuyMutation } = storeItemsApi;

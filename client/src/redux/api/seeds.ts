@@ -8,7 +8,7 @@ export const seedsApi = createApi({
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token
+      const token = (getState() as RootState).user.token
       if (token) {
         headers.set('authorization', `Bearer ${token}`) 
       }

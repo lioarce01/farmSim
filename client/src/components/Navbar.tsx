@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import UserMenu from './UserMenu';
-import LoginButton from './login';
+import LoginButton from './LoginButton';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const Navbar: React.FC = () => {

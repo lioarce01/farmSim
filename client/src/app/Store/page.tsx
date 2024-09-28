@@ -7,6 +7,7 @@ import { RootState } from '../../redux/store/store';
 import { setTimeRemaining, decrementTime } from '../../redux/slices/timerSlice';
 import Navbar from 'src/components/Navbar';
 import { StoreItem } from 'src/types';
+import PurchaseButton from 'src/components/PurchaseButton';
 
 const rarityColors: { [key: string]: string } = {
   common: '#6DBE45',
@@ -18,9 +19,10 @@ const rarityColors: { [key: string]: string } = {
 
 const StorePage: React.FC = () => {
   const dispatch = useDispatch();
-  const { data: storeItems, refetch } = useGetStoreItemsQuery();
+  const { data: storeItems, refetch: refetchStoreItems } = useGetStoreItemsQuery();
   const { data: remainingTimeData, refetch: refetchRemainingTime } = useGetRemainingTimeQuery();
   const timeRemaining = useSelector((state: RootState) => state.timer.timeRemaining);
+  const userSub = useSelector((state: RootState) => state.user.sub)
 
   // Efecto para sincronizar el temporizador con el backend cada vez que se obtenga un nuevo tiempo restante
   useEffect(() => {
@@ -37,13 +39,13 @@ const StorePage: React.FC = () => {
         dispatch(decrementTime());
       } else if (timeRemaining === 0) {
         // Si el temporizador llega a 0, hacer refetch de los items y el tiempo restante
-        refetch();  // Refrescar los items
+        refetchStoreItems();  // Refrescar los items
         refetchRemainingTime();  // Actualizar el tiempo restante desde el backend
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [timeRemaining, refetch, refetchRemainingTime, dispatch]);
+  }, [timeRemaining, refetchStoreItems, refetchRemainingTime, dispatch]);
 
   // Efecto para reiniciar el temporizador después de hacer refetch
   useEffect(() => {
@@ -55,10 +57,12 @@ const StorePage: React.FC = () => {
 
   if (!storeItems) return <div>Loading...</div>;
 
+  if (!userSub) return <div>Please log in to make a purchase.</div>
+
   return (
     <>
-      <Navbar /> 
-      <div className="pt-24 w-full p-4"> 
+      <Navbar />
+      <div className="pt-24 w-full p-4">
         <h1 className="text-4xl font-bold text-[#A8D5BA] mb-8 text-center">Store Items</h1>
         <p className="text-lg text-center mb-4">
           Refreshing in {timeRemaining > 0 ? timeRemaining : 0} seconds...
@@ -85,9 +89,14 @@ const StorePage: React.FC = () => {
                 </p>
               ) : null}
               <div className="mt-auto">
-                <button className="w-full bg-[#FFC1A1] text-white py-2 rounded-md hover:bg-[#FFB385] transition duration-300">
-                  Buy
-                </button>
+                <PurchaseButton
+                  userSub={userSub}
+                  itemId={item.id}
+                  quantity={1} // Cantidad fija de 1, puedes ajustarlo según el caso
+                  itemType={item.itemType}
+                  stock={item.stock}
+                  refetchStoreItems={refetchStoreItems}
+                />
               </div>
             </div>
           ))}

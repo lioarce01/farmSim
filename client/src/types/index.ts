@@ -25,6 +25,22 @@ export interface Inventory {
   waters: Water[];
 }
 
+export interface PurchaseData {
+  userSub: string;
+  itemId: string;
+  quantity: number;
+  itemType: ItemType
+}
+
+export interface PurchaseButtonProps {
+  userSub: string;
+  itemId: string;
+  quantity: number;
+  itemType: ItemType
+  stock: number;
+  refetchStoreItems: () => void;
+}
+
 export interface StoreItem {
   id: string;
   name: string;
@@ -62,8 +78,8 @@ export enum Rarity {
 }
 
 export enum ItemType {
-    SEED,
-    WATER
+  seed = "seed",
+  water = "water"
 }
 
 // Enum para SeedStatus

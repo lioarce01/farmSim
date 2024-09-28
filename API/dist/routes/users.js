@@ -22,7 +22,7 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             include: {
                 inventory: {
                     include: {
-                        seeds: false,
+                        seeds: true,
                         waters: true,
                     }
                 }
@@ -108,16 +108,16 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
 }));
 //update tokens del usuario por body
 router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, tokensToAdd } = req.body;
+    const { userSub, tokensToAdd } = req.body;
     try {
         const user = yield prisma.user.findUnique({
-            where: { id: userId }
+            where: { sub: userSub }
         });
         if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
         yield prisma.user.update({
-            where: { id: userId },
+            where: { sub: userSub },
             data: {
                 balanceToken: { increment: tokensToAdd }
             }
@@ -129,11 +129,11 @@ router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Error al agregar tokens al usuario" });
     }
 }));
-router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
+router.delete('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sub } = req.params;
     try {
         const deletedUser = yield prisma.user.delete({
-            where: { id }
+            where: { sub }
         });
         deletedUser ? res.status(200).send({ message: "User deleted successfully" })
             : res.status(404).send({ message: "ID Could not be found" });

@@ -1,5 +1,6 @@
 import express from 'express';
 import { PrismaClient } from "@prisma/client";
+import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -144,7 +145,7 @@ router.post('/addTokens', async (req, res) => {
     }
 })
 
-router.put('/convert', async (req, res) => {
+router.put('/convert', authMiddleware, async (req, res) => {
     const { sub } = req.body;
 
     try {

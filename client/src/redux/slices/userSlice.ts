@@ -1,8 +1,9 @@
 'use client'
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Role } from 'src/types';
 
-interface UserState {
+export interface UserState {
   nickname: string | null;
   email: string | null;
   token: string | null;
@@ -10,7 +11,8 @@ interface UserState {
   balanceToken?: number | null;
   loading: boolean;
   error: string | null;
-  role?: string | null
+  role?: Role | null
+  // refetch: () => void
 }
 
 const initialState: UserState = {
@@ -21,14 +23,15 @@ const initialState: UserState = {
   balanceToken: null,
   loading: false,
   error: null,
-  role: null
+  role: null,
+  // refetch: () => {}
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: string; }>) => {
+    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: Role; refetch: () => void }>) => {
       // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;

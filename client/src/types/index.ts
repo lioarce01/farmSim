@@ -58,7 +58,7 @@ export interface User {
   id: string;
   sub: string;
   nickname: string;
-  role?: string;
+  role?: Role;
   email: string; // Agregado ya que está en tu modelo
   balanceToken?: number; // Cambiado de Int a number
   inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
@@ -69,6 +69,11 @@ export interface RemainingTimeData {
   timeRemaining: string;
   timeRemainingInMs: number;
   canUpdate: boolean;
+}
+
+export enum Role {
+  admin = 'ADMIN',
+  user = 'USER'
 }
 
 // Enum para Rarity

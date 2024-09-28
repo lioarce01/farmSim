@@ -27,7 +27,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; }>) => {
-      console.log('Dispatching setUser with: ', action.payload)
+      // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;

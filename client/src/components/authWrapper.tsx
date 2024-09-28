@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0, User } from '@auth0/auth0-react';
 import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from '../redux/slices/userSlice';
 import useRegisterUser from 'src/hooks/useRegisterUser';
@@ -27,7 +27,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         register(userData);
         
         // Establece el usuario en el estado de Redux
-        dispatch(setUser(userData));
+        // dispatch(setUser(userData));
       } else {
         dispatch(clearUser());
       }

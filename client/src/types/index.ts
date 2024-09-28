@@ -61,7 +61,8 @@ export interface User {
   email: string; // Agregado ya que está en tu modelo
   balanceToken?: number; // Cambiado de Int a number
   inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
-}
+  refetch: () => void;
+ }
 
 export interface RemainingTimeData {
   timeRemaining: string;

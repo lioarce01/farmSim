@@ -2,11 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
 import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
 
-type UserTag = { type: 'User'; sub: string }
-
 export const usersApi = createApi({
   reducerPath: 'usersApi',
-  tagTypes: ['User'],
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
     prepareHeaders: (headers, { getState }) => {
@@ -25,7 +22,6 @@ export const usersApi = createApi({
 
     getUserBySub: builder.query<User, string>({
       query: (sub) => `/users/${sub}`,
-      providesTags: (result, error, sub) => [{ type: 'User', sub: sub }]
     }),
 
     registerUser: builder.mutation({

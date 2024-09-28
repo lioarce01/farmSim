@@ -26,6 +26,7 @@ const UsersPage = () => {
                 <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Nickname</th>
                 <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Balance Tokens</th>
                 <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Inventory Items</th>
+                <th className="py-4 px-6 border-b font-semibold text-[#17271e]">Role</th>
               </tr>
             </thead>
             <tbody>

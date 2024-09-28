@@ -10,6 +10,7 @@ interface UserState {
   balanceToken?: number | null;
   loading: boolean;
   error: string | null;
+  role?: string | null
 }
 
 const initialState: UserState = {
@@ -20,13 +21,14 @@ const initialState: UserState = {
   balanceToken: null,
   loading: false,
   error: null,
+  role: null
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; }>) => {
+    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: string; }>) => {
       // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
@@ -35,6 +37,7 @@ const userSlice = createSlice({
       state.balanceToken = action.payload.balanceToken
       state.loading = false;
       state.error = null
+      state.role = action.payload.role
       // localStorage.setItem('user', JSON.stringify(state))
     },
     clearUser(state) {
@@ -45,6 +48,7 @@ const userSlice = createSlice({
       state.balanceToken = null;
       state.loading = false;
       state.error = null;
+      state.role = null
       // localStorage.removeItem('user')
 
     },
@@ -67,6 +71,7 @@ const userSlice = createSlice({
         state.balanceToken = action.payload.balanceToken || null;
         state.loading = action.payload.loading;
         state.error = action.payload.error;
+        state.role = action.payload.role
       }
     },
   },

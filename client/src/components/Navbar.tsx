@@ -4,9 +4,11 @@ import Link from 'next/link';
 import UserMenu from './UserMenu';
 import LoginButton from './LoginButton';
 import { useAuth0 } from '@auth0/auth0-react';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, user } = useAuth0();
+  const { user: fetchedUser, error, isLoading } = useFetchUser();
 
   return (
     <nav className="bg-[#A8D5BA] p-4 shadow-lg fixed w-full top-0 z-10 flex items-center transition duration-300">
@@ -19,11 +21,15 @@ const Navbar: React.FC = () => {
             Home
           </Link>
         </li>
-        <li>
-          <Link href="/Users" className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"> {/* Cambiado el hover */}
-            Users
-          </Link>
-        </li>
+        {
+          fetchedUser?.role == "ADMIN"
+            ? <li>
+                <Link href="/Users" className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"> {/* Cambiado el hover */}
+                  Users
+                </Link>
+              </li>
+            : null
+          }
         <li>
           <Link href="/Store" className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"> {/* Cambiado el hover */}
             Store

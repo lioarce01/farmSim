@@ -31,7 +31,14 @@ export const usersApi = createApi({
         body: userData,
       }),
     }),
+    convertUser: builder.mutation({
+      query: (body) => ({
+        url: '/users/convert',
+        method: 'PUT',
+        body: body,
+      }),
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useRegisterUserMutation, useGetUserBySubQuery } = usersApi
+export const { useGetUsersQuery, useRegisterUserMutation, useConvertUserMutation, useGetUserBySubQuery } = usersApi

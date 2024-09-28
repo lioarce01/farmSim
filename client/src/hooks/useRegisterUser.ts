@@ -2,7 +2,7 @@
 
 import { useRegisterUserMutation } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/slices/userSlice';
+import { setLoading, setUser } from '../redux/slices/userSlice';
 import { useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import useFetchUser from './useFetchUser';
@@ -17,10 +17,11 @@ interface ApiError {
 const useRegisterUser = () => {
   const [registerUser] = useRegisterUserMutation();
   const dispatch = useDispatch();
-  const { user } = useAuth0(); // Obtén el usuario de Auth0
+  const { user } = useAuth0(); 
   const { refetch } = useFetchUser()
 
   const register = useCallback(async (userData: any) => {
+    dispatch(setLoading(true))
     try {
       const result = await registerUser(userData).unwrap();
       console.log('registration result: ', result);
@@ -30,7 +31,8 @@ const useRegisterUser = () => {
           email: user.email || '', 
           token: user.sub || '',
           sub: user.sub || '',
-          balanceToken: result.balanceToken || 0
+          balanceToken: result.balanceToken || 0,
+          role: result.role
         }));
 
         refetch()
@@ -47,7 +49,10 @@ const useRegisterUser = () => {
       } else {
         console.error('Error registrando el usuario: Error desconocido');
       }
+    } finally {
+      dispatch(setLoading(false))
     }
+
   }, [dispatch, registerUser, user]); 
 
   return { register };

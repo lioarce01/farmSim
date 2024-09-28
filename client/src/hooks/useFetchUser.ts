@@ -5,10 +5,11 @@ import { setUser } from 'src/redux/slices/userSlice';
 import { useDispatch } from 'react-redux';
 
 const useFetchUser = () => {
-  const { user } = useAuth0(); // Obtén el usuario de Auth0
+  const { user } = useAuth0(); 
   const dispatch = useDispatch()
+
   const { data, error, isLoading, refetch } = useGetUserBySubQuery(user?.sub || '', {
-    skip: !user?.sub, // Solo ejecutar la consulta si el sub está disponible
+    skip: !user?.sub // Solo ejecutar la consulta si el sub está disponible
   });
 
   useEffect(() => {
@@ -18,7 +19,8 @@ const useFetchUser = () => {
         email: data.email,
         token: user?.sub || '',
         sub: user?.sub || '',
-        balanceToken: data.balanceToken || 0 
+        balanceToken: data.balanceToken || 0 ,
+        role: data.role || ''
       }));
     }
   }, [data, dispatch, user]);

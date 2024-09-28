@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth0, User } from '@auth0/auth0-react';
 import { useDispatch } from 'react-redux';
-import { setUser, clearUser } from '../redux/slices/userSlice';
+import { clearUser } from '../redux/slices/userSlice';
 import useRegisterUser from 'src/hooks/useRegisterUser';
 
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,6 +21,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           token: user.sub || '',
           sub: user.sub || '',
           balanceToken: user.balanceToken,
+          role: user.role
         };
 
         // Registra el usuario en el backend

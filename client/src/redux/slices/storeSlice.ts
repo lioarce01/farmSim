@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const storeItemSlice = createSlice({
-  name: 'storeItem',
+  name: 'store',
   initialState: null,
   reducers: {
     setUser: (state, action) => action.payload,

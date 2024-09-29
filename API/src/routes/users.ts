@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
 
     } catch (e) {
         console.log(e)
-        res.status(500).send({error: "Error al obtener usuarios"})
+        res.status(500).send({message: "Error al obtener usuarios"})
     }
 })
 
@@ -68,7 +68,7 @@ router.get('/:sub', async (req, res) => {
             }
         })
 
-        user ? res.status(200).send(user) : res.status(404).send("ERROR: User not found.")
+        user ? res.status(200).send(user) : res.status(404).send({message: "User not found."})
 
     } catch (e) {
         console.error ("Error", e)
@@ -78,46 +78,57 @@ router.get('/:sub', async (req, res) => {
 
 router.post('/register', async (req, res) => {
     const { nickname, email, sub } = req.body;
-    console.log('data:', req.body)
   
     // Validación de entradas
     if (!email || !nickname) {
-        return res.status(400).json({ message: 'Todos los campos son requeridos' });
-      }
+      return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
   
     try {
-      // Verificar si el usuario ya existe
-      const existingUser = await prisma.user.findUnique({ where: { sub } });
+      // Verificar si el usuario ya existe por sub o email
+      const existingUser = await prisma.user.findUnique({
+        where: { sub },
+      });
+  
       if (existingUser) {
         return res.status(409).json({ message: 'Usuario ya existe' });
+      }
+  
+      // También verificar por email
+      const existingUserByEmail = await prisma.user.findUnique({
+        where: { email },
+      });
+  
+      if (existingUserByEmail) {
+        return res.status(409).json({ message: 'Email ya está registrado' });
       }
   
       // Crear el usuario en la base de datos
       const newUser = await prisma.user.create({
         data: {
-            nickname,
-            email,
-            sub,
-            role: 'USER',
-            inventory: {
-                create: {
-                seeds: {},
-                waters: {},
-                },
+          nickname,
+          email,
+          sub,
+          role: 'USER',
+          inventory: {
+            create: {
+              seeds: {},
+              waters: {},
             },
+          },
         },
       });
   
       res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
     } catch (error) {
-        const e = error as Error
+      const e = error as Error;
       console.error("Error al crear usuario:", e.message);
-      return res.status(500).json({ message: 'error al crear usuario', error: e.message });
+      return res.status(500).json({ message: 'Error al crear usuario', error: e.message });
     }
   });
+  
 
 //update tokens del usuario por body
-
 router.post('/addTokens', async (req, res) => {
     const { userSub, tokensToAdd } = req.body
 

@@ -48,7 +48,7 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (e) {
         console.log(e);
-        res.status(500).send({ error: "Error al obtener usuarios" });
+        res.status(500).send({ message: "Error al obtener usuarios" });
     }
 }));
 router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -65,7 +65,7 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 }
             }
         });
-        user ? res.status(200).send(user) : res.status(404).send("ERROR: User not found.");
+        user ? res.status(200).send(user) : res.status(404).send({ message: "User not found." });
     }
     catch (e) {
         console.error("Error", e);

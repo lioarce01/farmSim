@@ -66,7 +66,7 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!seed) {
             return res.status(404).json({ message: 'Semilla no encontrada' });
         }
-        // Actualizar el slot con la semilla y sus características
+        // Actualizar el slot con la semilla y sus caracteristicas
         const currentTime = new Date();
         const updatedSlot = yield prisma.slot.update({
             where: { id: slotId },
@@ -74,10 +74,10 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
                 seedId: seedId,
                 plantingTime: currentTime,
                 growthStatus: 'GROWING',
-                seedName: seed.name, // Asegúrate de que seed.name esté disponible
-                seedDescription: seed.description, // Asegúrate de que seed.description esté disponible
-                seedRarity: seed.rarity, // Asegúrate de que seed.rarity esté disponible
-                seedTokensGenerated: seed.tokensGenerated, // Asegúrate de que seed.tokensGenerated esté disponible
+                seedName: seed.name,
+                seedDescription: seed.description,
+                seedRarity: seed.rarity,
+                seedTokensGenerated: seed.tokensGenerated,
             },
         });
         // Eliminar la semilla del inventario del usuario usando su sub
@@ -108,13 +108,87 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(200).json({ message: 'Semilla plantada exitosamente', updatedSlot });
     }
     catch (error) {
-        const e = error; // Aserción de tipo
+        const e = error;
         console.error("Error al plantar la semilla:", e.message);
         return res.status(500).json({ message: 'Error al plantar la semilla', error: e.message });
     }
 }));
 router.put('/water-plant', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //logica para regar una seed de un slot de la granja
+    const { farmId, slotId, waterId, userSub } = req.body;
+    // Validación de entradas
+    if (!farmId || !slotId || !waterId || !userSub) {
+        return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
+    try {
+        // Verificar que el slot existe
+        const slot = yield prisma.slot.findUnique({
+            where: { id: slotId },
+        });
+        if (!slot) {
+            return res.status(404).json({ message: 'Slot no encontrado' });
+        }
+        // Verificar que el estado de crecimiento es 'WATER_NEEDED'
+        if (slot.growthStatus !== 'WATER_NEEDED') {
+            return res.status(400).json({ message: 'La planta no necesita ser regada en este momento' });
+        }
+        // Verificar que el agua existe
+        const water = yield prisma.water.findUnique({
+            where: { id: waterId },
+        });
+        // Asegurarse de que el agua no sea nula
+        if (!water || water.quantity === null) {
+            return res.status(404).json({ message: 'Agua no encontrada o cantidad no disponible' });
+        }
+        // Buscar el usuario por su sub para obtener el userId
+        const user = yield prisma.user.findUnique({
+            where: { sub: userSub },
+        });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        // Verificar que el inventario del usuario existe usando su 'userId'
+        const userInventory = yield prisma.inventory.findUnique({
+            where: { userId: user.id }, // Aquí buscamos el inventario usando el 'userId'
+            include: { waters: true },
+        });
+        if (!userInventory || !userInventory.waters.some(w => w.id === waterId)) {
+            return res.status(403).json({ message: 'Esta agua no pertenece a tu inventario' });
+        }
+        // Comprobar que hay suficiente agua para usar
+        if (water.quantity < 1) {
+            return res.status(400).json({ message: 'No tienes suficiente agua para regar' });
+        }
+        // Actualizar el slot para reflejar que la planta ha sido regada
+        const updatedSlot = yield prisma.slot.update({
+            where: { id: slotId },
+            data: {
+                growthStatus: 'GROWING',
+                wateredCount: slot.wateredCount + 1,
+                lastWatered: new Date(),
+            },
+        });
+        // Decrementar la cantidad de agua en el inventario del usuario
+        const updatedWater = yield prisma.water.update({
+            where: { id: waterId },
+            data: {
+                quantity: {
+                    decrement: 1,
+                },
+            },
+        });
+        // Si la cantidad de agua llega a cero, eliminar el registro
+        if (updatedWater.quantity === 0) {
+            yield prisma.water.delete({
+                where: { id: waterId },
+            });
+        }
+        res.status(200).json({ message: 'Planta regada exitosamente', updatedSlot });
+    }
+    catch (error) {
+        const e = error;
+        console.error("Error al regar la planta:", e.message);
+        res.status(500).json({ message: 'Error al regar la planta', error: e.message });
+    }
 }));
 router.post('/harvest-plant', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //logica para cosechar una seed de un slot de la granja

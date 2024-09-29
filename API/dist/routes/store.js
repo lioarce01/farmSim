@@ -160,7 +160,8 @@ router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                         description: storeItem.description,
                         quantity: quantity,
                         rarity: storeItem.rarity,
-                        inventoryId: user.inventory.id // Non-null assertion here
+                        inventoryId: user.inventory.id,
+                        tokensGenerated: storeItem.tokensGenerated
                     }
                 });
             }

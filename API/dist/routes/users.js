@@ -26,25 +26,15 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         seeds: true,
                         waters: true,
                     }
+                },
+                farm: {
+                    include: {
+                        slots: true, // Incluir los slots de la granja
+                    }
                 }
             }
         });
-        const countingInventory = yield Promise.all(users.map((user) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a, _b;
-            const seedCount = yield prisma.seed.count({
-                where: {
-                    inventoryId: (_a = user.inventory) === null || _a === void 0 ? void 0 : _a.id, // Contar las semillas de este inventario
-                },
-            });
-            const waterCount = yield prisma.water.count({
-                where: {
-                    inventoryId: (_b = user.inventory) === null || _b === void 0 ? void 0 : _b.id,
-                }
-            });
-            // Añadir el conteo de semillas al inventario
-            return Object.assign(Object.assign({}, user), { inventory: Object.assign(Object.assign({}, user.inventory), { seedCount: seedCount, waterCount: waterCount }) });
-        })));
-        res.json(countingInventory);
+        res.json(users); // Devolver directamente la lista de usuarios con sus datos relacionados
     }
     catch (e) {
         console.log(e);
@@ -63,7 +53,7 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                         waters: true,
                     }
                 }
-            }
+            },
         });
         user ? res.status(200).send(user) : res.status(404).send({ message: "User not found." });
     }
@@ -74,18 +64,26 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { nickname, email, sub } = req.body;
-    console.log('data:', req.body);
     // Validación de entradas
     if (!email || !nickname) {
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
-        // Verificar si el usuario ya existe
-        const existingUser = yield prisma.user.findUnique({ where: { sub } });
+        // Verificar si el usuario ya existe por sub o email
+        const existingUser = yield prisma.user.findUnique({
+            where: { sub },
+        });
         if (existingUser) {
             return res.status(409).json({ message: 'Usuario ya existe' });
         }
-        // Crear el usuario en la base de datos
+        // También verificar por email
+        const existingUserByEmail = yield prisma.user.findUnique({
+            where: { email },
+        });
+        if (existingUserByEmail) {
+            return res.status(409).json({ message: 'Email ya está registrado' });
+        }
+        // Crear el usuario en la base de datos junto con su granja y slots
         const newUser = yield prisma.user.create({
             data: {
                 nickname,
@@ -98,6 +96,18 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                         waters: {},
                     },
                 },
+                farm: {
+                    create: {
+                        slots: {
+                            create: Array(8).fill(null).map(() => ({
+                                // Inicializa cada slot, ajusta los campos si es necesario
+                                seedId: null,
+                                plantingTime: null,
+                                growthStatus: 'NONE', // o el valor por defecto que quieras
+                            })),
+                        },
+                    },
+                },
             },
         });
         res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
@@ -105,7 +115,7 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         const e = error;
         console.error("Error al crear usuario:", e.message);
-        return res.status(500).json({ message: 'error al crear usuario', error: e.message });
+        return res.status(500).json({ message: 'Error al crear usuario', error: e.message });
     }
 }));
 //update tokens del usuario por body

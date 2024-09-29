@@ -26,13 +26,14 @@ app.use((0, express_openid_connect_1.auth)({
     authRequired: false, // Establece esto a true si quieres que todas las rutas estén protegidas
     auth0Logout: true, // Habilita el logout
 }));
-// app.get('/api/auth/me', (req, res) => {
-//   if (req.oidc.isAuthenticated()) {
-//     res.json(req.oidc.user);
-//   } else {
-//     res.status(401).json({ error: 'Not authenticated' });
-//   }
-// });
+app.get('/api/auth/me', (req, res) => {
+    if (req.oidc.isAuthenticated()) {
+        res.json(req.oidc.user);
+    }
+    else {
+        res.status(401).json({ error: 'Not authenticated' });
+    }
+});
 app.get('/test', (req, res) => {
     res.send('server running');
 });

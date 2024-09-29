@@ -17,67 +17,72 @@ const rarityHarvestTimes = {
     'EPIC': 6 * 60 * 60 * 1000, // 6 horas
     'LEGENDARY': 3 * 60 * 60 * 1000 // 3 horas
 };
-// Función para actualizar el estado de las seeds
-function updateSeedStatus() {
+// Función para actualizar el estado de crecimiento de las plantas en los slots
+function updateGrowthStatus() {
     return __awaiter(this, void 0, void 0, function* () {
-        const seeds = yield prisma.seed.findMany({
+        const slots = yield prisma.slot.findMany({
             where: {
-                status: {
+                growthStatus: {
                     in: ['GROWING', 'WATER_NEEDED']
+                },
+                seedId: {
+                    not: null // Solo actualizar slots que tengan una semilla plantada
                 }
+            },
+            include: {
+                seed: true, // Para obtener la información de la semilla relacionada
             }
         });
-        for (const seed of seeds) {
-            const timePlanted = new Date(seed.plantedTime).getTime();
+        const now = new Date();
+        for (const slot of slots) {
+            const timePlanted = new Date(slot.plantingTime).getTime();
             const timeElapsed = now.getTime() - timePlanted;
-            if (seed.status === 'GROWING') {
-                // Revisar si la semilla ha alcanzado el tiempo para cambiar a WATER_NEEDED
+            if (slot.growthStatus === 'GROWING') {
+                // Revisar si la planta necesita agua después de 2 horas
                 if (timeElapsed >= 2 * 60 * 60 * 1000) { // 2 horas
-                    yield prisma.seed.update({
-                        where: { id: seed.id },
-                        data: { status: 'WATER_NEEDED' }
+                    yield prisma.slot.update({
+                        where: { id: slot.id },
+                        data: { growthStatus: 'WATER_NEEDED' }
                     });
                 }
             }
-            if (seed.status === "WATER_NEEDED") {
-                const sixHoursInMs = 6 * 60 * 60 * 1000; //limite de tiempo de 6hs para regar la seed
-                const now = new Date();
-                const timeSinceWaterNeeded = now - seed.lastWatered;
-                //primer comportamiento: chequea si paso mucho tiempo sin agua
-                //y cambia el estado a marchita. ya no se puede regar ni cosechar
+            if (slot.growthStatus === "WATER_NEEDED") {
+                const sixHoursInMs = 6 * 60 * 60 * 1000; // Límite de tiempo de 6 horas para regar
+                const timeSinceWaterNeeded = now - slot.lastWatered;
+                // Comportamiento 1: La planta se marchita si no se riega en 6 horas
                 if (timeSinceWaterNeeded >= sixHoursInMs) {
-                    yield prisma.seed.update({
-                        where: { id: seed.id },
-                        data: { status: "WITHERED" }
+                    yield prisma.slot.update({
+                        where: { id: slot.id },
+                        data: { growthStatus: "WITHERED" }
                     });
-                    console.log(`Seed with ID ${seed.id} has withered due to lack of water.`);
+                    console.log(`Plant in slot with ID ${slot.id} has withered due to lack of water.`);
                 }
                 else {
                     const inventory = yield prisma.inventory.findUnique({
-                        where: { id: seed.inventoryId },
+                        where: { id: slot.seed.inventoryId },
                         select: { userId: true }
                     });
-                    //segundo comportamiento: notifica al jugador que necesita regar
+                    // Comportamiento 2: Notificar al jugador que necesita regar la planta
                     yield prisma.notification.create({
                         data: {
-                            userId: seed.inventoryId.userId,
-                            message: `Your seed ${seed.name} needs water!`,
+                            userId: inventory.userId,
+                            message: `Your plant ${slot.seed.name} in the farm needs water!`,
                             createdAt: new Date(),
                         }
                     });
                 }
             }
-            //Revisar si la semilla estas lista para cosechar
-            const harvestTime = rarityHarvestTimes[seed.rarity];
+            // Revisar si la planta está lista para cosechar según la rareza de la semilla
+            const harvestTime = rarityHarvestTimes[slot.seed.rarity];
             if (timeElapsed >= harvestTime) {
-                yield prisma.seed.update({
-                    where: { id: seed.id },
-                    data: { status: 'READY_TO_HARVEST' }
+                yield prisma.slot.update({
+                    where: { id: slot.id },
+                    data: { growthStatus: 'READY_TO_HARVEST' }
                 });
             }
         }
     });
 }
 module.exports = {
-    updateSeedStatus
+    updateGrowthStatus
 };

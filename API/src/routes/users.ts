@@ -14,67 +14,53 @@ router.get('/', async (req, res) => {
                         seeds: true,
                         waters: true,
                     }
+                },
+                farm: {  // Incluir la granja
+                    include: {
+                        slots: true, // Incluir los slots de la granja
+                    }
                 }
             }
-        })
+        });
 
-        const countingInventory = await Promise.all(users.map(async (user) => {
-            const seedCount = await prisma.seed.count({
-              where: {
-                inventoryId: user.inventory?.id, // Contar las semillas de este inventario
-              },
-            });
-
-            const waterCount = await prisma.water.count({
-                where: {
-                    inventoryId: user.inventory?.id,
-                }
-            })
-            
-            // Añadir el conteo de semillas al inventario
-            return {
-              ...user,
-              inventory: {
-                ...user.inventory,
-                seedCount: seedCount, // Incluye el conteo de semillas
-                waterCount: waterCount,
-            },
-            };
-          }));
-
-          res.json(countingInventory)
+        res.json(users); // Devolver directamente la lista de usuarios con sus datos relacionados
 
     } catch (e) {
-        console.log(e)
-        res.status(500).send({message: "Error al obtener usuarios"})
+        console.log(e);
+        res.status(500).send({ message: "Error al obtener usuarios" });
     }
-})
+});
+
+
 
 router.get('/:sub', async (req, res) => {
-    const {sub} = req.params
+    const { sub } = req.params;
 
     try {
-
         const user = await prisma.user.findUnique({
             where: { sub },
-            include: 
-            {
+            include: {
                 inventory: {
                     include: {
                         seeds: true,
                         waters: true,
                     }
+                },
+                farm: {  // Incluir la granja aquí correctamente
+                    include: {
+                        slots: true,
+                    }
                 }
             }
-        })
+        });
 
-        user ? res.status(200).send(user) : res.status(404).send({message: "User not found."})
-
+        user ? res.status(200).send(user) : res.status(404).send({ message: "User not found." });
     } catch (e) {
-        console.error ("Error", e)
-        res.status(500).json ({ message: "Error"})
+        console.error("Error", e);
+        res.status(500).json({ message: "Error" });
     }
-})
+});
+
 
 router.post('/register', async (req, res) => {
     const { nickname, email, sub } = req.body;
@@ -103,7 +89,7 @@ router.post('/register', async (req, res) => {
         return res.status(409).json({ message: 'Email ya está registrado' });
       }
   
-      // Crear el usuario en la base de datos
+      // Crear el usuario en la base de datos junto con su granja y slots
       const newUser = await prisma.user.create({
         data: {
           nickname,
@@ -114,6 +100,18 @@ router.post('/register', async (req, res) => {
             create: {
               seeds: {},
               waters: {},
+            },
+          },
+          farm: {
+            create: {
+              slots: {
+                create: Array(8).fill(null).map(() => ({
+                  // Inicializa cada slot, ajusta los campos si es necesario
+                  seedId: null,
+                  plantingTime: null,
+                  growthStatus: 'NONE', // o el valor por defecto que quieras
+                })),
+              },
             },
           },
         },

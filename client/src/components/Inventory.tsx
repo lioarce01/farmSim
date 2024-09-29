@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import useFetchUser from 'src/hooks/useFetchUser';
@@ -5,17 +7,24 @@ import useFetchUser from 'src/hooks/useFetchUser';
 interface InventoryPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  onSeedSelect: (seed: any) => void; // Función para seleccionar una semilla
 }
 
-const InventoryList: React.FC<{ items: any[]; title: string; }> = ({ items, title }) => {
+const InventoryList: React.FC<{ items: any[]; title: string; onSeedSelect: (seed: any) => void }> = ({ items, title, onSeedSelect }) => {
   return (
     <>
       <h3 className="text-md font-semibold text-[#172c1f]">{title}</h3>
       {items.length > 0 ? (
         <ul className="mb-4">
           {items.map((item, index) => (
-            <li key={index} className="text-[#172c1f] mb-2">
-              {item.name} - Quantity: {item.quantity}
+            <li key={index} className="flex justify-between text-[#172c1f] mb-2">
+              <span>{item.name} - Qty: {item.quantity}</span>
+              <button
+                className="bg-[#FFB385] text-[#172c1f] font-semibold px-2 py-1 rounded-lg hover:bg-[#FFC1A1] transition duration-300"
+                onClick={() => onSeedSelect(item)}
+              >
+                Plant
+              </button>
             </li>
           ))}
         </ul>
@@ -26,12 +35,10 @@ const InventoryList: React.FC<{ items: any[]; title: string; }> = ({ items, titl
   );
 };
 
-const InventoryPopup: React.FC<InventoryPopupProps> = ({ isOpen, onClose }) => {
+const InventoryPopup: React.FC<InventoryPopupProps> = ({ isOpen, onClose, onSeedSelect }) => {
   const { user: fetchedUser, error, isLoading } = useFetchUser();
 
-  if (isLoading) return (
-      <span className="text-[#A8D5BA] font-semibold">Loading inventory...</span>
-  );  
+  if (isLoading) return <span className="text-[#A8D5BA] font-semibold">Loading inventory...</span>;
 
   if (error) return <div className="text-red-500">{`Error: ${error}`}</div>;
 
@@ -53,10 +60,10 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({ isOpen, onClose }) => {
           <FaTimes size={20} />
         </button>
         <h2 className="text-lg font-semibold mb-4 text-[#172c1f]">Inventory</h2>
-        
+
         {/* Mostrar las semillas y aguas usando el componente InventoryList */}
-        <InventoryList items={seeds} title="Seeds" />
-        <InventoryList items={waters} title="Waters" />
+        <InventoryList items={seeds} title="Seeds" onSeedSelect={onSeedSelect} />
+        <InventoryList items={waters} title="Waters" onSeedSelect={() => {}} /> {/* Sin funcionalidad para aguas */}
       </div>
     </div>
   );

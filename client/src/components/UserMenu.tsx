@@ -7,6 +7,7 @@ import LogoutButton from './LogoutButton';
 import { FaUserCircle, FaCoins, FaCaretDown } from 'react-icons/fa';
 import { useState } from 'react';
 import InventoryPopup from './Inventory';
+import Link from 'next/link';
 
 const UserMenu: React.FC = () => {
   const { user: fetchedUser, error, isLoading } = useFetchUser();
@@ -77,11 +78,12 @@ const UserMenu: React.FC = () => {
           </div>
 
           <div className="p-2 w-full">
-            <button 
-              className="px-4 py-2 w-full text-left text-[#333] hover:bg-[#FFC1A1] transition duration-300 font-semibold"
-            >
+            <Link
+              href="/Farm"
+              className="px-4 py-2 w-full text-left text-[#333] hover:bg-[#FFC1A1] transition duration-300 font-semibold block"
+              >
               My Farm
-            </button>
+            </Link>
           </div>
           <div className="p-2 w-full">
             <LogoutButton />

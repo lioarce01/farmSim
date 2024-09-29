@@ -167,7 +167,8 @@ router.post('/buy', async (req, res) => {
             description: storeItem.description,
             quantity: quantity,
             rarity: storeItem.rarity as Rarity,
-            inventoryId: user.inventory!.id // Non-null assertion here
+            inventoryId: user.inventory!.id,
+            tokensGenerated: storeItem.tokensGenerated
           }
         });
       }

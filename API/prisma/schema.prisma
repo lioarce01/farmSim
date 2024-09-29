@@ -49,6 +49,10 @@ model Slot {
   growthStatus growthStatus
   wateredCount Int @default(0)
   lastWatered DateTime?
+  seedName String?
+  seedDescription String?
+  seedRarity String?
+  seedTokensGenerated Int?
 }
 
 model Seed {

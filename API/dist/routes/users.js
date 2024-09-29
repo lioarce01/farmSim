@@ -52,8 +52,13 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                         seeds: true,
                         waters: true,
                     }
+                },
+                farm: {
+                    include: {
+                        slots: true,
+                    }
                 }
-            },
+            }
         });
         user ? res.status(200).send(user) : res.status(404).send({ message: "User not found." });
     }

@@ -60,12 +60,12 @@ export const store = configureStore({
     }).concat(usersApi.middleware, storeItemsApi.middleware),
 });
 
-store.subscribe(() => {
-  const state = store.getState();
-  if (state.user.nickname) {
-    console.log('User state in localStorage:', state.user);
-  }
-});
+// store.subscribe(() => {
+//   const state = store.getState();
+//   if (state.user.nickname) {
+//     console.log('User state in localStorage:', state.user);
+//   }
+// });
 
 export const persistor = persistStore(store);
 

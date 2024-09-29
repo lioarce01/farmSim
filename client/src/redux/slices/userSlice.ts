@@ -31,7 +31,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: Role; refetch: () => void }>) => {
+    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: Role; }>) => {
       // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
@@ -83,5 +83,6 @@ const userSlice = createSlice({
 // Exportamos las acciones
 export const { setUser, clearUser, setBalanceToken, setLoading, setError, hydrate } = userSlice.actions;
 
+export const selectUser = (state: any) => state.user
 // Exportamos el reducer
 export default userSlice.reducer;

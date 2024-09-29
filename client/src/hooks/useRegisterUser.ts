@@ -2,10 +2,9 @@
 
 import { useRegisterUserMutation } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
-import { setLoading, setUser } from '../redux/slices/userSlice';
+import { setError, setLoading, setUser } from '../redux/slices/userSlice';
 import { useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import useFetchUser from './useFetchUser';
 
 interface ApiError {
   status: number;
@@ -17,43 +16,39 @@ interface ApiError {
 const useRegisterUser = () => {
   const [registerUser] = useRegisterUserMutation();
   const dispatch = useDispatch();
-  const { user } = useAuth0(); 
-  const { refetch } = useFetchUser()
 
   const register = useCallback(async (userData: any) => {
-    dispatch(setLoading(true))
-    try {
-      const result = await registerUser(userData).unwrap();
-      console.log('registration result: ', result);
-      if (result && user) {
-        dispatch(setUser({
-          nickname: user.nickname || '', 
-          email: user.email || '', 
-          token: user.sub || '',
-          sub: user.sub || '',
-          balanceToken: result.balanceToken || 0,
-          role: result.role
-        }));
-
-        refetch()
-        
-      } else {
-        console.error('user is undefined or registration result is null')
-      }
-    } catch (error) {
-      const err = error as ApiError;
-      if (err.status === 409 && err.data?.message) {
-        console.error('Error registrando el usuario:', err.data.message);
-      } else if (error instanceof Error) {
-        console.error('Error registrando el usuario:', error.message);
-      } else {
-        console.error('Error registrando el usuario: Error desconocido');
-      }
-    } finally {
-      dispatch(setLoading(false))
+    if (!userData.sub || !userData.email) {
+      console.error('Datos del usuario inválidos:', userData);
+      return;
     }
 
-  }, [dispatch, registerUser, user]); 
+    dispatch(setLoading(true));
+
+    try {
+      const registeredUser = await registerUser(userData).unwrap();
+      dispatch(setUser(registeredUser));
+      return registeredUser;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      if (err.status === 409) {
+        dispatch(setError('El usuario ya existe. Por favor intenta con otro.')); // Mensaje claro
+        console.error('Error registrando el usuario:', err.data?.message);
+      } else if (error instanceof Error) {
+        dispatch(setError('Error durante el registro del usuario'));
+        console.error('Error registrando el usuario:', error.message);
+      } else {
+        dispatch(setError('Error desconocido durante el registro'));
+        console.error('Error desconocido registrando el usuario');
+      }
+      throw error; // Lanza el error para manejarlo más arriba
+
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }, [dispatch, registerUser]);
 
   return { register };
 };

@@ -1,3 +1,5 @@
+'use client'
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
 import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
@@ -10,6 +12,8 @@ export const usersApi = createApi({
       const token = (getState() as RootState).user.token
       if (token) {
         headers.set('authorization', `Bearer ${token}`) 
+      } else {
+        console.warn('Intentando hacer una solicitud sin un token')
       }
       return headers
     },

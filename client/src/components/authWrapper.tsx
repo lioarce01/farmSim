@@ -1,39 +1,64 @@
 'use client'
 
 import { useEffect } from 'react';
-import { useAuth0, User } from '@auth0/auth0-react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch } from 'react-redux';
-import { clearUser } from '../redux/slices/userSlice';
-import useRegisterUser from 'src/hooks/useRegisterUser';
+import { setUser, clearUser } from '../redux/slices/userSlice';
+import { useRegisterUserMutation, useGetUserBySubQuery } from '../redux/api/users';
+import { Role } from 'src/types';
 
-const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { isLoading, isAuthenticated, user } = useAuth0();
   const dispatch = useDispatch();
-  const { register } = useRegisterUser();
+
+  const [registerUser] = useRegisterUserMutation();
+  const { data: fetchedUser, refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', { skip: !user?.sub });
 
   useEffect(() => {
-    if (!isLoading) {
+    const handleUserRegistration = async () => {
+      if (isLoading) return; 
+      
       if (isAuthenticated && user) {
-        // Datos del usuario a enviar al backend
-        const userData = {
-          nickname: user.nickname || 'Default Nickname',
-          email: user.email || 'default@example.com',
-          token: user.sub || '',
-          sub: user.sub || '',
-          balanceToken: user.balanceToken,
-          role: user.role
-        };
+        try {
+          if (fetchedUser) {
+            console.log('Usuario ya existe, cargando datos...');
+            dispatch(setUser({
+              nickname: fetchedUser.nickname,
+              email: fetchedUser.email,
+              token: user.sub || '',
+              sub: user.sub || '',
+              balanceToken: fetchedUser.balanceToken || 0,
+              role: fetchedUser.role as Role,
+            }));
+          } else {
+            const userData = {
+              nickname: user.nickname || 'Default Nickname',
+              email: user.email || 'default@example.com',
+              token: user.sub || '',
+              sub: user.sub || '',
+            };
 
-        // Registra el usuario en el backend
-        register(userData);
-        
-        // Establece el usuario en el estado de Redux
-        // dispatch(setUser(userData));
-      } else {
+            console.log('Intentando registrar usuario...', userData);
+            await registerUser(userData).unwrap();
+            console.log('Usuario registrado exitosamente');
+            
+            await refetchUser(); // Esperar a que se refresquen los datos del usuario registrado
+          }
+        } catch (error) {
+          console.error('Error durante el registro o al obtener el usuario:', error);
+        }
+      } else if (!isAuthenticated) {
         dispatch(clearUser());
       }
-    }
-  }, [isAuthenticated, user, isLoading, dispatch, register]);
+    };
+
+    handleUserRegistration();
+  }, [isLoading, isAuthenticated, user, fetchedUser, refetchUser, dispatch, registerUser]);
+
+  // Puedes agregar un estado de carga aquí si es necesario
+  if (isLoading) {
+    return <div>Loading...</div>; // Opcional: Puedes reemplazar esto por un spinner o un componente de carga
+  }
 
   return <>{children}</>;
 };

@@ -154,7 +154,7 @@ router.post('/addTokens', async (req, res) => {
     }
 })
 
-router.put('/convert', authMiddleware, async (req, res) => {
+router.put('/convert', async (req, res) => {
     const { sub } = req.body;
 
     try {

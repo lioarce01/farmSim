@@ -20,7 +20,7 @@
     "src/types/express.d.ts",
     "src/utils/seedsGeneration.js",
     "src/utils/waterGeneration.js",
-    "src/utils/updateSeedStatus.js"
+    "src/utils/updateGrowthStatus.ts"
   ],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

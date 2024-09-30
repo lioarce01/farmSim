@@ -39,6 +39,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+
 router.post('/plant-seed', async (req, res) => {
     const { farmId, slotId, seedId, sub } = req.body;
 

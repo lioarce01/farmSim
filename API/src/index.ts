@@ -7,9 +7,13 @@ import { auth } from 'express-openid-connect';
 
 const app = express();
 
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST']
+}));
+
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(cors());
 
 app.use('/', routes);
 
@@ -30,13 +34,13 @@ app.use(
   )
 
 
-  app.get('/api/auth/me', (req, res) => {
-    if (req.oidc.isAuthenticated()) {
-      res.json(req.oidc.user);
-    } else {
-      res.status(401).json({ error: 'Not authenticated' });
-    }
-  });
+  // app.get('/api/auth/me', (req, res) => {
+  //   if (req.oidc.isAuthenticated()) {
+  //     res.json(req.oidc.user);
+  //   } else {
+  //     res.status(401).json({ error: 'Not authenticated' });
+  //   }
+  // });
 
 app.get('/test', (req, res) => {
     res.send('server running');

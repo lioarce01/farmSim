@@ -5,57 +5,57 @@ import { useGetUserBySubQuery } from '../redux/api/users';
 import { useAuth0 } from '@auth0/auth0-react';
 import { setUser } from 'src/redux/slices/userSlice';
 import { useDispatch } from 'react-redux';
-import { Role } from 'src/types';
+import { Role, User } from 'src/types';
+
+interface UserData {
+  nickname: string;
+  email: string;
+  balanceToken: number;
+  role: Role;
+}
 
 const useFetchUser = () => {
   const { user } = useAuth0();
   const dispatch = useDispatch();
   
   const { data, error, isLoading, refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
-    skip: !user || !user.sub, 
+    skip: !user || !user.sub,
   });
 
   useEffect(() => {
-    if (user?.sub && !isLoading && !error) {
-      const intervalId = setInterval(async () => {
+    const fetchUserData = async () => {
+      if (user?.sub) {
         try {
           const response = await refetchUser();
           if (response.data) {
-            const fetchedData = response.data;
+            const fetchedData: User = response.data; // Asume que 'data' tiene esta estructura
             dispatch(setUser({
               nickname: fetchedData.nickname,
               email: fetchedData.email,
-              token: user.sub || '',
-              sub: user.sub || '',
+              token: user.sub,
+              sub: user.sub,
               balanceToken: fetchedData.balanceToken || 0,
               role: fetchedData.role as Role,
             }));
-            clearInterval(intervalId); // Detener el polling si se obtiene el usuario
           } else {
             console.warn('Usuario no registrado aún en el backend');
           }
-        } catch (error) {
-          console.error('Error obteniendo el usuario:', error);
-          clearInterval(intervalId);
+        } catch (err) {
+          console.error('Error obteniendo el usuario:', err);
         }
-      }, 5000); // Intervalo mayor para evitar sobrecargar el servidor
-  
-      return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar
-    }
-  }, [user, refetchUser, error]);
-  
-  
+      }
+    };
+
+    const intervalId = setInterval(fetchUserData, 5000);
+
+    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar
+  }, [user?.sub, refetchUser]); // Solo dependencias necesarias
 
   useEffect(() => {
     if (error) {
-      let errorMessage: string;
-
-      if ('status' in error) {
-        errorMessage = `Error ${error.status}: ${JSON.stringify(error.data)}`;
-      } else {
-        errorMessage = error.message || 'Ocurrió un error desconocido';
-      }
-
+      const errorMessage = 'status' in error 
+        ? `Error ${error.status}: ${JSON.stringify(error.data)}`
+        : error.message || 'Ocurrió un error desconocido';
       console.error('Error al obtener el usuario:', errorMessage);
     }
   }, [error]);

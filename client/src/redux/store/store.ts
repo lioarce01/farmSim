@@ -2,11 +2,13 @@
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
-import { usersApi } from '../api/users'; // Ajusta la ruta según tu estructura de carpetas
-import userReducer from '../slices/userSlice'; // Ahora solo importas userReducer
+import { usersApi } from '../api/users';
+import userReducer from '../slices/userSlice';
+import slotReducer from '../slices/slotSlice'
 import { storeItemsApi } from '../api/store';
 import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
+import { farmApi } from '../api/farm';
 
 console.log("Running on client:", typeof window !== 'undefined');
 
@@ -30,14 +32,15 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user'], 
+  whitelist: ['user', 'slots'], 
 };
 
-// Combinamos todos los reducers
 const rootReducer = combineReducers({
-  user: userReducer, 
+  user: userReducer,
+  slot: slotReducer,
   [storeItemsApi.reducerPath]: storeItemsApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
+  [farmApi.reducerPath]: farmApi.reducer,
   timer: timerReducer,
 });
 
@@ -57,7 +60,7 @@ export const store = configureStore({
           'persist/REGISTER',
         ],
       },
-    }).concat(usersApi.middleware, storeItemsApi.middleware),
+    }).concat(usersApi.middleware, storeItemsApi.middleware, farmApi.middleware),
 });
 
 // store.subscribe(() => {

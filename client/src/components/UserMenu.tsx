@@ -1,7 +1,5 @@
 'use client';
 
-import { useSelector } from 'react-redux';
-import { RootState } from 'src/redux/store/store';
 import useFetchUser from '../hooks/useFetchUser';
 import LogoutButton from './LogoutButton';
 import { FaUserCircle, FaCoins, FaCaretDown } from 'react-icons/fa';
@@ -27,18 +25,15 @@ const UserMenu: React.FC = () => {
     setIsInventoryOpen(false);
   };
 
-
   let errorMessage = 'Error desconocido';
   if (error) {
     if ('status' in error) {
-      // Comprobar si el error tiene la propiedad 'status'
       if (error.status === 409) {
         errorMessage = 'El usuario ya existe.';
       } else {
         errorMessage = 'Error al cargar el usuario.';
       }
     } else if (error instanceof Error) {
-      // Si el error es una instancia de Error
       errorMessage = error.message;
     }
   }
@@ -58,10 +53,10 @@ const UserMenu: React.FC = () => {
         {fetchedUser?.nickname} <FaCaretDown className="inline-block ml-1" />
       </span>
       <FaCoins className="text-[#FFB385] mr-2" size={20} />
+      {/* Balance visible en pantallas pequeñas sin la etiqueta "Balance" */}
       <span className="flex items-center mr-4 text-[#172c1f] font-medium text-sm">
-        <span className="mr-1">Balance Tokens:</span>
-        <span className="bg-[#FFB385] text-[#172c1f] font-semibold px-2 py-1 rounded-full shadow-md">
-          {fetchedUser?.balanceToken}
+        <span className="bg-[#FFB385] text-[#172c1f] font-semibold px-2 py-1 rounded-xl shadow-md">
+          T$ {fetchedUser?.balanceToken}
         </span>
       </span>
 
@@ -81,7 +76,7 @@ const UserMenu: React.FC = () => {
             <Link
               href="/Farm"
               className="px-4 py-2 w-full text-left text-[#333] hover:bg-[#FFC1A1] transition duration-300 font-semibold block"
-              >
+            >
               My Farm
             </Link>
           </div>
@@ -90,7 +85,11 @@ const UserMenu: React.FC = () => {
           </div>
         </div>
       )}
-      <InventoryPopup isOpen={isInventoryOpen} onClose={closeInventory} />
+      <InventoryPopup 
+        isOpen={isInventoryOpen} 
+        onClose={closeInventory} 
+        onSeedSelect={() => {}}  // Aquí puedes agregar la lógica que necesites para manejar la selección de semillas
+      />
     </div>
   );
 };

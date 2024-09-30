@@ -2,25 +2,25 @@ export interface Seed {
   id: string;
   name: string;
   description: string;
-  plantedTime?: Date; // puede ser opcional
+  plantedTime?: Date; 
   wateredCount: number;
-  lastWatered?: Date; // puede ser opcional
+  lastWatered?: Date;
   quantity: number;
-  rarity: Rarity; // Enum que puedes definir
-  status: SeedStatus; // Enum que puedes definir
-  tokensGenerated?: number; // puede ser opcional
+  rarity: Rarity;
+  status: SeedStatus; 
+  tokensGenerated?: number; 
 }
 
 export interface Water {
   id: string;
   name: string;
   description: string;
-  quantity?: number; // puede ser opcional
+  quantity?: number;
 }
 
 export interface Inventory {
   id: string;
-  userId: string; // ID del usuario propietario
+  userId: string; 
   seeds: Seed[];
   waters: Water[];
 }
@@ -30,6 +30,20 @@ export interface PurchaseData {
   itemId: string;
   quantity: number;
   itemType: ItemType
+}
+
+export interface Slot {
+  id: string;
+  farmId: string;
+  seedId: string | null;
+  plantingTime: string | null;
+  growthStatus: string;
+  wateredCount: number;
+  lastWatered: string | null;
+  seedName: string | null;
+  seedDescription: string | null;
+  seedRarity: string | null;
+  seedTokensGenerated: number | null;
 }
 
 export interface PurchaseButtonProps {
@@ -63,6 +77,13 @@ export interface User {
   balanceToken?: number; // Cambiado de Int a number
   inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
   refetch: () => void;
+  farm: Farm
+ }
+
+ export interface Farm {
+  id: string;
+  userId: string;
+  slots: Slot[]
  }
 
 export interface RemainingTimeData {

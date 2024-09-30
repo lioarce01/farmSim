@@ -46,12 +46,12 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({ userSub, itemId, quanti
             : 'bg-[#398b5a] text-white hover:bg-[#276844]' // Estilo cuando está habilitado
         }`}
       >
-        {stock <= 0 ? 'No stock' : 'Comprar'}
+        {stock <= 0 ? 'No stock' : 'Buy Seed'}
       </button>
 
       {showPopup && (
         <Popup
-          message="No tienes suficientes tokens para realizar esta compra."
+          message="Not enough balance."
           onClose={() => setShowPopup(false)}
         />
       )}

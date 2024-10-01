@@ -1,26 +1,34 @@
-// hooks/useSocket.ts
-import { useEffect } from 'react';
+'use client'
+
+import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const useSocket = (url: string) => {
-  const socket: Socket = io(url);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    socket.on('connect', () => {
+    const newSocket = io(url, {
+      transports: ['polling', 'websocket'],
+      withCredentials: true,
+    });
+    
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
       console.log('Connected to Socket.IO server');
     });
 
-    // Manejar la desconexión
-    socket.on('disconnect', () => {
+    newSocket.on('disconnect', () => {
       console.log('Disconnected from Socket.IO server');
     });
 
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
+      setSocket(null);
     };
-  }, [socket]);
+  }, [url]);
 
-  return socket;
+  return socket; // Retorna el socket
 };
 
 export default useSocket;

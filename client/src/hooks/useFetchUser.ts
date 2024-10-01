@@ -17,7 +17,7 @@ interface UserData {
 const useFetchUser = () => {
   const { user } = useAuth0();
   const dispatch = useDispatch();
-  
+
   const { data, error, isLoading, refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
     skip: !user || !user.sub,
   });
@@ -28,15 +28,21 @@ const useFetchUser = () => {
         try {
           const response = await refetchUser();
           if (response.data) {
-            const fetchedData: User = response.data; // Asume que 'data' tiene esta estructura
-            dispatch(setUser({
-              nickname: fetchedData.nickname,
-              email: fetchedData.email,
-              token: user.sub,
-              sub: user.sub,
-              balanceToken: fetchedData.balanceToken || 0,
-              role: fetchedData.role as Role,
-            }));
+            const fetchedData: User = response.data;
+
+            // Asegúrate de que fetchedData tenga la estructura esperada
+            if (fetchedData.nickname && fetchedData.email) {
+              dispatch(setUser({
+                nickname: fetchedData.nickname,
+                email: fetchedData.email,
+                token: user.sub,
+                sub: user.sub,
+                balanceToken: fetchedData.balanceToken || 0,
+                role: fetchedData.role as Role,
+              }));
+            } else {
+              console.warn('Datos de usuario incompletos:', fetchedData);
+            }
           } else {
             console.warn('Usuario no registrado aún en el backend');
           }
@@ -46,10 +52,13 @@ const useFetchUser = () => {
       }
     };
 
+    // Llama a la función de forma inmediata para obtener los datos del usuario
+    fetchUserData();
+
     const intervalId = setInterval(fetchUserData, 5000);
 
-    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar
-  }, [user?.sub, refetchUser]); // Solo dependencias necesarias
+    return () => clearInterval(intervalId);
+  }, [user?.sub, refetchUser]);
 
   useEffect(() => {
     if (error) {

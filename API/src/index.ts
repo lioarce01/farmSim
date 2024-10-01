@@ -8,8 +8,9 @@ import { auth } from 'express-openid-connect';
 const app = express();
 
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST']
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST'],
+  credentials: true
 }));
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));

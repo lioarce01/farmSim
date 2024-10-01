@@ -46,27 +46,18 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ message: 'Error' });
     }
 }));
+// Ruta para plantar semilla
 router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { farmId, slotId, seedId, sub } = req.body;
-    // Validación de entradas
     if (!farmId || !slotId || !seedId || !sub) {
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
-        // Verificar que el slot y la semilla existen
-        const slot = yield prisma.slot.findUnique({
-            where: { id: slotId },
-        });
-        const seed = yield prisma.seed.findUnique({
-            where: { id: seedId },
-        });
-        if (!slot) {
-            return res.status(404).json({ message: 'Slot no encontrado' });
+        const slot = yield prisma.slot.findUnique({ where: { id: slotId } });
+        const seed = yield prisma.seed.findUnique({ where: { id: seedId } });
+        if (!slot || !seed) {
+            return res.status(404).json({ message: 'Slot o semilla no encontrada' });
         }
-        if (!seed) {
-            return res.status(404).json({ message: 'Semilla no encontrada' });
-        }
-        // Actualizar el slot con la semilla y sus caracteristicas
         const currentTime = new Date();
         const updatedSlot = yield prisma.slot.update({
             where: { id: slotId },
@@ -80,7 +71,6 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
                 seedTokensGenerated: seed.tokensGenerated,
             },
         });
-        // Eliminar la semilla del inventario del usuario usando su sub
         const userInventory = yield prisma.user.findUnique({
             where: { sub },
             include: {
@@ -92,25 +82,32 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
             },
         });
         if (userInventory && userInventory.inventory) {
-            const seedInInventory = userInventory.inventory.seeds.find(seed => seed.id === seedId);
+            const seedInInventory = userInventory.inventory.seeds.find(s => s.id === seedId);
             if (seedInInventory) {
-                yield prisma.seed.delete({
-                    where: { id: seedId },
-                });
+                yield prisma.seed.delete({ where: { id: seedId } });
             }
             else {
-                return res.status(404).json({ message: 'La semilla no está en el inventario del usuario.' });
+                return res.status(404).json({ message: 'Semilla no encontrada en el inventario' });
             }
         }
         else {
-            return res.status(404).json({ message: 'Inventario no encontrado.' });
+            return res.status(404).json({ message: 'Inventario no encontrado' });
+        }
+        // Emitir evento de Socket.IO si `io` está disponible en req.app.locals
+        const io = req.app.locals.io;
+        if (io) {
+            io.emit('seed-planted', {
+                farmId,
+                slotId,
+                updatedSlot,
+            });
         }
         res.status(200).json({ message: 'Semilla plantada exitosamente', updatedSlot });
     }
     catch (error) {
         const e = error;
-        console.error("Error al plantar la semilla:", e.message);
-        return res.status(500).json({ message: 'Error al plantar la semilla', error: e.message });
+        console.error("Error al plantar la semilla:", error);
+        res.status(500).json({ message: 'Error al plantar la semilla', error: e.message });
     }
 }));
 router.put('/water-plant', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

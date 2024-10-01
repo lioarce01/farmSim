@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
-const auth_js_1 = __importDefault(require("../middleware/auth.js"));
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -146,7 +145,7 @@ router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Error al agregar tokens al usuario" });
     }
 }));
-router.put('/convert', auth_js_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sub } = req.body;
     try {
         const convertedUser = yield prisma.user.findUnique({

@@ -43,7 +43,7 @@ export async function updateGrowthStatus(io: any) {
     const timeSinceLastWatered = now - lastWateredTime;
 
     // Si la planta está en estado GROWING, verificar si necesita agua después de 2 HORAS.
-    if (slot.growthStatus === 'GROWING' && timeSinceLastWatered >= 2 * 60 * 60 * 1000) {
+    if (slot.growthStatus === 'GROWING' && timeSinceLastWatered >= 1 * 60 * 1000) {
       await prisma.slot.update({
         where: { id: slot.id },
         data: { growthStatus: 'WATER_NEEDED' }

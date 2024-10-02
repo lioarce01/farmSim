@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from '../redux/slices/userSlice';
@@ -55,12 +55,11 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     handleUserRegistration();
   }, [isLoading, isAuthenticated, user, fetchedUser, refetchUser, dispatch, registerUser]);
 
-  // Puedes agregar un estado de carga aquí si es necesario
   if (isLoading) {
-    return <div>Loading...</div>; // Opcional: Puedes reemplazar esto por un spinner o un componente de carga
+    return <div>Loading...</div>; // poner spinner
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 };
 
 export default AuthWrapper;

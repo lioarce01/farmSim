@@ -34,7 +34,7 @@ const useRegisterUser = () => {
       const err = error as ApiError;
 
       if (err.status === 409) {
-        dispatch(setError('El usuario ya existe. Por favor intenta con otro.')); // Mensaje claro
+        dispatch(setError('El usuario ya existe. Por favor intenta con otro.'));
         console.error('Error registrando el usuario:', err.data?.message);
       } else if (error instanceof Error) {
         dispatch(setError('Error durante el registro del usuario'));
@@ -43,7 +43,7 @@ const useRegisterUser = () => {
         dispatch(setError('Error desconocido durante el registro'));
         console.error('Error desconocido registrando el usuario');
       }
-      throw error; // Lanza el error para manejarlo más arriba
+      throw error;
 
     } finally {
       dispatch(setLoading(false));

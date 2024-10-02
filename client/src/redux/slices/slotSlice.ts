@@ -1,10 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Slot } from '../../types/index'
 
-// Define el estado inicial
 const initialState: Slot[] = [];
 
-// Crea el slice
 const slotSlice = createSlice({
   name: 'slots',
   initialState,
@@ -18,7 +16,7 @@ const slotSlice = createSlice({
         state[index] = action.payload;
       }
     },
-    // Agrega otras acciones si es necesario
+    // Agrega otras acciones 
   },
 });
 

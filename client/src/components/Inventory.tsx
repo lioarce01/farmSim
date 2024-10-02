@@ -17,8 +17,8 @@ interface Water {
 interface InventoryPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSeedSelect: (seed: Seed) => void; // Función para seleccionar una semilla
-  onWaterSelect: (water: Water) => void; // Función para seleccionar agua
+  onSeedSelect: (seed: Seed) => void; 
+  onWaterSelect: (water: Water) => void; 
 }
 
 const InventoryPopup: React.FC<InventoryPopupProps> = ({

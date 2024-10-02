@@ -24,33 +24,29 @@ const StorePage: React.FC = () => {
   const timeRemaining = useSelector((state: RootState) => state.timer.timeRemaining);
   const userSub = useSelector((state: RootState) => state.user.sub)
 
-  // Efecto para sincronizar el temporizador con el backend cada vez que se obtenga un nuevo tiempo restante
   useEffect(() => {
     if (remainingTimeData?.timeRemainingInMs) {
-      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000); // Convertir ms a segundos
+      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000);
       dispatch(setTimeRemaining(remainingTime));
     }
   }, [remainingTimeData, dispatch]);
 
-  // Efecto para manejar la cuenta regresiva del temporizador
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (timeRemaining > 0) {
         dispatch(decrementTime());
       } else if (timeRemaining === 0) {
-        // Si el temporizador llega a 0, hacer refetch de los items y el tiempo restante
-        refetchStoreItems();  // Refrescar los items
-        refetchRemainingTime();  // Actualizar el tiempo restante desde el backend
+        refetchStoreItems();  
+        refetchRemainingTime();  
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
   }, [timeRemaining, refetchStoreItems, refetchRemainingTime, dispatch]);
 
-  // Efecto para reiniciar el temporizador después de hacer refetch
   useEffect(() => {
     if (remainingTimeData?.timeRemainingInMs) {
-      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000); // Reiniciar el temporizador
+      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000); 
       dispatch(setTimeRemaining(remainingTime));
     }
   }, [storeItems, remainingTimeData, dispatch]);
@@ -92,7 +88,7 @@ const StorePage: React.FC = () => {
                 <PurchaseButton
                   userSub={userSub}
                   itemId={item.id}
-                  quantity={1} // Cantidad fija de 1, puedes ajustarlo según el caso
+                  quantity={1} 
                   itemType={item.itemType}
                   stock={item.stock}
                   refetchStoreItems={refetchStoreItems}

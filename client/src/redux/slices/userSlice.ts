@@ -41,7 +41,6 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null
       state.role = action.payload.role
-      // localStorage.setItem('user', JSON.stringify(state))
     },
     clearUser(state) {
       state.nickname = null;
@@ -52,7 +51,6 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.role = null
-      // localStorage.removeItem('user')
 
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -60,7 +58,7 @@ const userSlice = createSlice({
     },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
-      state.loading = false; // Establecer loading a false cuando hay un error
+      state.loading = false;
     },
     setBalanceToken: (state, action: PayloadAction<number>) => {
       state.balanceToken = action.payload;
@@ -80,9 +78,7 @@ const userSlice = createSlice({
   },
 });
 
-// Exportamos las acciones
 export const { setUser, clearUser, setBalanceToken, setLoading, setError, hydrate } = userSlice.actions;
 
 export const selectUser = (state: any) => state.user
-// Exportamos el reducer
 export default userSlice.reducer;

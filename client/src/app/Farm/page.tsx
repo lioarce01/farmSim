@@ -21,30 +21,29 @@ const Farm = () => {
     skip: !farmId,
   });
 
-  const socket = useSocket('http://localhost:3002'); // Conectar al servidor de socket
+  const socket = useSocket('http://localhost:3002'); 
 
   useEffect(() => {
     if (socket) {
       socket.on('seed-planted', (data) => {
         console.log('Seed planted event received:', data);
-        refetchFarm(); // Refresca la granja para obtener datos actualizados
+        refetchFarm(); 
       });
 
       socket.on('actualizacion-planta', (data) => {
         console.log('Plant update event received:', data);
-        // En lugar de modificar directamente farm.slots, puedes refetch o manejar la lógica aquí.
-        refetchFarm(); // Vuelve a obtener los datos para reflejar el estado actualizado
+        
+        refetchFarm(); 
       });
 
       return () => {
         socket.off('seed-planted');
-        socket.off('actualizacion-planta'); // Limpia el evento al desmontar el componente
+        socket.off('actualizacion-planta'); 
       };
     }
   }, [socket, farm]);
 
 
-  // Loading and error handling
   if (userLoading) return <div className="text-center text-lg">Loading user...</div>;
   if (userError) {
     const errorMessage = 'status' in userError
@@ -85,7 +84,6 @@ const Farm = () => {
     setSelectedSlot(null);
   };
 
-  // Plant seed in selected slot
   const plantSeedInSlot = async (seed: any) => {
     if (selectedSlot !== null && farmId) {
       try {
@@ -109,18 +107,16 @@ const Farm = () => {
     }
   };
 
-  // Functions for watering and harvesting plants
   const waterPlant = (slotIndex: number) => {
     console.log(`Watering plant in slot ${slotIndex}`);
-    // Lógica para regar la planta aquí
+    // Lógica para regar la planta 
   };
 
   const harvestPlant = (slotIndex: number) => {
     console.log(`Harvesting plant in slot ${slotIndex}`);
-    // Lógica para cosechar la planta aquí
+    // Lógica para cosechar la planta 
   };
 
-  // Function to format growth status
   const formatGrowthStatus = (status: string | null) => {
     switch (status) {
       case SeedStatus.GROWING:
@@ -216,7 +212,7 @@ const Farm = () => {
           isOpen={isInventoryOpen}
           onClose={closeInventory}
           onSeedSelect={plantSeedInSlot}
-          onWaterSelect={() => {}} // Placeholder for watering logic if needed
+          onWaterSelect={() => {}}
         />
       </div>
     </div>

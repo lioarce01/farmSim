@@ -28,7 +28,7 @@ const useSocket = (url: string) => {
     };
   }, [url]);
 
-  return socket; // Retorna el socket
+  return socket; 
 };
 
 export default useSocket;

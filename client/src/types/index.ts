@@ -61,11 +61,11 @@ export interface StoreItem {
   name: string;
   description: string;
   price: number;
-  itemType: ItemType; // Enum que puedes definir
-  rarity?: Rarity; // Opcional, ya que no todos los items tienen rareza
+  itemType: ItemType; 
+  rarity?: Rarity; 
   stock: number;
-  tokensGenerated?: number; // puede ser opcional
-  quantity?: number; // puede ser opcional
+  tokensGenerated?: number; 
+  quantity?: number;
 }
 
 export interface User {
@@ -73,9 +73,9 @@ export interface User {
   sub: string;
   nickname: string;
   role?: Role;
-  email: string; // Agregado ya que está en tu modelo
-  balanceToken?: number; // Cambiado de Int a number
-  inventory?: Inventory; // Puede ser opcional si el usuario no tiene inventario
+  email: string; 
+  balanceToken?: number;
+  inventory?: Inventory; 
   refetch: () => void;
   farm: Farm
  }

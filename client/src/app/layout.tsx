@@ -3,10 +3,10 @@
 import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '../redux/store/store'; // Ajusta la ruta según tu estructura
+import { store, persistor } from '../redux/store/store'; 
 import './globals.css';
 import { Auth0Provider } from '@auth0/auth0-react';
-import AuthWrapper from 'src/components/authWrapper'; // Importa el AuthWrapper
+import AuthWrapper from 'src/components/authWrapper'; 
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   const redirectUri = typeof window !== 'undefined' ? window.location.origin : '';

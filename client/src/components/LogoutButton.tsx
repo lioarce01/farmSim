@@ -9,10 +9,8 @@ const LogoutButton = () => {
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    // Limpia el usuario antes de salir
     dispatch(clearUser());
 
-    // Realiza el logout
     logout({
       returnTo: window.location.origin,
     } as any); 

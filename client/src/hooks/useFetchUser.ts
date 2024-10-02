@@ -30,7 +30,6 @@ const useFetchUser = () => {
           if (response.data) {
             const fetchedData: User = response.data;
 
-            // Asegúrate de que fetchedData tenga la estructura esperada
             if (fetchedData.nickname && fetchedData.email) {
               dispatch(setUser({
                 nickname: fetchedData.nickname,
@@ -52,7 +51,6 @@ const useFetchUser = () => {
       }
     };
 
-    // Llama a la función de forma inmediata para obtener los datos del usuario
     fetchUserData();
 
     const intervalId = setInterval(fetchUserData, 5000);

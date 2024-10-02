@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { PurchaseData, RemainingTimeData, StoreItem } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { PurchaseData, RemainingTimeData, StoreItem } from '../../types';
 
 
 export const storeItemsApi = createApi({

@@ -53,14 +53,12 @@ const UserMenu: React.FC = () => {
         {fetchedUser?.nickname} <FaCaretDown className="inline-block ml-1" />
       </span>
       <FaCoins className="text-[#FFB385] mr-2" size={20} />
-      {/* Balance visible en pantallas pequeñas sin la etiqueta "Balance" */}
       <span className="flex items-center mr-4 text-[#172c1f] font-medium text-sm">
         <span className="bg-[#FFB385] text-[#172c1f] font-semibold px-2 py-1 rounded-xl shadow-md">
           T$ {fetchedUser?.balanceToken}
         </span>
       </span>
 
-      {/* Menú desplegable */}
       {isOpen && (
         <div className="absolute right-0 top-[50px] w-48 bg-[#FDE8C9] rounded-b-lg z-10 shadow-lg border border-[#FFC1A1]">
           <div className="p-2 w-full">
@@ -88,7 +86,8 @@ const UserMenu: React.FC = () => {
       <InventoryPopup 
         isOpen={isInventoryOpen} 
         onClose={closeInventory} 
-        onSeedSelect={() => {}}  // Aquí puedes agregar la lógica que necesites para manejar la selección de semillas
+        onSeedSelect={() => {}}
+        onWaterSelect={() => {}}
       />
     </div>
   );

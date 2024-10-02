@@ -2,7 +2,7 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { User } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { User } from '../../types'; 
 
 export const usersApi = createApi({
   reducerPath: 'usersApi',

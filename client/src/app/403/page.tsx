@@ -1,12 +1,12 @@
-"use client"; // Asegúrate de que este archivo se ejecute en el cliente
+"use client";
 
 import { useRouter } from 'next/navigation';
 
 const Page403 = () => {
-  const router = useRouter(); // Obtiene el router de Next.js
+  const router = useRouter(); 
 
   const handleRedirect = () => {
-    router.push('/Home'); // Redirige al home
+    router.push('/Home');
   };
 
   return (

@@ -1,17 +1,17 @@
 'use client'
 
 import Link from 'next/link';
-import { useState } from 'react'; // Para controlar el menú hamburguesa
+import { useState } from 'react';
 import UserMenu from './UserMenu';
 import LoginButton from './LoginButton';
 import { useAuth0 } from '@auth0/auth0-react';
 import useFetchUser from 'src/hooks/useFetchUser';
-import { HiMenu, HiX } from 'react-icons/hi'; // Para los iconos del menú hamburguesa
+import { HiMenu, HiX } from 'react-icons/hi'; 
 
 const Navbar: React.FC = () => {
   const { isAuthenticated } = useAuth0();
   const { user } = useFetchUser();
-  const [isOpen, setIsOpen] = useState(false); // Estado para abrir/cerrar el menú hamburguesa
+  const [isOpen, setIsOpen] = useState(false); 
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -19,12 +19,11 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-[#A8D5BA] p-4 shadow-lg fixed w-full top-0 z-10 flex items-center justify-between transition duration-300">
-      {/* Logo */}
+
       <div className="text-3xl font-bold text-[#333] hover:text-[#FFB385] transition duration-300">
         <Link href="/">FarmSim</Link>
       </div>
 
-      {/* Menú en pantallas grandes */}
       <ul className="hidden md:flex space-x-8 ml-auto items-center">
         <li>
           <Link href="/Home" className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300">
@@ -46,14 +45,12 @@ const Navbar: React.FC = () => {
         <li>{isAuthenticated ? <UserMenu /> : <LoginButton />}</li>
       </ul>
 
-      {/* Menú hamburguesa para pantallas pequeñas */}
       <div className="md:hidden flex items-center">
         <button onClick={toggleMenu} className="text-3xl text-[#333] focus:outline-none">
           {isOpen ? <HiX /> : <HiMenu />}
         </button>
       </div>
 
-      {/* Menú desplegable cuando está en modo hamburguesa */}
       {isOpen && (
         <ul className="absolute top-16 left-0 w-full bg-[#A8D5BA] flex flex-col items-center space-y-4 py-4 shadow-lg">
           <li>

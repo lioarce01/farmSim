@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { Seed, User } from '../../types'; // Asegúrate de que esta ruta sea correcta
+import { Seed, User } from '../../types';
 
 
 export const seedsApi = createApi({

@@ -24,13 +24,12 @@ router.get("/", async (req, res) => {
 
 
 let lastUpdateTime: number | null = null;
-const updateInterval = 1 * 60 * 1000; // 1 minutos en milisegundos
+const updateInterval = 1 * 60 * 1000;
 
-// Configurar el cron job para que se ejecute cada 5 minutos
 cron.schedule('* * * * *', async () => {
   try {
     await updateStoreWithNewSeeds();
-    lastUpdateTime = Date.now(); // Actualizar la hora de la última actualización
+    lastUpdateTime = Date.now(); 
   } catch (error) {
     console.error("Error updating store:", error);
   }
@@ -55,24 +54,23 @@ router.get('/refreshStore', (req, res) => {
       res.status(200).json({
         message: 'Tiempo hasta la próxima actualización',
         timeRemaining: formatTimeRemaining(timeRemaining),
-        timeRemainingInMs: timeRemaining, // Incluye el tiempo en milisegundos
-        canUpdate: false, // Indica que no se puede actualizar aún
+        timeRemainingInMs: timeRemaining,
+        canUpdate: false, 
       });
     } else {
       res.status(200).json({
         message: 'La tienda puede ser actualizada ahora.',
         timeRemaining: '0 minutos y 0 segundos',
         timeRemainingInMs: 0,
-        canUpdate: true, // Indica que se puede actualizar
+        canUpdate: true, 
       });
     }
   } else {
-    // Si no hay tiempo de actualización, devolver que puede actualizarse
     res.status(200).json({
       message: 'La tienda puede ser actualizada ahora.',
       timeRemaining: '0 minutos y 0 segundos',
       timeRemainingInMs: 0,
-      canUpdate: true, // Indica que se puede actualizar
+      canUpdate: true, 
     });
   }
 });
@@ -81,7 +79,6 @@ router.post('/buy', async (req, res) => {
   const { userSub, itemId, quantity, itemType } = req.body;
 
   try {
-    // Buscar el ítem en la tienda
     const storeItem = await prisma.storeItem.findUnique({
       where: { id: itemId }
     });
@@ -90,23 +87,19 @@ router.post('/buy', async (req, res) => {
       return res.status(404).json({ message: 'El ítem no existe en la tienda' });
     }
 
-    // Verificar si hay suficiente stock disponible
     if (storeItem.stock < quantity) {
       return res.status(400).json({ message: 'Stock insuficiente' });
     }
 
-    // Buscar al usuario
     let user = await prisma.user.findUnique({
       where: { sub: userSub },
       include: { inventory: { include: { seeds: true, waters: true } } }
     });
 
-    // Comprobar si el usuario existe
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Crear el inventario si no existe
     if (!user.inventory) {
       user = await prisma.user.update({
         where: { sub: userSub },
@@ -119,13 +112,11 @@ router.post('/buy', async (req, res) => {
       });
     }
 
-    // Verificar si el usuario tiene suficientes tokens
     const totalPrice = storeItem.price * quantity;
     if (user.balanceToken < totalPrice) {
       return res.status(400).json({ message: 'Saldo insuficiente de tokens' });
     }
 
-    // Reducir el stock en la tienda solo por la cantidad solicitada
     await prisma.storeItem.update({
       where: { id: itemId },
       data: {
@@ -133,7 +124,6 @@ router.post('/buy', async (req, res) => {
       }
     });
 
-    // Descontar los tokens del usuario por la cantidad de ítems comprados
     await prisma.user.update({
       where: { sub: userSub },
       data: {
@@ -141,18 +131,15 @@ router.post('/buy', async (req, res) => {
       }
     });
 
-    // Verificar si el ítem es una semilla o agua
     if (itemType === 'seed') {
-      // Verificar si la semilla ya está en el inventario del usuario
       const existingSeed = await prisma.seed.findFirst({
         where: {
-          inventoryId: user.inventory!.id, // Non-null assertion here
+          inventoryId: user.inventory!.id,
           name: storeItem.name
         }
       });
 
       if (existingSeed) {
-        // Si la semilla ya existe, incrementar la cantidad
         await prisma.seed.update({
           where: { id: existingSeed.id },
           data: {
@@ -160,7 +147,6 @@ router.post('/buy', async (req, res) => {
           }
         });
       } else {
-        // Si no existe, crear una nueva semilla en el inventario
         await prisma.seed.create({
           data: {
             name: storeItem.name,
@@ -173,16 +159,14 @@ router.post('/buy', async (req, res) => {
         });
       }
     } else if (itemType === 'water') {
-      // Verificar si el ítem de agua ya está en el inventario del usuario
       const existingWater = await prisma.water.findFirst({
         where: {
-          inventoryId: user.inventory!.id, // Non-null assertion here
+          inventoryId: user.inventory!.id,
           name: storeItem.name
         }
       });
 
       if (existingWater) {
-        // Si el ítem de agua ya existe, incrementar la cantidad
         await prisma.water.update({
           where: { id: existingWater.id },
           data: {
@@ -190,13 +174,12 @@ router.post('/buy', async (req, res) => {
           }
         });
       } else {
-        // Si no existe, crear un nuevo ítem de agua en el inventario
         await prisma.water.create({
           data: {
             name: storeItem.name,
             description: storeItem.description,
             quantity: quantity,
-            inventoryId: user.inventory!.id // Non-null assertion here
+            inventoryId: user.inventory!.id
           }
         });
       }

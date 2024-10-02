@@ -26,22 +26,13 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 app.use(
     auth({
       issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
-      baseURL: 'http://localhost:3002', // Cambia esto a la URL de tu aplicación
+      baseURL: 'http://localhost:3002', 
       clientID: process.env.AUTH0_CLIENT_ID,
       secret: process.env.AUTH0_CLIENT_SECRET,
-      authRequired: false, // Establece esto a true si quieres que todas las rutas estén protegidas
-      auth0Logout: true,   // Habilita el logout
+      authRequired: false, 
+      auth0Logout: true, 
     })
   )
-
-
-  // app.get('/api/auth/me', (req, res) => {
-  //   if (req.oidc.isAuthenticated()) {
-  //     res.json(req.oidc.user);
-  //   } else {
-  //     res.status(401).json({ error: 'Not authenticated' });
-  //   }
-  // });
 
 app.get('/test', (req, res) => {
     res.send('server running');

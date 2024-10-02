@@ -92,7 +92,6 @@ router.post('/plant-seed', async (req, res) => {
             return res.status(404).json({ message: 'Inventario no encontrado' });
         }
 
-        // Emitir evento de Socket.IO si `io` está disponible en req.app.locals
         const io = req.app.locals.io;
         if (io) {
             io.emit('seed-planted', {
@@ -128,22 +127,18 @@ router.put('/water-plant', async (req, res) => {
             return res.status(404).json({ message: 'Slot no encontrado' });
         }
 
-        // Verificar que el estado de crecimiento es 'WATER_NEEDED'
         if (slot.growthStatus !== 'WATER_NEEDED') {
             return res.status(400).json({ message: 'La planta no necesita ser regada en este momento' });
         }
 
-        // Verificar que el agua existe
         const water = await prisma.water.findUnique({
             where: { id: waterId },
         });
 
-        // Asegurarse de que el agua no sea nula
         if (!water || water.quantity === null) {
             return res.status(404).json({ message: 'Agua no encontrada o cantidad no disponible' });
         }
 
-        // Buscar el usuario por su sub para obtener el userId
         const user = await prisma.user.findUnique({
             where: { sub: userSub },
         });
@@ -152,9 +147,8 @@ router.put('/water-plant', async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        // Verificar que el inventario del usuario existe usando su 'userId'
         const userInventory = await prisma.inventory.findUnique({
-            where: { userId: user.id }, // Aquí buscamos el inventario usando el 'userId'
+            where: { userId: user.id }, 
             include: { waters: true },
         });
 
@@ -162,12 +156,10 @@ router.put('/water-plant', async (req, res) => {
             return res.status(403).json({ message: 'Esta agua no pertenece a tu inventario' });
         }
 
-        // Comprobar que hay suficiente agua para usar
         if (water.quantity < 1) {
             return res.status(400).json({ message: 'No tienes suficiente agua para regar' });
         }
 
-        // Actualizar el slot para reflejar que la planta ha sido regada
         const updatedSlot = await prisma.slot.update({
             where: { id: slotId },
             data: {
@@ -177,7 +169,6 @@ router.put('/water-plant', async (req, res) => {
             },
         });
 
-        // Decrementar la cantidad de agua en el inventario del usuario
         const updatedWater = await prisma.water.update({
             where: { id: waterId },
             data: {
@@ -187,7 +178,6 @@ router.put('/water-plant', async (req, res) => {
             },
         });
 
-        // Si la cantidad de agua llega a cero, eliminar el registro
         if (updatedWater.quantity === 0) {
             await prisma.water.delete({
                 where: { id: waterId },

@@ -1,9 +1,9 @@
-import { User } from './userTypes'; // Ajusta la ruta según tu estructura de carpetas
+import { User } from './userTypes';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: User; // La propiedad user es opcional
+      user?: User; 
     }
   }
 }

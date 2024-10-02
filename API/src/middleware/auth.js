@@ -13,9 +13,8 @@ const authMiddleware = jwt({
   issuer: `https://${process.env.AUTH0_DOMAIN}/`,
 });
 
-// Luego, en tu app, puedes hacer un log
 app.use((req, res, next) => {
-  console.log(req.user); // Aquí deberías ver el usuario si todo está bien
+  console.log(req.user);
   next();
 });
 

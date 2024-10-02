@@ -26,14 +26,13 @@ function getRandomQuantity() {
 
 // Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 async function seedStoreWithRandomWaters() {
-  const watersToCreate = 2; // Número de aguas a generar
+  const watersToCreate = 2; 
   const createdWaters = [];
 
   for (let i = 0; i < watersToCreate; i++) {
     let name;
     let unique = false;
 
-    // Generar un nombre único
     while (!unique) {
       name = `${waterNames[Math.floor(Math.random() * waterNames.length)]}-${Date.now()}`;
       

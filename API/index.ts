@@ -9,7 +9,6 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3002;
 
-// Crea el servidor HTTP
 const server = createServer(app); 
 
 // Usa la instancia del servidor para Socket.IO
@@ -34,13 +33,12 @@ io.on('connection', (socket) => {
 // Asigna la instancia de Socket.IO a locals
 app.locals.io = io;
 
-// Cambia esto para usar el servidor que creaste
 server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
-// Tarea programada para ejecutar cada 21 minutos.
-cron.schedule('* * * * *', async () => {
+// Tarea programada para ejecutar cada 2 horas.
+cron.schedule('0 */2 * * *', async () => {
   console.log(`Running cron job at ${new Date().toISOString()}`);
   
   await updateGrowthStatus(io);

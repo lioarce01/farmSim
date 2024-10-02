@@ -15,15 +15,15 @@ router.get('/', async (req, res) => {
                         waters: true,
                     }
                 },
-                farm: {  // Incluir la granja
+                farm: {  
                     include: {
-                        slots: true, // Incluir los slots de la granja
+                        slots: true, 
                     }
                 }
             }
         });
 
-        res.json(users); // Devolver directamente la lista de usuarios con sus datos relacionados
+        res.json(users);
 
     } catch (e) {
         console.log(e);
@@ -46,7 +46,7 @@ router.get('/:sub', async (req, res) => {
                         waters: true,
                     }
                 },
-                farm: {  // Incluir la granja aquí correctamente
+                farm: {  
                     include: {
                         slots: true,
                     }
@@ -65,13 +65,11 @@ router.get('/:sub', async (req, res) => {
 router.post('/register', async (req, res) => {
     const { nickname, email, sub } = req.body;
   
-    // Validación de entradas
     if (!email || !nickname) {
       return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
   
     try {
-      // Verificar si el usuario ya existe por sub o email
       const existingUser = await prisma.user.findUnique({
         where: { sub },
       });
@@ -80,7 +78,6 @@ router.post('/register', async (req, res) => {
         return res.status(409).json({ message: 'Usuario ya existe' });
       }
   
-      // También verificar por email
       const existingUserByEmail = await prisma.user.findUnique({
         where: { email },
       });
@@ -88,8 +85,7 @@ router.post('/register', async (req, res) => {
       if (existingUserByEmail) {
         return res.status(409).json({ message: 'Email ya está registrado' });
       }
-  
-      // Crear el usuario en la base de datos junto con su granja y slots
+
       const newUser = await prisma.user.create({
         data: {
           nickname,
@@ -106,10 +102,9 @@ router.post('/register', async (req, res) => {
             create: {
               slots: {
                 create: Array(8).fill(null).map(() => ({
-                  // Inicializa cada slot, ajusta los campos si es necesario
                   seedId: null,
                   plantingTime: null,
-                  growthStatus: 'NONE', // o el valor por defecto que quieras
+                  growthStatus: 'NONE', 
                 })),
               },
             },
@@ -126,7 +121,6 @@ router.post('/register', async (req, res) => {
   });
   
 
-//update tokens del usuario por body
 router.post('/addTokens', async (req, res) => {
     const { userSub, tokensToAdd } = req.body
 

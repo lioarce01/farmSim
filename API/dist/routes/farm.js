@@ -185,15 +185,21 @@ router.put('/water-plant', (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(500).json({ message: 'Error al regar la planta', error: e.message });
     }
 }));
-router.post('/harvest-plant', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/harvest-plant', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //logica para cosechar una seed de un slot de la granja
-    const { slotId, sub } = req.body;
+    const { slotId, sub, farmId } = req.body;
+    if (!farmId || !slotId || !sub) {
+        return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
     try {
         const slot = yield prisma.slot.findUnique({
             where: { id: slotId }
         });
         if (!slot) {
             return res.status(404).json({ message: 'Slot not found' });
+        }
+        if (slot.farmId !== farmId) {
+            return res.status(403).json({ message: 'You do not have permission to harvest from this farm.' });
         }
         const user = yield prisma.user.findUnique({
             where: { sub }
@@ -232,6 +238,7 @@ router.post('/harvest-plant', (req, res) => __awaiter(void 0, void 0, void 0, fu
             io.emit('seed-harvested', {
                 slotId,
                 updatedSlot,
+                farmId
             });
         }
         return res.status(200).json({ message: 'Plant harvested successfully', updatedSlot });

@@ -38,7 +38,7 @@ server.listen(PORT, () => {
 });
 
 // Tarea programada para ejecutar cada 2 horas.
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 */2 * * *', async () => {
   console.log(`Running cron job at ${new Date().toISOString()}`);
   
   await updateGrowthStatus(io);

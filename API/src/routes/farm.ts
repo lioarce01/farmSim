@@ -267,6 +267,7 @@ router.put('/harvest-plant', async (req, res) => {
             io.emit('seed-harvested', {
                 slotId,
                 updatedSlot,
+                farmId
             });
         }
 

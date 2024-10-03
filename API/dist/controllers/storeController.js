@@ -28,7 +28,6 @@ const seedNamesByRarity = {
     EPIC: ['Bonsai', 'Fern', 'Bamboo'],
     LEGENDARY: ['Dragon Tree', 'Phoenix Flower', 'Golden Rose']
 };
-// Definir los rangos de precios por rareza
 const priceRangesByRarity = {
     COMMON: [20, 30],
     UNCOMMON: [30, 50],
@@ -52,9 +51,9 @@ function getRandomRarity() {
     for (const [rarity, probability] of Object.entries(rarityProbabilities)) {
         sum += probability;
         if (random < sum)
-            return rarity; // Asegúrate de que aquí se devuelva un Rarity
+            return rarity;
     }
-    return 'COMMON'; // Valor predeterminado
+    return 'COMMON';
 }
 // Función para obtener un nombre base aleatorio según la rareza
 function getRandomSeedName(rarity) {
@@ -83,7 +82,7 @@ function seedStoreWithRandomSeeds() {
         const createdSeeds = [];
         for (let i = 0; i < seedsToCreate; i++) {
             const rarity = getRandomRarity();
-            let uniqueName = ''; // Inicializar con un valor predeterminado
+            let uniqueName = '';
             let isUnique = false;
             while (!isUnique) {
                 uniqueName = createUniqueSeedName(rarity);
@@ -119,9 +118,9 @@ function getStockByRarity(rarity) {
         case 'COMMON':
         case 'UNCOMMON':
         case 'RARE':
-            return Math.floor(Math.random() * 3) + 1; // Stock entre 1 y 3
+            return Math.floor(Math.random() * 3) + 1;
         case 'EPIC':
-            return Math.floor(Math.random() * 2) + 1; // Stock entre 1 y 2
+            return Math.floor(Math.random() * 2) + 1;
         case 'LEGENDARY':
             return 1; // Stock fijo de 1
         default:

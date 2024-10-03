@@ -32,12 +32,11 @@ function getRandomQuantity() {
 // Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 function seedStoreWithRandomWaters() {
     return __awaiter(this, void 0, void 0, function* () {
-        const watersToCreate = 2; // Número de aguas a generar
+        const watersToCreate = 2;
         const createdWaters = [];
         for (let i = 0; i < watersToCreate; i++) {
             let name;
             let unique = false;
-            // Generar un nombre único
             while (!unique) {
                 name = `${waterNames[Math.floor(Math.random() * waterNames.length)]}-${Date.now()}`;
                 const existingItem = yield prisma.storeItem.findUnique({

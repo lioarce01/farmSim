@@ -77,7 +77,7 @@ function createUniqueSeedName(rarity) {
 // Función para poblar la tienda con semillas aleatorias
 function seedStoreWithRandomSeeds() {
     return __awaiter(this, void 0, void 0, function* () {
-        const seedsToCreate = 5; // Número de semillas a generar
+        const seedsToCreate = 5;
         const createdSeeds = [];
         for (let i = 0; i < seedsToCreate; i++) {
             const rarity = getRandomRarity();
@@ -102,9 +102,9 @@ function seedStoreWithRandomSeeds() {
                     case 'EPIC':
                         return Math.floor(Math.random() * 2) + 1; // Stock entre 1 y 2
                     case 'LEGENDARY':
-                        return 1; // Stock fijo de 1
+                        return 1;
                     default:
-                        return 1; // Valor predeterminado
+                        return 1;
                 }
             }
             const stock = getStockByRarity(rarity);
@@ -153,7 +153,6 @@ function updateStoreWithNewSeeds() {
             where: { itemType: 'WATER' }
         });
         console.log(`Deleted ${deleteWatersResult.count} existing waters.`);
-        // Añade nuevas semillas
         yield seedStoreWithRandomSeeds();
         yield (0, waterGeneration_js_1.seedStoreWithRandomWaters)();
     });

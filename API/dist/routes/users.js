@@ -28,12 +28,12 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
                 farm: {
                     include: {
-                        slots: true, // Incluir los slots de la granja
+                        slots: true,
                     }
                 }
             }
         });
-        res.json(users); // Devolver directamente la lista de usuarios con sus datos relacionados
+        res.json(users);
     }
     catch (e) {
         console.log(e);
@@ -68,26 +68,22 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { nickname, email, sub } = req.body;
-    // Validación de entradas
     if (!email || !nickname) {
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
-        // Verificar si el usuario ya existe por sub o email
         const existingUser = yield prisma.user.findUnique({
             where: { sub },
         });
         if (existingUser) {
             return res.status(409).json({ message: 'Usuario ya existe' });
         }
-        // También verificar por email
         const existingUserByEmail = yield prisma.user.findUnique({
             where: { email },
         });
         if (existingUserByEmail) {
             return res.status(409).json({ message: 'Email ya está registrado' });
         }
-        // Crear el usuario en la base de datos junto con su granja y slots
         const newUser = yield prisma.user.create({
             data: {
                 nickname,
@@ -104,10 +100,9 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                     create: {
                         slots: {
                             create: Array(8).fill(null).map(() => ({
-                                // Inicializa cada slot, ajusta los campos si es necesario
                                 seedId: null,
                                 plantingTime: null,
-                                growthStatus: 'NONE', // o el valor por defecto que quieras
+                                growthStatus: 'NONE',
                             })),
                         },
                     },
@@ -122,7 +117,6 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: 'Error al crear usuario', error: e.message });
     }
 }));
-//update tokens del usuario por body
 router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userSub, tokensToAdd } = req.body;
     try {

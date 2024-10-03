@@ -184,6 +184,15 @@ router.put('/water-plant', async (req, res) => {
             });
         }
 
+        const io = req.app.locals.io;
+        if (io) {
+            io.emit('seed-watered', {
+                farmId,
+                slotId,
+                updatedSlot,
+            });
+        }
+
         res.status(200).json({ message: 'Planta regada exitosamente', updatedSlot });
 
     } catch (error) {

@@ -204,10 +204,78 @@ router.put('/water-plant', async (req, res) => {
 
 
 
-router.post('/harvest-plant', async (req, res) => {
+router.put('/harvest-plant', async (req, res) => {
     //logica para cosechar una seed de un slot de la granja
+    const {slotId, sub, farmId } = req.body;
+
+    if (!farmId || !slotId || !sub) {
+        return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
+    
+    try {
+        const slot = await prisma.slot.findUnique({
+            where: {id: slotId}
+        })
+
+        if (!slot) {
+            return res.status(404).json({message: 'Slot not found'})
+        }
+
+        if (slot.farmId !== farmId) {
+            return res.status(403).json({message: 'You do not have permission to harvest from this farm.'})
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { sub }
+        })
+
+        if (!user) {
+            return res.status(404).json({message: 'User not found'})
+        }
+
+        if (slot.growthStatus !== 'READY_TO_HARVEST') {
+            return res.status(400).json({ message: 'La planta no puede ser cosechada en este momento' });
+        }
+
+        if (slot.seedTokensGenerated) {
+            await prisma.user.update({
+                where: { sub },
+                data: {
+                    balanceToken: {
+                        increment: slot.seedTokensGenerated
+                    }
+                }
+            })
+        }
+
+        const updatedSlot = await prisma.slot.update({
+            where: {id: slotId},
+            data: {
+                plantingTime: null,
+                growthStatus: "NONE",
+                wateredCount: 0,
+                lastWatered: null,
+                seedName: null,
+                seedDescription: null,
+                seedRarity: null,
+                seedTokensGenerated: null
+            }
+        })
+
+        const io = req.app.locals.io;
+        if (io) {
+            io.emit('seed-harvested', {
+                slotId,
+                updatedSlot,
+            });
+        }
+
+        return res.status(200).json({message: 'Plant harvested successfully', updatedSlot})
+
+    } catch (error) {
+        console.error('Error harvesting plant:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 })
-
-
 
 export default router

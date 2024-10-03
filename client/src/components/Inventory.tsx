@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import useFetchUser from 'src/hooks/useFetchUser';
 
@@ -28,15 +29,23 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
   onWaterSelect,
 }) => {
   const { user: fetchedUser, error, isLoading } = useFetchUser();
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   if (isLoading) {
     return <span className="text-[#A8D5BA] font-semibold">Loading inventory...</span>;
   }
-  
+
   if (error) {
-    const e = error as Error
+    const e = error as Error;
     console.error('Error fetching user:', error);
-    return <div className="text-red-500">{`Error: ${e.message || 'Unknown error'}`}</div>;
+    return <div className="text-red-500">Error: {e.message || 'Unknown error'}</div>;
   }
 
   const { seeds = [], waters = [] } = fetchedUser?.inventory || {};
@@ -46,51 +55,53 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-[#FFF5D1] p-6 rounded-lg shadow-lg w-96 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-[#FFB385] hover:text-red-500 transition duration-300"
-        >
-          <FaTimes size={20} />
+        <button onClick={onClose} className="absolute top-2 right-2 text-[#FFB385] hover:text-[#FFC1A1] transition duration-300">
+          <FaTimes size={24} />
         </button>
-        <h2 className="text-lg font-semibold mb-4 text-[#172c1f]">Inventory</h2>
 
-        <h3 className="text-md font-semibold text-[#172c1f] mb-2">Seeds</h3>
-        <ul className="mb-4">
-          {seeds.length > 0 ? (
-            seeds.map((seed: Seed, index: number) => (
-              <li key={index} className="flex justify-between text-[#172c1f] mb-2">
-                <span>{seed.name}</span>
-                <button
-                  className="bg-[#FFB385] text-[#172c1f] font-semibold px-3 py-1 rounded-lg hover:bg-[#FFC1A1] transition duration-300"
-                  onClick={() => onSeedSelect(seed)}
-                >
-                  Plant
-                </button>
-              </li>
-            ))
-          ) : (
-            <p className="text-[#172c1f] mb-4">No seeds available.</p>
-          )}
-        </ul>
+        <h2 className="text-center text-xl font-bold mb-4">Inventory</h2>
+        
+        {pathname === '/Farm' && (
+          <>
+            <h3 className="font-semibold mb-2">Seeds:</h3>
+            {seeds.length > 0 ? (
+              <ul className="mb-4">
+                {seeds.map((seed: Seed) => (
+                  <li key={seed.id} className="flex justify-between items-center mb-2 p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]">
+                    <span className="text-[#398b5a] font-medium">{seed.name}</span>
+                    <button
+                      className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
+                      onClick={() => onSeedSelect(seed)}
+                    >
+                      Plant
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-red-500 font-semibold">No seeds available.</p>
+            )}
+          </>
+        )}
 
-        <h3 className="text-md font-semibold text-[#172c1f] mb-2">Waters</h3>
-        <ul className="mb-4">
-          {waters.length > 0 ? (
-            waters.map((water: Water, index: number) => (
-              <li key={index} className="flex justify-between text-[#172c1f] mb-2">
-                <span>{water.name}</span>
+        <h3 className="font-semibold mb-2">Waters:</h3>
+        {waters.length > 0 ? (
+          <ul>
+            {waters.map((water: Water) => (
+              <li key={water.id} className="flex justify-between items-center mb-2 p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]">
+                <span className="text-[#398b5a] font-medium">{water.name}</span>
                 <button
-                  className="bg-[#FFB385] text-[#172c1f] font-semibold px-4 py-1 rounded-lg hover:bg-[#FFC1A1] transition duration-300"
+                  className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
                   onClick={() => onWaterSelect(water)}
                 >
                   Use
                 </button>
               </li>
-            ))
-          ) : (
-            <p className="text-[#172c1f] mb-4">No waters available.</p>
-          )}
-        </ul>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-red-500 font-semibold">No water available.</p>
+        )}
       </div>
     </div>
   );

@@ -48,7 +48,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({ userSub, itemId, quanti
             : 'bg-[#398b5a] text-white hover:bg-[#276844]' 
         }`}
       >
-        {stock <= 0 ? 'No stock' : 'Buy Seed'}
+        {stock <= 0 ? 'No stock' : 'Buy'}
       </button>
 
       {showPopup && (

@@ -61,14 +61,14 @@ const UserMenu: React.FC = () => {
 
       {isOpen && (
         <div className="absolute right-0 top-[50px] w-48 bg-[#FDE8C9] rounded-b-lg z-10 shadow-lg border border-[#FFC1A1]">
-          <div className="p-2 w-full">
+          {/* <div className="p-2 w-full">
             <button 
               className="px-4 py-2 w-full text-left text-[#333] hover:bg-[#FFC1A1] transition duration-300 font-semibold"
               onClick={openInventory}
             >
               My Inventory
             </button>
-          </div>
+          </div> */}
 
           <div className="p-2 w-full">
             <Link
@@ -83,12 +83,6 @@ const UserMenu: React.FC = () => {
           </div>
         </div>
       )}
-      <InventoryPopup 
-        isOpen={isInventoryOpen} 
-        onClose={closeInventory} 
-        onSeedSelect={() => {}}
-        onWaterSelect={() => {}}
-      />
     </div>
   );
 };

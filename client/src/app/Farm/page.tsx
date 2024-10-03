@@ -14,6 +14,7 @@ const Farm = () => {
   const { user, error: userError, isLoading: userLoading } = useFetchUser();
   const [plantSeed, { isLoading: isPlanting }] = usePlantSeedMutation();
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const [action, setAction] = useState<'plant' | 'water' | 'harvest' | null>(null);
 
   const farmId = user?.farm?.id;
 
@@ -32,7 +33,6 @@ const Farm = () => {
 
       socket.on('actualizacion-planta', (data) => {
         console.log('Plant update event received:', data);
-        
         refetchFarm(); 
       });
 
@@ -42,7 +42,6 @@ const Farm = () => {
       };
     }
   }, [socket, farm]);
-
 
   if (userLoading) return <div className="text-center text-lg">Loading user...</div>;
   if (userError) {
@@ -59,7 +58,6 @@ const Farm = () => {
     return <div className="text-center text-red-500">Error loading farm: {errorMessage}</div>;
   }
 
-  // Function to format last watered time
   const formatLastWatered = (lastWatered: string | null) => {
     if (!lastWatered) return 'Never';
 
@@ -73,9 +71,9 @@ const Farm = () => {
     return `${hours}h ${minutes}m`;
   };
 
-
-  const openInventory = (slotIndex: number) => {
+  const openInventory = (slotIndex: number | null = null, action: 'plant' | 'water' | 'harvest' | null = null) => {
     setSelectedSlot(slotIndex);
+    setAction(action);
     setIsInventoryOpen(true);
   };
 
@@ -141,15 +139,23 @@ const Farm = () => {
       <Navbar />
       <div className="p-4 sm:p-8" style={{ paddingTop: '120px' }}>
         <h1 className="text-[#172c1f] text-3xl font-bold mb-6 text-center">My Farm</h1>
+
+        {/* Botón para abrir el inventario */}
+        <div className="flex justify-center mb-6">
+          <button
+            className="bg-[#FFB385] text-[#172c1f] font-semibold px-4 py-2 rounded-lg hover:bg-[#FFC1A1] transition duration-300"
+            onClick={() => openInventory(null, 'plant')}
+          >
+            Inventory
+          </button>
+        </div>
+
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 mt-18">
           {farm.slots.map((slot: Slot, index: number) => (
-            <div
-              key={index}
-              className="border-4 border-[#FFB385] bg-[#FDE8C9] p-4 flex flex-col items-center justify-between rounded-lg shadow-lg transition-transform transform hover:scale-105"
-            >
+            <div key={index} className="border-4 border-[#FFB385] bg-[#FDE8C9] p-4 flex flex-col items-center justify-between rounded-lg shadow-lg transition-transform transform hover:scale-105">
               {slot.seedName ? (
                 <>
-                  <span className="text-[#172c1f] font-semibold text-lg">{slot.seedName}</span>
+                  <div className="font-bold text-xl mb-2">{slot.seedName}</div>
                   <span className="font-bold text-sm my-1">
                     Rarity:&nbsp;
                     <span className={`${
@@ -181,16 +187,16 @@ const Farm = () => {
                   <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-2">
                     {slot.growthStatus === SeedStatus.WATER_NEEDED && (
                       <button
-                        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]`}
-                        onClick={() => waterPlant(index)}
+                        className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                        onClick={() => openInventory(index, 'water')}
                       >
                         Water
                       </button>
                     )}
                     {slot.growthStatus === SeedStatus.READY_TO_HARVEST && (
                       <button
-                        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]`}
-                        onClick={() => harvestPlant(index)}
+                        className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                        onClick={() => openInventory(index, 'harvest')}
                       >
                         Harvest
                       </button>
@@ -199,8 +205,8 @@ const Farm = () => {
                 </>
               ) : (
                 <button
-                  className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]`}
-                  onClick={() => openInventory(index)}
+                  className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                  onClick={() => openInventory(index, 'plant')}
                 >
                   Add Seed
                 </button>
@@ -208,13 +214,18 @@ const Farm = () => {
             </div>
           ))}
         </div>
-        <InventoryPopup
-          isOpen={isInventoryOpen}
-          onClose={closeInventory}
-          onSeedSelect={plantSeedInSlot}
-          onWaterSelect={() => {}}
-        />
       </div>
+
+      <InventoryPopup
+        isOpen={isInventoryOpen}
+        onClose={closeInventory}
+        onSeedSelect={plantSeedInSlot}
+        onWaterSelect={() => {
+          if (action === 'water') {
+            // Lógica para usar agua
+          }
+        }}
+      />
     </div>
   );
 };

@@ -36,10 +36,10 @@ export const farmApi = createApi({
         })
     }),
     harvestPlant: builder.mutation({
-        query: (seedData) => ({
+        query: (slotData) => ({
             url: '/farm/harvest-plant',
-            method: 'POST',
-            body: seedData
+            method: 'PUT',
+            body: slotData
         })
     }),
   }),

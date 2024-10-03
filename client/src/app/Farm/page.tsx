@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
-import { useGetFarmByIdQuery, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
+import { useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
 import { Slot } from 'src/types';
 import { SeedStatus, Rarity } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
@@ -14,8 +14,9 @@ const Farm = () => {
   const { user, error: userError, isLoading: userLoading } = useFetchUser();
   const [plantSeed, { isLoading: isPlanting }] = usePlantSeedMutation();
   const [waterPlant, {isLoading: isWatering}] = useWaterPlantMutation()
+  const [harvestPlant, {isLoading: isHarvesting}] = useHarvestPlantMutation()
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
-  const [action, setAction] = useState<'plant' | 'water' | 'harvest' | null>(null);
+  const [action, setAction] = useState<'plant' | 'water' | null>(null);
 
   const farmId = user?.farm?.id;
 
@@ -42,10 +43,16 @@ const Farm = () => {
         refetchFarm(); 
       });
 
+      socket.on('seed-harvested', (data) => {
+        console.log('Plant update event received:', data);
+        refetchFarm(); 
+      });
+
       return () => {
         socket.off('seed-planted');
         socket.off('actualizacion-planta'); 
         socket.off('seed-watered'); 
+        socket.off('seed-harvested')
       };
     }
   }, [socket, farm]);
@@ -78,7 +85,7 @@ const Farm = () => {
     return `${hours}h ${minutes}m`;
   };
 
-  const openInventory = (slotIndex: number | null = null, action: 'plant' | 'water' | 'harvest' | null = null) => {
+  const openInventory = (slotIndex: number | null = null, action: 'plant' | 'water' | null = null) => {
     setSelectedSlot(slotIndex);
     setAction(action);
     setIsInventoryOpen(true);
@@ -104,10 +111,12 @@ const Farm = () => {
           sub: user?.sub,
         };
 
-        await plantSeed(seedData).unwrap();
-        closeInventory();
+        await plantSeed(seedData).unwrap()
       } catch (e) {
-        console.error('Error planting seed:', e);
+        const error = e as Error
+        console.error('Error planting seed:', error.message);
+      } finally {
+        closeInventory()
       }
     }
   };
@@ -128,16 +137,33 @@ const Farm = () => {
         }
 
         await waterPlant(seedData).unwrap()
-        closeInventory()
       } catch(e) {
-        console.error('Error watering seed:', e)
+        const error = e as Error
+        console.error('Error watering seed:', error.message)
+      } finally {
+        closeInventory()
       }
     }
   };
 
-  const harvestPlant = (slotIndex: number) => {
-    console.log(`Harvesting plant in slot ${slotIndex}`);
-    // Lógica para cosechar la planta 
+  const harvestPlantInSlot = async (slotIndex: number) => {
+
+    if (farmId){
+      try {
+        const slotData = {
+          farmId,
+          slotId: farm.slots[slotIndex].id,
+          sub: user?.sub
+        }
+
+        const response = await harvestPlant(slotData).unwrap()
+      } catch(e) {
+        const error = e as Error
+        console.error('Error harvesting plant:', error.message)
+      }
+    } else {
+      console.log('Farmid is missing')
+    }
   };
 
   const formatGrowthStatus = (status: string | null) => {
@@ -214,6 +240,7 @@ const Farm = () => {
                       <button
                         className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
                         onClick={() => openInventory(index, 'water')}
+                        disabled={isWatering}
                       >
                         Water
                       </button>
@@ -221,9 +248,10 @@ const Farm = () => {
                     {slot.growthStatus === SeedStatus.READY_TO_HARVEST && (
                       <button
                         className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
-                        onClick={() => openInventory(index, 'harvest')}
+                        onClick={() => harvestPlantInSlot(index)}
+                        disabled={isHarvesting}
                       >
-                        Harvest
+                        {isHarvesting ? 'Harvesting...' : 'Harvest'}
                       </button>
                     )}
                   </div>
@@ -232,6 +260,7 @@ const Farm = () => {
                 <button
                   className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
                   onClick={() => openInventory(index, 'plant')}
+                  disabled={isPlanting}
                 >
                   Add Seed
                 </button>

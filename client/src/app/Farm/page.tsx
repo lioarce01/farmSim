@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
-import { useGetFarmByIdQuery, usePlantSeedMutation } from '../../redux/api/farm';
+import { useGetFarmByIdQuery, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
 import { Slot } from 'src/types';
 import { SeedStatus, Rarity } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
@@ -13,6 +13,7 @@ const Farm = () => {
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const { user, error: userError, isLoading: userLoading } = useFetchUser();
   const [plantSeed, { isLoading: isPlanting }] = usePlantSeedMutation();
+  const [waterPlant, {isLoading: isWatering}] = useWaterPlantMutation()
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [action, setAction] = useState<'plant' | 'water' | 'harvest' | null>(null);
 
@@ -36,9 +37,15 @@ const Farm = () => {
         refetchFarm(); 
       });
 
+      socket.on('seed-watered', (data) => {
+        console.log('Plant update event received:', data);
+        refetchFarm(); 
+      });
+
       return () => {
         socket.off('seed-planted');
         socket.off('actualizacion-planta'); 
+        socket.off('seed-watered'); 
       };
     }
   }, [socket, farm]);
@@ -105,9 +112,27 @@ const Farm = () => {
     }
   };
 
-  const waterPlant = (slotIndex: number) => {
-    console.log(`Watering plant in slot ${slotIndex}`);
-    // Lógica para regar la planta 
+  const waterPlantInSlot = async (water: any) => {
+    if (selectedSlot !== null && farmId) {
+      try {
+        if(!water.id) {
+          console.error('Water ID is missing!')
+          return
+        }
+
+        const seedData = {
+          farmId,
+          slotId: farm.slots[selectedSlot].id,
+          waterId: water.id,
+          userSub: user?.sub
+        }
+
+        await waterPlant(seedData).unwrap()
+        closeInventory()
+      } catch(e) {
+        console.error('Error watering seed:', e)
+      }
+    }
   };
 
   const harvestPlant = (slotIndex: number) => {
@@ -220,11 +245,7 @@ const Farm = () => {
         isOpen={isInventoryOpen}
         onClose={closeInventory}
         onSeedSelect={plantSeedInSlot}
-        onWaterSelect={() => {
-          if (action === 'water') {
-            // Lógica para usar agua
-          }
-        }}
+        onWaterSelect={waterPlantInSlot}
       />
     </div>
   );

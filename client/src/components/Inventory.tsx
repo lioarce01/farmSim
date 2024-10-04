@@ -4,16 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import useFetchUser from 'src/hooks/useFetchUser';
-
-interface Seed {
-  id: string;
-  name: string;
-}
-
-interface Water {
-  id: string;
-  name: string;
-}
+import { Rarity, Seed, Water } from '../types/index'
 
 interface InventoryPopupProps {
   isOpen: boolean;
@@ -65,10 +56,21 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
           <>
             <h3 className="font-semibold mb-2">Seeds:</h3>
             {seeds.length > 0 ? (
-              <ul className="mb-4">
+              <ul className="mb-4 space-y-2">
                 {seeds.map((seed: Seed) => (
-                  <li key={seed.id} className="flex justify-between items-center mb-2 p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]">
+                  <li key={seed.id} className="flex justify-between items-center p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]">
                     <span className="text-[#398b5a] font-medium">{seed.name}</span>
+                    <span
+                      className={`text-sm font-bold ${
+                        seed.rarity === Rarity.LEGENDARY ? 'text-yellow-500' :
+                        seed.rarity === Rarity.EPIC ? 'text-purple-600' :
+                        seed.rarity === Rarity.RARE ? 'text-blue-600' :
+                        seed.rarity === Rarity.UNCOMMON ? 'text-gray-500' :
+                        'text-gray-700'
+                      }`}
+                    >
+                      {seed.rarity}
+                    </span>
                     <button
                       className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
                       onClick={() => onSeedSelect(seed)}

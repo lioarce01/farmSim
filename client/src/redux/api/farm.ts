@@ -42,8 +42,15 @@ export const farmApi = createApi({
             body: slotData
         })
     }),
+    deletePlant: builder.mutation({
+      query: (slotData)  => ({
+        url: '/farm/delete-plant',
+        method: 'DELETE',
+        body: slotData
+      })
+    })
   }),
   
 });
 
-export const { useGetFarmsQuery ,useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } = farmApi;
+export const { useDeletePlantMutation, useGetFarmsQuery ,useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } = farmApi;

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
-import { useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
+import { useDeletePlantMutation, useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
 import { Slot } from 'src/types';
 import { SeedStatus, Rarity } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
@@ -16,6 +16,7 @@ const Farm = () => {
   const [plantSeed, { isLoading: isPlanting }] = usePlantSeedMutation();
   const [waterPlant, {isLoading: isWatering}] = useWaterPlantMutation()
   const [harvestPlant, {isLoading: isHarvesting}] = useHarvestPlantMutation()
+  const [deletePlant, {isLoading: isDeleting}] = useDeletePlantMutation()
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [action, setAction] = useState<'plant' | 'water' | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false)
@@ -49,12 +50,17 @@ const Farm = () => {
         console.log('Plant update event received:', data);
         refetchFarm(); 
       });
+      socket.on('seed-deleted', (data) => {
+        console.log('Plant update event received:', data);
+        refetchFarm()
+      })
 
       return () => {
         socket.off('seed-planted');
         socket.off('actualizacion-planta'); 
         socket.off('seed-watered'); 
         socket.off('seed-harvested')
+        socket.off('seed-deleted')
       };
     }
   }, [socket, farm]);
@@ -164,9 +170,27 @@ const Farm = () => {
         console.error('Error harvesting plant:', error.message)
       }
     } else {
-      console.log('Farmid is missing')
+      console.log('FarmId is missing')
     }
   };
+
+  const deletePlantInSlot = async (slotIndex: number) => {
+    if (farmId) {
+      try {
+        const slotData= {
+          farmId,
+          slotId: farm.slots[slotIndex].id,
+          sub: user?.sub
+        }
+        const response = await deletePlant(slotData).unwrap()
+      } catch(e) {
+        const error = e as Error
+        console.error('Error harvesting plant:', error.message)
+      }
+    } else {
+      console.log('FarmId is missing.')
+    }
+  }
 
   const formatGrowthStatus = (status: string | null) => {
     switch (status) {
@@ -255,6 +279,15 @@ const Farm = () => {
                       >
                         {isHarvesting ? 'Harvesting...' : 'Harvest'}
                       </button>
+                    )}
+                    {slot.growthStatus === SeedStatus.WITHERED && (
+                      <button
+                      className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                      onClick={() => deletePlantInSlot(index)}
+                      disabled={isDeleting}
+                    >
+                      Delete
+                    </button>
                     )}
                   </div>
                 </>

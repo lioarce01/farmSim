@@ -12,11 +12,11 @@ import Timer from './Timer';
 import { setTimeRemaining } from 'src/redux/slices/timerSlice';
 
 const rarityColors: { [key: string]: string } = {
-  common: '#6DBE45',
-  uncommon: '#FFA07A',
-  rare: '#FF8C00',
-  epic: '#FFD700',
-  legendary: '#32CD32'
+  common: '#6c6d70', // text-gray-700
+  uncommon: '#808080', // text-gray-500
+  rare: '#0000ff', // text-blue-600
+  epic: '#800080', // text-purple-600
+  legendary: '#ffd700' // text-yellow-500
 };
 
 const StorePage: React.FC = () => {

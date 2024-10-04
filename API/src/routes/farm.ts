@@ -202,7 +202,65 @@ router.put('/water-plant', async (req, res) => {
     }
 });
 
+router.delete('/delete-plant', async (req, res) => {
+    const { slotId, farmId, sub }  = req.body;
 
+    try {
+
+        const slot = await prisma.slot.findUnique({
+            where:  { id: slotId },
+        })
+
+        if (!slot?.seedName) {
+            return res.status(404).json({ message: 'Plant does not exist' });
+        }
+
+        if (slot.farmId !== farmId) {
+            return res.status(403).json({message: 'You do not have permission to delete this plant.'})
+        }
+
+        const user = await  prisma.user.findUnique({
+            where: { sub },
+        })
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (slot.growthStatus !== 'WITHERED') {
+            return res.status(400).json({message: 'You cannot delete this plant right now.'})
+        }
+
+        const updatedSlot = await prisma.slot.update({
+            where: {id: slotId},
+            data: {
+                plantingTime: null,
+                growthStatus: "NONE",
+                wateredCount: 0,
+                lastWatered: null,
+                seedName: null,
+                seedDescription: null,
+                seedRarity: null,
+                seedTokensGenerated: null
+            }
+        })
+
+        const io = req.app.locals.io;
+        if (io) {
+            io.emit('seed-deleted', {
+                slotId,
+                updatedSlot,
+                farmId
+            });
+        }
+
+        return res.status(200).json({message:  'Seed deleted successfully', updatedSlot})
+
+
+    } catch(e) {
+        res.status(500).json({message: 'Error: unexpected error.'})
+    }
+})
 
 router.put('/harvest-plant', async (req, res) => {
     //logica para cosechar una seed de un slot de la granja

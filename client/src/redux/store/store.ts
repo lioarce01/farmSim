@@ -32,7 +32,7 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'slots'], 
+  whitelist: ['user', 'slots', 'timer'], 
 };
 
 const rootReducer = combineReducers({

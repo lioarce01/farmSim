@@ -3,11 +3,12 @@ import React from 'react';
 interface PopupProps {
   message: string;
   onClose: () => void;
+  isOpen: boolean;
 }
 
-const Popup: React.FC<{ message: string; onClose: () => void }> = ({ message, onClose }) => {
+const Popup: React.FC<{ message: string; onClose: () => void; isOpen: boolean }> = ({ message, onClose, isOpen }) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${isOpen ? 'fade-in' : ''}`}>
       <div className="bg-[#FFFAE3] p-6 rounded-lg shadow-lg text-center border border-[#FFD700]">
         <h2 className="text-lg font-bold mb-4 text-[#333]">{message}</h2>
         <button
@@ -22,4 +23,3 @@ const Popup: React.FC<{ message: string; onClose: () => void }> = ({ message, on
 };
 
 export default Popup;
-

@@ -8,6 +8,7 @@ import { useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, use
 import { Slot } from 'src/types';
 import { SeedStatus, Rarity } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
+import Popup from '../../components/PopUp';
 
 const Farm = () => {
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
@@ -17,6 +18,7 @@ const Farm = () => {
   const [harvestPlant, {isLoading: isHarvesting}] = useHarvestPlantMutation()
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [action, setAction] = useState<'plant' | 'water' | null>(null);
+  const [showPopup, setShowPopup] = useState<boolean>(false)
 
   const farmId = user?.farm?.id;
 
@@ -136,7 +138,7 @@ const Farm = () => {
           userSub: user?.sub
         }
 
-        await waterPlant(seedData).unwrap()
+        await waterPlant(seedData).unwrap().then(() => setShowPopup(true))
       } catch(e) {
         const error = e as Error
         console.error('Error watering seed:', error.message)
@@ -276,6 +278,15 @@ const Farm = () => {
         onSeedSelect={plantSeedInSlot}
         onWaterSelect={waterPlantInSlot}
       />
+      {
+        showPopup && (
+          <Popup
+          message="Plant harvested successfully"
+          onClose={() => setShowPopup(false)}
+          isOpen={showPopup}
+        />
+        )
+      }
     </div>
   );
 };

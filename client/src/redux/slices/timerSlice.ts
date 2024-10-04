@@ -12,14 +12,17 @@ const timerSlice = createSlice({
   name: 'timer',
   initialState,
   reducers: {
-    setTimeRemaining(state, action: PayloadAction<number>) {
+    setTimeRemaining(state: TimerState, action: PayloadAction<number>) {
       state.timeRemaining = action.payload;
     },
-    decrementTime(state) {
+    decrementTime(state: TimerState) {
       state.timeRemaining = Math.max(0, state.timeRemaining - 1);
     },
+    setInitialTime(state: TimerState, action: PayloadAction<number>) {
+      state.timeRemaining = action.payload
+    }
   },
 });
 
-export const { setTimeRemaining, decrementTime } = timerSlice.actions;
+export const { setTimeRemaining, decrementTime, setInitialTime } = timerSlice.actions;
 export default timerSlice.reducer;

@@ -2,12 +2,14 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetStoreItemsQuery, useGetRemainingTimeQuery } from '../../redux/api/store';
+import { useGetStoreItemsQuery } from '../../redux/api/store';
 import { RootState } from '../../redux/store/store';
-import { setTimeRemaining, decrementTime } from '../../redux/slices/timerSlice';
 import Navbar from 'src/components/Navbar';
 import { StoreItem } from 'src/types';
 import PurchaseButton from 'src/components/PurchaseButton';
+import useSocket from 'src/hooks/useSocket';
+import Timer from './Timer';
+import { setTimeRemaining } from 'src/redux/slices/timerSlice';
 
 const rarityColors: { [key: string]: string } = {
   common: '#6DBE45',
@@ -18,56 +20,40 @@ const rarityColors: { [key: string]: string } = {
 };
 
 const StorePage: React.FC = () => {
-  const dispatch = useDispatch();
   const { data: storeItems, refetch: refetchStoreItems } = useGetStoreItemsQuery();
-  const { data: remainingTimeData, refetch: refetchRemainingTime } = useGetRemainingTimeQuery();
-  const timeRemaining = useSelector((state: RootState) => state.timer.timeRemaining);
   const userSub = useSelector((state: RootState) => state.user.sub)
-
+  const socket = useSocket('http://localhost:3002'); 
+  const dispatch = useDispatch()
   useEffect(() => {
-    if (remainingTimeData?.timeRemainingInMs) {
-      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000);
-      dispatch(setTimeRemaining(remainingTime));
-    }
-  }, [remainingTimeData, dispatch]);
+    if(socket) {
+      socket.on('storeUpdated', (timeRemaining) => {
+        console.log('store update event received:', timeRemaining);
+        refetchStoreItems()
+        dispatch(setTimeRemaining(timeRemaining))
+      })
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (timeRemaining > 0) {
-        dispatch(decrementTime());
-      } else if (timeRemaining === 0) {
-        refetchStoreItems();  
-        refetchRemainingTime();  
+      return () => {
+        socket.off('storeUpdated')
       }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [timeRemaining, refetchStoreItems, refetchRemainingTime, dispatch]);
-
-  useEffect(() => {
-    if (remainingTimeData?.timeRemainingInMs) {
-      const remainingTime = Math.floor(remainingTimeData.timeRemainingInMs / 1000); 
-      dispatch(setTimeRemaining(remainingTime));
     }
-  }, [storeItems, remainingTimeData, dispatch]);
+
+  }, [socket, storeItems]) 
 
   if (!storeItems) return <div>Loading...</div>;
 
   if (!userSub) return <div>Please log in to make a purchase.</div>
 
   return (
-    <>
+    <div className="bg-[#FFF5D1] min-h-screen">
       <Navbar />
-      <div className="pt-24 w-full p-4">
-        <h1 className="text-4xl font-bold text-[#A8D5BA] mb-8 text-center">Store Items</h1>
-        <p className="text-lg text-center mb-4">
-          Refreshing in {timeRemaining > 0 ? timeRemaining : 0} seconds...
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="p-4 sm:p-8" style={{ paddingTop: '120px' }}>
+        <h1 className="text-[#172c1f] text-3xl font-bold mb-6 text-center">Store Items</h1>
+        <Timer/>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 mt-18">
           {storeItems?.map((item: StoreItem) => (
             <div
               key={item.id}
-              className="bg-[#FFFAE3] border border-[#FFD700] rounded-lg shadow-lg flex flex-col p-4 transition-shadow duration-300"
+              className="border-4 border-[#FFB385] bg-[#FDE8C9] p-4 flex flex-col justify-between rounded-lg shadow-lg transition-transform transform hover:scale-105"
             >
               <h2 className="text-xl font-semibold text-[#333]">{item.name}</h2>
               <p className="mt-2 text-gray-700">{item.description}</p>
@@ -84,7 +70,7 @@ const StorePage: React.FC = () => {
                   Rarity: {item.rarity}
                 </p>
               ) : null}
-              <div className="mt-auto">
+              <div className="mt-auto flex items-center justify-center">
                 <PurchaseButton
                   userSub={userSub}
                   itemId={item.id}
@@ -99,7 +85,7 @@ const StorePage: React.FC = () => {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

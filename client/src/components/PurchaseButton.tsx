@@ -7,7 +7,7 @@ import { useGetUserBySubQuery } from 'src/redux/api/users';
 import Popup from './PopUp';
 
 const PurchaseButton: React.FC<PurchaseButtonProps> = ({ userSub, itemId, quantity, itemType: propItemType, stock, price, refetchStoreItems }) => {
-  const [buyItem, { isLoading, error }] = useGetStoreBuyMutation();
+  const [buyItem, { isLoading: isBuying, error }] = useGetStoreBuyMutation();
   const { data: user, refetch } = useGetUserBySubQuery(userSub)
   const [purchaseQuantity, setPurchaseQuantity] = useState<number>(quantity || 1);
   const [showPopup, setShowPopup] = useState<boolean>(false)
@@ -41,20 +41,21 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({ userSub, itemId, quanti
     <>
       <button
         onClick={handleBuy}
-        disabled={isLoading || stock <= 0}
-        className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 ${
-          isLoading || stock <= 0
+        disabled={isBuying || stock <= 0}
+        className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors duration-300 ${
+          isBuying || stock <= 0
             ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
             : 'bg-[#398b5a] text-white hover:bg-[#276844]' 
         }`}
       >
-        {stock <= 0 ? 'No stock' : 'Buy'}
+        {stock <= 0 ? 'No Stock' : isBuying ? 'Buying...' : 'Buy'}
       </button>
 
       {showPopup && (
         <Popup
           message="Not enough balance."
           onClose={() => setShowPopup(false)}
+          isOpen={showPopup}
         />
       )}
     </>

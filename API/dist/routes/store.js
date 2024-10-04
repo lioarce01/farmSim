@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
-const storeController_1 = require("../controllers/storeController");
-const node_cron_1 = __importDefault(require("node-cron"));
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -30,54 +28,41 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
     }
 }));
-let lastUpdateTime = null;
-const updateInterval = 1 * 60 * 1000;
-node_cron_1.default.schedule('* * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, storeController_1.updateStoreWithNewSeeds)();
-        lastUpdateTime = Date.now();
-    }
-    catch (error) {
-        console.error("Error updating store:", error);
-    }
-}));
-function formatTimeRemaining(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes} minutos y ${seconds} segundos`;
-}
-router.get('/refreshStore', (req, res) => {
-    const currentTime = Date.now();
-    if (lastUpdateTime) {
-        const timeSinceLastUpdate = currentTime - lastUpdateTime;
-        const timeRemaining = updateInterval - timeSinceLastUpdate;
-        if (timeRemaining > 0) {
-            res.status(200).json({
-                message: 'Tiempo hasta la próxima actualización',
-                timeRemaining: formatTimeRemaining(timeRemaining),
-                timeRemainingInMs: timeRemaining,
-                canUpdate: false,
-            });
-        }
-        else {
-            res.status(200).json({
-                message: 'La tienda puede ser actualizada ahora.',
-                timeRemaining: '0 minutos y 0 segundos',
-                timeRemainingInMs: 0,
-                canUpdate: true,
-            });
-        }
-    }
-    else {
-        res.status(200).json({
-            message: 'La tienda puede ser actualizada ahora.',
-            timeRemaining: '0 minutos y 0 segundos',
-            timeRemainingInMs: 0,
-            canUpdate: true,
-        });
-    }
-});
+// function formatTimeRemaining(ms: number): string {
+//   const totalSeconds = Math.floor(ms / 1000);
+//   const minutes = Math.floor(totalSeconds / 60);
+//   const seconds = totalSeconds % 60;
+//   return `${minutes} minutos y ${seconds} segundos`;
+// }
+// router.get('/refreshStore', (req, res) => {
+//   const currentTime = Date.now();
+//   if (lastUpdateTime) {
+//     const timeSinceLastUpdate = currentTime - lastUpdateTime;
+//     const timeRemaining = updateInterval - timeSinceLastUpdate;
+//     if (timeRemaining > 0) {
+//       res.status(200).json({
+//         message: 'Tiempo hasta la próxima actualización',
+//         timeRemaining: formatTimeRemaining(timeRemaining),
+//         timeRemainingInMs: timeRemaining,
+//         canUpdate: false, 
+//       });
+//     } else {
+//       res.status(200).json({
+//         message: 'La tienda puede ser actualizada ahora.',
+//         timeRemaining: '0 minutos y 0 segundos',
+//         timeRemainingInMs: 0,
+//         canUpdate: true, 
+//       });
+//     }
+//   } else {
+//     res.status(200).json({
+//       message: 'La tienda puede ser actualizada ahora.',
+//       timeRemaining: '0 minutos y 0 segundos',
+//       timeRemainingInMs: 0,
+//       canUpdate: true, 
+//     });
+//   }
+// });
 router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userSub, itemId, quantity, itemType } = req.body;
     try {

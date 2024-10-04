@@ -4,6 +4,7 @@ import cron from 'node-cron';
 import { updateGrowthStatus } from './src/utils/updateGrowthStatus';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { updateStoreWithNewSeeds } from './src/controllers/storeController';
 
 dotenv.config();
 
@@ -37,9 +38,20 @@ server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
-// Tarea programada para ejecutar cada 2 horas.
+// Tarea programada para ejecutar cada 2 horas. (update growth status)
 cron.schedule('0 */2 * * *', async () => {
   console.log(`Running cron job at ${new Date().toISOString()}`);
   
   await updateGrowthStatus(io);
+});
+
+// Tarea programada para ejecutarse cada 1 minuto (renew store)
+cron.schedule('* * * * *', async () => {
+  try {
+    await updateStoreWithNewSeeds();
+    io.emit('storeUpdated', 60)
+    console.log('store updated with socket io')
+  } catch (error) {
+    console.error("Error updating store:", error);
+  }
 });

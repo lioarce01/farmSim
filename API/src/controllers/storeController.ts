@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { seedStoreWithRandomWaters } from '../utils/waterGeneration.js';
 
+
 const prisma = new PrismaClient();
 
 // Definir el tipo Rarity

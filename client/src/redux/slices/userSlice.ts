@@ -1,5 +1,6 @@
 'use client'
 
+import { GetAccessTokenResult } from '@auth0/nextjs-auth0';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Role } from 'src/types';
 
@@ -51,7 +52,9 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.role = null
-
+    },
+    setAccessToken: (state, action: PayloadAction<string | null>) => {
+      state.token = action.payload
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

@@ -1,10 +1,9 @@
 'use client'
 
-import { useRegisterUserMutation } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
 import { setError, setLoading, setUser } from '../redux/slices/userSlice';
 import { useCallback } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useRegisterUserMutation } from '../redux/api/users';
 
 interface ApiError {
   status: number;
@@ -14,7 +13,7 @@ interface ApiError {
 }
 
 const useRegisterUser = () => {
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, { isLoading: isRegistering }] = useRegisterUserMutation();
   const dispatch = useDispatch();
 
   const register = useCallback(async (userData: any) => {
@@ -22,14 +21,12 @@ const useRegisterUser = () => {
       console.error('Datos del usuario inválidos:', userData);
       return;
     }
-
     dispatch(setLoading(true));
-
+    
     try {
       const registeredUser = await registerUser(userData).unwrap();
       dispatch(setUser(registeredUser));
       return registeredUser;
-
     } catch (error) {
       const err = error as ApiError;
 
@@ -44,13 +41,12 @@ const useRegisterUser = () => {
         console.error('Error desconocido registrando el usuario');
       }
       throw error;
-
     } finally {
       dispatch(setLoading(false));
     }
   }, [dispatch, registerUser]);
 
-  return { register };
+  return { register, isRegistering };
 };
 
 export default useRegisterUser;

@@ -4,44 +4,23 @@ import useFetchUser from '../hooks/useFetchUser';
 import LogoutButton from './LogoutButton';
 import { FaUserCircle, FaCoins, FaCaretDown } from 'react-icons/fa';
 import { useState } from 'react';
-import InventoryPopup from './Inventory';
 import Link from 'next/link';
+import { useAuth0 } from '@auth0/auth0-react';
+import LoadingSpinner from './LoadingSpinner';
 
 const UserMenu: React.FC = () => {
-  const { user: fetchedUser, error, isLoading } = useFetchUser();
+  const { user } = useAuth0();
+  const { fetchedUser, fetchError, isLoading: isUserLoading } = useFetchUser(user);
   const [isOpen, setIsOpen] = useState(false);
-  const [isInventoryOpen, setIsInventoryOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  };
-
-  const openInventory = () => {
-    setIsInventoryOpen(true);
-    setIsOpen(false);
-  };
-
-  const closeInventory = () => {
-    setIsInventoryOpen(false);
-  };
-
-  let errorMessage = 'Error desconocido';
-  if (error) {
-    if ('status' in error) {
-      if (error.status === 409) {
-        errorMessage = 'El usuario ya existe.';
-      } else {
-        errorMessage = 'Error al cargar el usuario.';
-      }
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
   }
 
-  if (error) {
+  if (isUserLoading) {
     return (
-      <div className="text-red-500 p-2 border border-red-600 bg-red-100 rounded-md">
-        <strong>Error:</strong> {errorMessage}
+      <div className="flex items-center bg-[#FDE8C9] p-2 rounded-lg shadow-md h-12">
+        <LoadingSpinner />
       </div>
     );
   }
@@ -61,15 +40,6 @@ const UserMenu: React.FC = () => {
 
       {isOpen && (
         <div className="absolute right-0 top-[50px] w-48 bg-[#FDE8C9] rounded-b-lg z-10 shadow-lg border border-[#FFC1A1]">
-          {/* <div className="p-2 w-full">
-            <button 
-              className="px-4 py-2 w-full text-left text-[#333] hover:bg-[#FFC1A1] transition duration-300 font-semibold"
-              onClick={openInventory}
-            >
-              My Inventory
-            </button>
-          </div> */}
-
           <div className="p-2 w-full">
             <Link
               href="/Farm"

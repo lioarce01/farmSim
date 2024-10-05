@@ -9,6 +9,7 @@ import Popup from './PopUp';
 const PurchaseButton: React.FC<PurchaseButtonProps> = ({ userSub, itemId, quantity, itemType: propItemType, stock, price, refetchStoreItems }) => {
   const [buyItem, { isLoading: isBuying, error }] = useGetStoreBuyMutation();
   const { data: user, refetch } = useGetUserBySubQuery(userSub)
+  
   const [purchaseQuantity, setPurchaseQuantity] = useState<number>(quantity || 1);
   const [showPopup, setShowPopup] = useState<boolean>(false)
   const derivedItemType: ItemType = purchaseQuantity > 0 ? ItemType.seed : ItemType.water

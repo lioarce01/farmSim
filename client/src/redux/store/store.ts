@@ -8,7 +8,7 @@ import slotReducer from '../slices/slotSlice'
 import { storeItemsApi } from '../api/store';
 import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
-import { farmApi } from '../api/farm';
+import { farmApi} from '../api/farm';
 
 console.log("Running on client:", typeof window !== 'undefined');
 
@@ -62,13 +62,6 @@ export const store = configureStore({
       },
     }).concat(usersApi.middleware, storeItemsApi.middleware, farmApi.middleware),
 });
-
-// store.subscribe(() => {
-//   const state = store.getState();
-//   if (state.user.nickname) {
-//     console.log('User state in localStorage:', state.user);
-//   }
-// });
 
 export const persistor = persistStore(store);
 

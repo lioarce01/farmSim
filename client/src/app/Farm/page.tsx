@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
-import { useDeletePlantMutation, useGetFarmByIdQuery, useHarvestPlantMutation, usePlantSeedMutation, useWaterPlantMutation } from '../../redux/api/farm';
+import { usePlantSeedMutation, useWaterPlantMutation, useHarvestPlantMutation, useDeletePlantMutation, useGetFarmByIdQuery } from '../../redux/api/farm';
 import { Slot } from 'src/types';
 import { SeedStatus, Rarity } from 'src/types';
 import useSocket from 'src/hooks/useSocket';

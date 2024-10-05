@@ -8,15 +8,6 @@ export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:3002/',
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).user.token
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`) 
-      } else {
-        console.warn('Intentando hacer una solicitud sin un token')
-      }
-      return headers
-    },
    }),
 
   endpoints: (builder) => ({

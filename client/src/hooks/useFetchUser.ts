@@ -1,22 +1,15 @@
 'use client'
 
 import { useEffect } from 'react';
-import { useGetUserBySubQuery } from '../redux/api/users';
 import { useAuth0 } from '@auth0/auth0-react';
-import { setUser } from 'src/redux/slices/userSlice';
+import { useGetUserBySubQuery } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
+import { setUser } from 'src/redux/slices/userSlice';
 import { Role, User } from 'src/types';
 
-interface UserData {
-  nickname: string;
-  email: string;
-  balanceToken: number;
-  role: Role;
-}
-
-const useFetchUser = () => {
-  const { user } = useAuth0();
+const useFetchUser = (user: any) => {
   const dispatch = useDispatch();
+  const { getAccessTokenSilently } = useAuth0();
 
   const { data, error, isLoading, refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
     skip: !user || !user.sub,
@@ -26,7 +19,9 @@ const useFetchUser = () => {
     const fetchUserData = async () => {
       if (user?.sub) {
         try {
+          const accessToken = await getAccessTokenSilently();
           const response = await refetchUser();
+
           if (response.data) {
             const fetchedData: User = response.data;
 
@@ -34,8 +29,8 @@ const useFetchUser = () => {
               dispatch(setUser({
                 nickname: fetchedData.nickname,
                 email: fetchedData.email,
-                token: user.sub,
-                sub: user.sub,
+                token: accessToken,
+                sub: fetchedData.sub,
                 balanceToken: fetchedData.balanceToken || 0,
                 role: fetchedData.role as Role,
               }));
@@ -54,20 +49,10 @@ const useFetchUser = () => {
     fetchUserData();
 
     const intervalId = setInterval(fetchUserData, 5000);
-
     return () => clearInterval(intervalId);
   }, [user?.sub, refetchUser]);
 
-  useEffect(() => {
-    if (error) {
-      const errorMessage = 'status' in error 
-        ? `Error ${error.status}: ${JSON.stringify(error.data)}`
-        : error.message || 'Ocurrió un error desconocido';
-      console.error('Error al obtener el usuario:', errorMessage);
-    }
-  }, [error]);
-
-  return { user: data, error, isLoading, refetchUser };
+  return { fetchedUser: data, fetchError: error, isLoading, refetchUser };
 };
 
 export default useFetchUser;

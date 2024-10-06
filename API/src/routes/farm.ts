@@ -40,6 +40,38 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Ruta para obtener slots filtrados de una granja
+router.get('/:id/slots', async (req, res) => {
+  const { id } = req.params;
+  const { rarity, growthStatus } = req.query;
+
+  try {
+    // Construir condiciones de búsqueda
+    const filters: any = { farmId: id };
+
+    if (rarity) {
+      filters.seedRarity = rarity;
+    }
+
+    if (growthStatus) {
+      filters.growthStatus = growthStatus;
+    }
+
+    const slots = await prisma.slot.findMany({
+      where: filters,
+    });
+
+    if (slots.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron slots' });
+    }
+
+    res.status(200).json(slots);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Error al obtener los slots' });
+  }
+});
+
 // Ruta para plantar semilla
 router.post('/plant-seed', async (req, res) => {
   const { farmId, slotId, seedId, sub } = req.body;
@@ -302,11 +334,9 @@ router.put('/harvest-plant', async (req, res) => {
     }
 
     if (slot.farmId !== farmId) {
-      return res
-        .status(403)
-        .json({
-          message: 'You do not have permission to harvest from this farm.',
-        });
+      return res.status(403).json({
+        message: 'You do not have permission to harvest from this farm.',
+      });
     }
 
     const user = await prisma.user.findUnique({

@@ -1,4 +1,4 @@
-"use client"; // Asegúrate de que este archivo se ejecute en el cliente
+'use client'; // Asegúrate de que este archivo se ejecute en el cliente
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';

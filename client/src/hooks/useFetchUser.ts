@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -11,7 +11,12 @@ const useFetchUser = (user: any) => {
   const dispatch = useDispatch();
   const { getAccessTokenSilently } = useAuth0();
 
-  const { data, error, isLoading, refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
+  const {
+    data,
+    error,
+    isLoading,
+    refetch: refetchUser,
+  } = useGetUserBySubQuery(user?.sub || '', {
     skip: !user || !user.sub,
   });
 
@@ -26,14 +31,16 @@ const useFetchUser = (user: any) => {
             const fetchedData: User = response.data;
 
             if (fetchedData.nickname && fetchedData.email) {
-              dispatch(setUser({
-                nickname: fetchedData.nickname,
-                email: fetchedData.email,
-                token: accessToken,
-                sub: fetchedData.sub,
-                balanceToken: fetchedData.balanceToken || 0,
-                role: fetchedData.role as Role,
-              }));
+              dispatch(
+                setUser({
+                  nickname: fetchedData.nickname,
+                  email: fetchedData.email,
+                  token: accessToken,
+                  sub: fetchedData.sub,
+                  balanceToken: fetchedData.balanceToken || 0,
+                  role: fetchedData.role as Role,
+                }),
+              );
             } else {
               console.warn('Datos de usuario incompletos:', fetchedData);
             }

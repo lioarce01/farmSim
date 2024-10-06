@@ -4,4 +4,4 @@ const LoadingSpinner = () => (
     <span className="ml-2 text-[#172c1f] font-semibold">Loading...</span>
   </div>
 );
-export default LoadingSpinner
+export default LoadingSpinner;

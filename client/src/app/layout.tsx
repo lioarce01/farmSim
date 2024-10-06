@@ -3,17 +3,18 @@
 import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '../redux/store/store'; 
+import { store, persistor } from '../redux/store/store';
 import './globals.css';
 import { Auth0Provider } from '@auth0/auth0-react';
-import AuthWrapper from 'src/components/authWrapper'; 
+import AuthWrapper from 'src/components/authWrapper';
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
-  const redirectUri = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectUri =
+    typeof window !== 'undefined' ? window.location.origin : '';
 
   return (
     <html lang="en">
-      <body className='text-gray-800'>
+      <body className="text-gray-800">
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <Auth0Provider
@@ -22,15 +23,13 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
               authorizationParams={{
                 redirect_uri: redirectUri,
                 audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,
-                scope: "openid profile email offline_access"
+                scope: 'openid profile email offline_access',
               }}
               useRefreshTokens={true}
               cacheLocation="localstorage"
             >
               <AuthWrapper>
-                <div className='bg-[#FFF5D1] min-h-screen'>
-                  {children}
-                </div>
+                <div className="bg-[#FFF5D1] min-h-screen">{children}</div>
               </AuthWrapper>
             </Auth0Provider>
           </PersistGate>

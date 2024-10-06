@@ -1,6 +1,5 @@
-'use client'
+'use client';
 
-import { GetAccessTokenResult } from '@auth0/nextjs-auth0';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Role } from 'src/types';
 
@@ -12,7 +11,7 @@ export interface UserState {
   balanceToken?: number | null;
   loading: boolean;
   error: string | null;
-  role?: Role | null
+  role?: Role | null;
   // refetch: () => void
 }
 
@@ -32,16 +31,26 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ nickname: string; email: string; token: string; sub: string; balanceToken: number; role: Role; }>) => {
+    setUser: (
+      state,
+      action: PayloadAction<{
+        nickname: string;
+        email: string;
+        token: string;
+        sub: string;
+        balanceToken: number;
+        role: Role;
+      }>,
+    ) => {
       // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;
       state.sub = action.payload.sub;
-      state.balanceToken = action.payload.balanceToken
+      state.balanceToken = action.payload.balanceToken;
       state.loading = false;
-      state.error = null
-      state.role = action.payload.role
+      state.error = null;
+      state.role = action.payload.role;
     },
     clearUser(state) {
       state.nickname = null;
@@ -51,10 +60,10 @@ const userSlice = createSlice({
       state.balanceToken = null;
       state.loading = false;
       state.error = null;
-      state.role = null
+      state.role = null;
     },
     setAccessToken: (state, action: PayloadAction<string | null>) => {
-      state.token = action.payload
+      state.token = action.payload;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -75,13 +84,20 @@ const userSlice = createSlice({
         state.balanceToken = action.payload.balanceToken || null;
         state.loading = action.payload.loading;
         state.error = action.payload.error;
-        state.role = action.payload.role
+        state.role = action.payload.role;
       }
     },
   },
 });
 
-export const { setUser, clearUser, setBalanceToken, setLoading, setError, hydrate } = userSlice.actions;
+export const {
+  setUser,
+  clearUser,
+  setBalanceToken,
+  setLoading,
+  setError,
+  hydrate,
+} = userSlice.actions;
 
-export const selectUser = (state: any) => state.user
+export const selectUser = (state: any) => state.user;
 export default userSlice.reducer;

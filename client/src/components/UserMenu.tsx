@@ -10,12 +10,16 @@ import LoadingSpinner from './LoadingSpinner';
 
 const UserMenu: React.FC = () => {
   const { user } = useAuth0();
-  const { fetchedUser, fetchError, isLoading: isUserLoading } = useFetchUser(user);
+  const {
+    fetchedUser,
+    fetchError,
+    isLoading: isUserLoading,
+  } = useFetchUser(user);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  }
+  };
 
   if (isUserLoading) {
     return (
@@ -28,7 +32,10 @@ const UserMenu: React.FC = () => {
   return (
     <div className="relative flex items-center bg-[#FDE8C9] p-2 rounded-lg shadow-md h-12">
       <FaUserCircle className="text-[#A8D5BA] mr-2" size={25} />
-      <span className="mr-2 text-[#172c1f] font-semibold text-sm cursor-pointer" onClick={toggleMenu}>
+      <span
+        className="mr-2 text-[#172c1f] font-semibold text-sm cursor-pointer"
+        onClick={toggleMenu}
+      >
         {fetchedUser?.nickname} <FaCaretDown className="inline-block ml-1" />
       </span>
       <FaCoins className="text-[#FFB385] mr-2" size={20} />

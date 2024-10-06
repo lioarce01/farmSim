@@ -3,11 +3,13 @@ import Navbar from '../../components/Navbar';
 
 const HomePage = () => {
   return (
-    <div className='w-full'>
+    <div className="w-full">
       <Navbar />
-      <div className='flex flex-col items-center justify-between'>
+      <div className="flex flex-col items-center justify-between">
         <div className="pt-32 text-center">
-          <h1 className="text-4xl font-bold text-[#A8D5BA]">Welcome to FarmSim</h1>
+          <h1 className="text-4xl font-bold text-[#A8D5BA]">
+            Welcome to FarmSim
+          </h1>
           <p className="mt-4 text-lg text-[#333]">
             The best app to manage your farm and maximize your crops.
           </p>
@@ -21,7 +23,7 @@ const HomePage = () => {
             <li className="text-lg">💧 Resource Management</li>
           </ul>
         </div>
-        
+
         <div className="mt-10">
           <button className="px-6 py-3 bg-[#FFC1A1] text-white rounded-md hover:bg-[#FFB385] transition duration-300">
             Get Started

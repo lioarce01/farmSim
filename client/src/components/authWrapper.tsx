@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -10,10 +10,16 @@ import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import LoadingSpinner from './LoadingSpinner';
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading, isAuthenticated, user, getAccessTokenSilently } = useAuth0();
+  const { isLoading, isAuthenticated, user, getAccessTokenSilently } =
+    useAuth0();
   const dispatch = useDispatch();
 
-  const { fetchedUser, fetchError, refetchUser, isLoading: isUserLoading } = useFetchUser(user);
+  const {
+    fetchedUser,
+    fetchError,
+    refetchUser,
+    isLoading: isUserLoading,
+  } = useFetchUser(user);
   const { register, isRegistering } = useRegisterUser();
 
   useEffect(() => {
@@ -39,13 +45,19 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
               console.log('Usuario registrado exitosamente');
               await refetchUser();
             } catch (registrationError) {
-              console.error('Error al registrar el usuario:', getErrorMessage(registrationError));
+              console.error(
+                'Error al registrar el usuario:',
+                getErrorMessage(registrationError),
+              );
             }
           } else if (fetchError.status === 409) {
             console.log('Error registrando el usuario: Usuario ya existe');
             await refetchUser();
           } else {
-            console.error('Error obteniendo el usuario:', getErrorMessage(fetchError));
+            console.error(
+              'Error obteniendo el usuario:',
+              getErrorMessage(fetchError),
+            );
           }
         }
       } else if (!isAuthenticated) {
@@ -54,11 +66,26 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     handleUserRegistration();
-  }, [isLoading, isAuthenticated, user, fetchedUser, fetchError, refetchUser, dispatch, getAccessTokenSilently, register, isRegistering, isUserLoading]);
+  }, [
+    isLoading,
+    isAuthenticated,
+    user,
+    fetchedUser,
+    fetchError,
+    refetchUser,
+    dispatch,
+    getAccessTokenSilently,
+    register,
+    isRegistering,
+    isUserLoading,
+  ]);
 
   if (isLoading || isUserLoading) {
     return (
-      <div className="flex items-center bg-[#FDE8C9] p-2 rounded-lg shadow-md h-12 min-h-screen w-full justify-center" style={{ backgroundColor: 'rgba(253, 232, 201, 0.8)' }}>
+      <div
+        className="flex items-center bg-[#FDE8C9] p-2 rounded-lg shadow-md h-12 min-h-screen w-full justify-center"
+        style={{ backgroundColor: 'rgba(253, 232, 201, 0.8)' }}
+      >
         <LoadingSpinner />
       </div>
     );

@@ -6,8 +6,11 @@ import { RootState } from 'src/redux/store/store';
 
 const Timer = () => {
   const dispatch = useDispatch();
-  const timeRemaining = useSelector((state: RootState) => state.timer.timeRemaining);
-  const { data: storeItems, refetch: refetchStoreItems } = useGetStoreItemsQuery();
+  const timeRemaining = useSelector(
+    (state: RootState) => state.timer.timeRemaining,
+  );
+  const { data: storeItems, refetch: refetchStoreItems } =
+    useGetStoreItemsQuery();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -29,7 +32,8 @@ const Timer = () => {
   return (
     <div className="flex justify-center mb-4">
       <p className="text-lg font-bold text-[#3e5f4c]">
-        Tiempo restante: <span className="text-[#398b5a]">{timeRemaining}</span> segundos
+        Tiempo restante: <span className="text-[#398b5a]">{timeRemaining}</span>{' '}
+        segundos
       </p>
     </div>
   );

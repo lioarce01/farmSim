@@ -2,13 +2,13 @@ export interface Seed {
   id: string;
   name: string;
   description: string;
-  plantedTime?: Date; 
+  plantedTime?: Date;
   wateredCount: number;
   lastWatered?: Date;
   quantity: number;
   rarity: Rarity;
-  status: SeedStatus; 
-  tokensGenerated?: number; 
+  status: SeedStatus;
+  tokensGenerated?: number;
 }
 
 export interface Water {
@@ -20,7 +20,7 @@ export interface Water {
 
 export interface Inventory {
   id: string;
-  userId: string; 
+  userId: string;
   seeds: Seed[];
   waters: Water[];
 }
@@ -29,7 +29,7 @@ export interface PurchaseData {
   userSub: string;
   itemId: string;
   quantity: number;
-  itemType: ItemType
+  itemType: ItemType;
 }
 
 export interface Slot {
@@ -50,7 +50,7 @@ export interface PurchaseButtonProps {
   userSub: string;
   itemId: string;
   quantity: number;
-  itemType: ItemType
+  itemType: ItemType;
   stock: number;
   price: number;
   refetchStoreItems: () => void;
@@ -61,10 +61,10 @@ export interface StoreItem {
   name: string;
   description: string;
   price: number;
-  itemType: ItemType; 
-  rarity?: Rarity; 
+  itemType: ItemType;
+  rarity?: Rarity;
   stock: number;
-  tokensGenerated?: number; 
+  tokensGenerated?: number;
   quantity?: number;
 }
 
@@ -73,18 +73,18 @@ export interface User {
   sub: string;
   nickname: string;
   role?: Role;
-  email: string; 
+  email: string;
   balanceToken?: number;
-  inventory?: Inventory; 
+  inventory?: Inventory;
   refetch: () => void;
-  farm: Farm
- }
+  farm: Farm;
+}
 
- export interface Farm {
+export interface Farm {
   id: string;
   userId: string;
-  slots: Slot[]
- }
+  slots: Slot[];
+}
 
 export interface RemainingTimeData {
   timeRemaining: string;
@@ -94,7 +94,7 @@ export interface RemainingTimeData {
 
 export enum Role {
   admin = 'ADMIN',
-  user = 'USER'
+  user = 'USER',
 }
 
 // Enum para Rarity
@@ -107,8 +107,8 @@ export enum Rarity {
 }
 
 export enum ItemType {
-  seed = "seed",
-  water = "water"
+  seed = 'seed',
+  water = 'water',
 }
 
 // Enum para SeedStatus

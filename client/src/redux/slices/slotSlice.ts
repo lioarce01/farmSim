@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Slot } from '../../types/index'
+import { Slot } from '../../types/index';
 
 const initialState: Slot[] = [];
 
@@ -11,12 +11,12 @@ const slotSlice = createSlice({
       return action.payload;
     },
     updateSlot(state, action: PayloadAction<Slot>) {
-      const index = state.findIndex(slot => slot.id === action.payload.id);
+      const index = state.findIndex((slot) => slot.id === action.payload.id);
       if (index !== -1) {
         state[index] = action.payload;
       }
     },
-    // Agrega otras acciones 
+    // Agrega otras acciones
   },
 });
 

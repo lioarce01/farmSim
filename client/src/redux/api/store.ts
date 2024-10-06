@@ -1,14 +1,13 @@
-'use client'
+'use client';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RootState } from '../store/store';
 import { PurchaseData, RemainingTimeData, StoreItem } from '../../types';
 
 export const storeItemsApi = createApi({
   reducerPath: 'storeApi',
-  baseQuery: fetchBaseQuery({ 
+  baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3002/',
-   }),
+  }),
 
   endpoints: (builder) => ({
     getStoreItems: builder.query<StoreItem[], void>({
@@ -25,7 +24,10 @@ export const storeItemsApi = createApi({
       }),
     }),
   }),
-  
 });
 
-export const { useGetStoreItemsQuery, useGetRemainingTimeQuery, useGetStoreBuyMutation } = storeItemsApi;
+export const {
+  useGetStoreItemsQuery,
+  useGetRemainingTimeQuery,
+  useGetStoreBuyMutation,
+} = storeItemsApi;

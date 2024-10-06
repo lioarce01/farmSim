@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -11,7 +11,7 @@ const useSocket = (url: string) => {
       transports: ['polling', 'websocket'],
       withCredentials: true,
     });
-    
+
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -28,7 +28,7 @@ const useSocket = (url: string) => {
     };
   }, [url]);
 
-  return socket; 
+  return socket;
 };
 
 export default useSocket;

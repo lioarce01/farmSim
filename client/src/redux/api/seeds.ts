@@ -1,14 +1,13 @@
-'use client'
+'use client';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RootState } from '../store/store';
 import { Seed, User } from '../../types';
 
 export const seedsApi = createApi({
   reducerPath: 'seedApi',
-  baseQuery: fetchBaseQuery({ 
+  baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3002/',
-   }),
+  }),
 
   endpoints: (builder) => ({
     getSeeds: builder.query<Seed[], void>({

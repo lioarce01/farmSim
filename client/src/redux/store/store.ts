@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import { usersApi } from '../api/users';
 import userReducer from '../slices/userSlice';
-import slotReducer from '../slices/slotSlice'
+import slotReducer from '../slices/slotSlice';
 import { storeItemsApi } from '../api/store';
 import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
-import { farmApi} from '../api/farm';
+import { farmApi } from '../api/farm';
 
-console.log("Running on client:", typeof window !== 'undefined');
+console.log('Running on client:', typeof window !== 'undefined');
 
 const createNoopStorage = () => {
   return {
@@ -26,13 +26,15 @@ const createNoopStorage = () => {
   };
 };
 
-// Verifica si estás en el cliente
-const storage = typeof window !== 'undefined' ? createWebStorage('local') : createNoopStorage();
+const storage =
+  typeof window !== 'undefined'
+    ? createWebStorage('local')
+    : createNoopStorage();
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'slots', 'timer'], 
+  whitelist: ['user', 'slots', 'timer'],
 };
 
 const rootReducer = combineReducers({
@@ -60,7 +62,11 @@ export const store = configureStore({
           'persist/REGISTER',
         ],
       },
-    }).concat(usersApi.middleware, storeItemsApi.middleware, farmApi.middleware),
+    }).concat(
+      usersApi.middleware,
+      storeItemsApi.middleware,
+      farmApi.middleware,
+    ),
 });
 
 export const persistor = persistStore(store);

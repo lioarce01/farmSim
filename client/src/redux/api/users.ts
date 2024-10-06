@@ -1,14 +1,13 @@
-'use client'
+'use client';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RootState } from '../store/store';
-import { User } from '../../types'; 
+import { User } from '../../types';
 
 export const usersApi = createApi({
   reducerPath: 'usersApi',
-  baseQuery: fetchBaseQuery({ 
+  baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3002/',
-   }),
+  }),
 
   endpoints: (builder) => ({
     getUsers: builder.query<User[], void>({
@@ -36,4 +35,9 @@ export const usersApi = createApi({
   }),
 });
 
-export const { useGetUsersQuery, useRegisterUserMutation, useConvertUserMutation, useGetUserBySubQuery } = usersApi
+export const {
+  useGetUsersQuery,
+  useRegisterUserMutation,
+  useConvertUserMutation,
+  useGetUserBySubQuery,
+} = usersApi;

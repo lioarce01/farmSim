@@ -10,16 +10,16 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3002;
 
-const server = createServer(app); 
+const server = createServer(app);
 
 // Usa la instancia del servidor para Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true
-  }
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true,
+  },
 });
 
 // Maneja las conexiones de Socket.IO
@@ -41,7 +41,7 @@ server.listen(PORT, () => {
 // Tarea programada para ejecutar cada 2 horas. (update growth status)
 cron.schedule('0 */2 * * *', async () => {
   console.log(`Running cron job at ${new Date().toISOString()}`);
-  
+
   await updateGrowthStatus(io);
 });
 
@@ -49,9 +49,9 @@ cron.schedule('0 */2 * * *', async () => {
 cron.schedule('* * * * *', async () => {
   try {
     await updateStoreWithNewSeeds();
-    io.emit('storeUpdated', 60)
-    console.log('store updated with socket io')
+    io.emit('storeUpdated', 60);
+    console.log('store updated with socket io');
   } catch (error) {
-    console.error("Error updating store:", error);
+    console.error('Error updating store:', error);
   }
 });

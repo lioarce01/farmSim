@@ -6,7 +6,7 @@ const waterDescriptions = [
   'Fresh and clean spring water.',
   'Collected from the rain.',
   'Drawn from a traditional well.',
-  'Pure mineral water with added nutrients.'
+  'Pure mineral water with added nutrients.',
 ];
 
 // Función para generar un precio aleatorio entre 10 y 20
@@ -26,7 +26,7 @@ function getRandomQuantity() {
 
 // Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 async function seedStoreWithRandomWaters() {
-  const watersToCreate = 2; 
+  const watersToCreate = 2;
   const createdWaters = [];
 
   for (let i = 0; i < watersToCreate; i++) {
@@ -35,9 +35,9 @@ async function seedStoreWithRandomWaters() {
 
     while (!unique) {
       name = `${waterNames[Math.floor(Math.random() * waterNames.length)]}-${Date.now()}`;
-      
+
       const existingItem = await prisma.storeItem.findUnique({
-        where: { name: name }
+        where: { name: name },
       });
 
       if (!existingItem) {
@@ -45,7 +45,8 @@ async function seedStoreWithRandomWaters() {
       }
     }
 
-    const description = waterDescriptions[Math.floor(Math.random() * waterDescriptions.length)];
+    const description =
+      waterDescriptions[Math.floor(Math.random() * waterDescriptions.length)];
     const price = getRandomPrice();
     const stock = getRandomStock();
     const quantity = getRandomQuantity();
@@ -57,8 +58,8 @@ async function seedStoreWithRandomWaters() {
         price: price,
         stock: stock,
         quantity: quantity,
-        itemType: 'water'
-      }
+        itemType: 'water',
+      },
     });
 
     createdWaters.push(storeWater);
@@ -68,5 +69,5 @@ async function seedStoreWithRandomWaters() {
 }
 
 module.exports = {
-  seedStoreWithRandomWaters
+  seedStoreWithRandomWaters,
 };

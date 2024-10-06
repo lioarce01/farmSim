@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { seedStoreWithRandomWaters } from '../utils/waterGeneration.js';
 
-
 const prisma = new PrismaClient();
 
 // Definir el tipo Rarity
@@ -9,9 +8,29 @@ type Rarity = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
 // Modificadores para los nombres de las semillas
 const modifiers = [
-  'Mystic', 'Radiant', 'Enchanted', 'Glowing', 'Ancient', 'Vibrant', 'Shadow', 'Luminous',
-  'Celestial', 'Blazing', 'Twilight', 'Ethereal', 'Crystalline', 'Stormborn', 'Frosted', 'Shimmering',
-  'Arcane', 'Solar', 'Moonlit', 'Emerald', 'Phantom', 'Flourishing', 'Infernal'
+  'Mystic',
+  'Radiant',
+  'Enchanted',
+  'Glowing',
+  'Ancient',
+  'Vibrant',
+  'Shadow',
+  'Luminous',
+  'Celestial',
+  'Blazing',
+  'Twilight',
+  'Ethereal',
+  'Crystalline',
+  'Stormborn',
+  'Frosted',
+  'Shimmering',
+  'Arcane',
+  'Solar',
+  'Moonlit',
+  'Emerald',
+  'Phantom',
+  'Flourishing',
+  'Infernal',
 ];
 
 // Nombres base por rareza
@@ -20,7 +39,7 @@ const seedNamesByRarity: Record<Rarity, string[]> = {
   UNCOMMON: ['Rose', 'Orchid', 'Tulip'],
   RARE: ['Cactus', 'Bluebell', 'Lavender'],
   EPIC: ['Bonsai', 'Fern', 'Bamboo'],
-  LEGENDARY: ['Dragon Tree', 'Phoenix Flower', 'Golden Rose']
+  LEGENDARY: ['Dragon Tree', 'Phoenix Flower', 'Golden Rose'],
 };
 
 const priceRangesByRarity: Record<Rarity, number[]> = {
@@ -28,7 +47,7 @@ const priceRangesByRarity: Record<Rarity, number[]> = {
   UNCOMMON: [30, 50],
   RARE: [50, 100],
   EPIC: [100, 200],
-  LEGENDARY: [200, 500]
+  LEGENDARY: [200, 500],
 };
 
 // Probabilidades de aparición para cada rareza
@@ -37,21 +56,27 @@ const rarityProbabilities: Record<Rarity, number> = {
   UNCOMMON: 40,
   RARE: 5,
   EPIC: 4,
-  LEGENDARY: 1
+  LEGENDARY: 1,
 };
 
 // Función para obtener una rareza aleatoria con probabilidades ajustadas
 function getRandomRarity(): Rarity {
-  const totalProbability = Object.values(rarityProbabilities).reduce((a, b) => a + b, 0);
+  const totalProbability = Object.values(rarityProbabilities).reduce(
+    (a, b) => a + b,
+    0,
+  );
   const random = Math.floor(Math.random() * totalProbability);
   let sum = 0;
 
-  for (const [rarity, probability] of Object.entries(rarityProbabilities) as [Rarity, number][]) {
+  for (const [rarity, probability] of Object.entries(rarityProbabilities) as [
+    Rarity,
+    number,
+  ][]) {
     sum += probability;
     if (random < sum) return rarity;
   }
 
-  return 'COMMON'; 
+  return 'COMMON';
 }
 
 // Función para obtener un nombre base aleatorio según la rareza
@@ -85,14 +110,14 @@ async function seedStoreWithRandomSeeds() {
 
   for (let i = 0; i < seedsToCreate; i++) {
     const rarity = getRandomRarity();
-    let uniqueName: string = ''; 
+    let uniqueName: string = '';
     let isUnique = false;
 
     while (!isUnique) {
       uniqueName = createUniqueSeedName(rarity);
 
       const existingSeed = await prisma.storeItem.findUnique({
-        where: { name: uniqueName }
+        where: { name: uniqueName },
       });
 
       if (!existingSeed) {
@@ -113,14 +138,16 @@ async function seedStoreWithRandomSeeds() {
         stock: stock,
         itemType: 'seed',
         rarity: rarity,
-        tokensGenerated: tokensGenerated
-      }
+        tokensGenerated: tokensGenerated,
+      },
     });
 
     createdSeeds.push(storeSeed);
   }
 
-  console.log(`Created ${createdSeeds.length} random unique seeds in the store.`);
+  console.log(
+    `Created ${createdSeeds.length} random unique seeds in the store.`,
+  );
 }
 
 // Funciones auxiliares para obtener stock y tokens según rareza
@@ -129,9 +156,9 @@ function getStockByRarity(rarity: Rarity): number {
     case 'COMMON':
     case 'UNCOMMON':
     case 'RARE':
-      return Math.floor(Math.random() * 3) + 1; 
+      return Math.floor(Math.random() * 3) + 1;
     case 'EPIC':
-      return Math.floor(Math.random() * 2) + 1; 
+      return Math.floor(Math.random() * 2) + 1;
     case 'LEGENDARY':
       return 1; // Stock fijo de 1
     default:
@@ -158,15 +185,17 @@ function getTokensByRarity(rarity: Rarity): number {
 
 // Función para actualizar la tienda con nuevas semillas
 export async function updateStoreWithNewSeeds() {
-  console.log("Updating store with new seeds...");
+  console.log('Updating store with new seeds...');
 
   // Elimina las semillas existentes
-  const deleteResult = await prisma.storeItem.deleteMany({ where: { itemType: 'seed' } });
+  const deleteResult = await prisma.storeItem.deleteMany({
+    where: { itemType: 'seed' },
+  });
   console.log(`Deleted ${deleteResult.count} existing seeds.`);
 
   // Elimina las waters existentes
   const deleteWatersResult = await prisma.storeItem.deleteMany({
-    where: { itemType: 'water' }
+    where: { itemType: 'water' },
   });
   console.log(`Deleted ${deleteWatersResult.count} existing waters.`);
 

@@ -1,8 +1,8 @@
 import { expressjwt as jwt } from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
-import express from 'express'
+import express from 'express';
 
-const app = express()
+const app = express();
 
 const authMiddleware = jwt({
   secret: jwksRsa.expressJwtSecret({

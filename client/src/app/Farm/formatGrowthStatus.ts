@@ -1,6 +1,6 @@
 import { SeedStatus } from 'src/types';
 
-const formatGrowthStatus = (status: string | null) => {
+export const formatGrowthStatus = (status: string | null) => {
   switch (status) {
     case SeedStatus.GROWING:
       return 'Growing';
@@ -19,4 +19,8 @@ const formatGrowthStatus = (status: string | null) => {
   }
 };
 
-export default formatGrowthStatus;
+export const formatLastWatered = (lastWatered: string | null) => {
+  if (!lastWatered) return 'Never';
+  const date = new Date(lastWatered);
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+};

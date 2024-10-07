@@ -13,7 +13,7 @@ export const farmApi = createApi({
       query: () => 'farm',
     }),
     getFarmById: builder.query({
-      query: (id) => `/farm/${id}`,
+      query: (farmId) => `/farm/${farmId}`,
     }),
     plantSeed: builder.mutation({
       query: (seedData) => ({
@@ -43,6 +43,12 @@ export const farmApi = createApi({
         body: slotData,
       }),
     }),
+    getFarmSlots: builder.query({
+      query: ({ farmId, filters }) => {
+        const queryString = new URLSearchParams(filters).toString();
+        return `/farm/${farmId}/slots?${queryString}`;
+      },
+    }),
   }),
 });
 
@@ -53,4 +59,5 @@ export const {
   useHarvestPlantMutation,
   usePlantSeedMutation,
   useWaterPlantMutation,
+  useGetFarmSlotsQuery,
 } = farmApi;

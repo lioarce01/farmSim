@@ -12,6 +12,8 @@ interface InventoryPopupProps {
   onClose: () => void;
   onSeedSelect: (seed: Seed) => void;
   onWaterSelect: (water: Water) => void;
+  selectedSlot: number | null;
+  action: 'plant' | 'water' | null;
 }
 
 const InventoryPopup: React.FC<InventoryPopupProps> = ({
@@ -19,6 +21,8 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
   onClose,
   onSeedSelect,
   onWaterSelect,
+  selectedSlot,
+  action,
 }) => {
   const { user } = useAuth0();
   const { fetchedUser, fetchError, isLoading } = useFetchUser(user);
@@ -91,7 +95,10 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
                     </span>
                     <button
                       className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
-                      onClick={() => onSeedSelect(seed)}
+                      onClick={() => {
+                        onSeedSelect(seed);
+                        onClose(); // Cierra el popup al seleccionar una semilla
+                      }}
                     >
                       Plant
                     </button>
@@ -115,7 +122,10 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
                 <span className="text-[#398b5a] font-medium">{water.name}</span>
                 <button
                   className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
-                  onClick={() => onWaterSelect(water)}
+                  onClick={() => {
+                    onWaterSelect(water);
+                    onClose(); // Cierra el popup al seleccionar agua
+                  }}
                 >
                   Use
                 </button>

@@ -33,3 +33,7 @@ html {
     transform: rotate(360deg);
   }
 }
+
+body {
+  background-image: linear-gradient(to bottom right, #a8d5ba, #fde8c9);
+}

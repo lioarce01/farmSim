@@ -4,13 +4,11 @@ interface PopupProps {
   message: string;
   onClose: () => void;
   isOpen: boolean;
+  selectedSlot?: number | null;
+  action?: 'plant' | 'water' | null;
 }
 
-const Popup: React.FC<{
-  message: string;
-  onClose: () => void;
-  isOpen: boolean;
-}> = ({ message, onClose, isOpen }) => {
+const Popup: React.FC<PopupProps> = ({ message, onClose, isOpen }) => {
   return (
     <div
       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${

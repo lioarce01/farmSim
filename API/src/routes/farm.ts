@@ -22,7 +22,6 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  //logica para traer farm por id
   const { id } = req.params;
   try {
     const farm = await prisma.farm.findUnique({
@@ -46,7 +45,6 @@ router.get('/:id/slots', async (req, res) => {
   const { rarity, growthStatus } = req.query;
 
   try {
-    // Construir condiciones de búsqueda
     const filters: any = { farmId: id };
 
     if (rarity) {
@@ -72,7 +70,6 @@ router.get('/:id/slots', async (req, res) => {
   }
 });
 
-// Ruta para plantar semilla
 router.post('/plant-seed', async (req, res) => {
   const { farmId, slotId, seedId, sub } = req.body;
 
@@ -158,7 +155,6 @@ router.put('/water-plant', async (req, res) => {
   }
 
   try {
-    // Verificar que el slot existe
     const slot = await prisma.slot.findUnique({
       where: { id: slotId },
     });

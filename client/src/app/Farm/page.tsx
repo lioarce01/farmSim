@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
+import bgStore from '../assets/bgstore.jpg';
+import Image from 'next/image';
 import {
   useDeletePlantMutation,
   useGetFarmByIdQuery,
@@ -88,11 +90,11 @@ const Farm = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('seed-planted', () => refetchFarm());
-      socket.on('actualizacion-planta', () => refetchFarm());
-      socket.on('seed-watered', () => refetchFarm());
-      socket.on('seed-harvested', () => refetchFarm());
-      socket.on('seed-deleted', () => refetchFarm());
+      socket.on('seed-planted', () => refetchFarmSlots());
+      socket.on('actualizacion-planta', () => refetchFarmSlots());
+      socket.on('seed-watered', () => refetchFarmSlots());
+      socket.on('seed-harvested', () => refetchFarmSlots());
+      socket.on('seed-deleted', () => refetchFarmSlots());
 
       return () => {
         socket.off('seed-planted');
@@ -102,7 +104,7 @@ const Farm = () => {
         socket.off('seed-deleted');
       };
     }
-  }, [socket, refetchFarm]);
+  }, [socket, refetchFarmSlots]);
 
   const handleOpenInventory = (
     slotIndex: number | null = null,
@@ -234,78 +236,86 @@ const Farm = () => {
   }
 
   return (
-    <div>
+    <div className="bg-[#4d2612] min-h-screen pt-20">
       <Navbar />
       <div className="flex flex-col items-center xl:w-2/3 mx-auto pt-24 pb-20">
-        <h1 className="text-4xl font-bold mb-8">My Farm</h1>
+        <h1 className="text-4xl font-bold mb-8 text-[#c76936]">My Farm</h1>
 
-        {/* Filtros */}
-        <div className="flex flex-col mb-8 w-full sm:items-center xl:items-start">
-          <div className="flex flex-col md:w-1/2 lg:w-1/3 xl:w-1/4 md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
-            <label className="flex flex-col text-lg font-medium">
-              Rarity:
-              <select
-                name="rarity"
-                onChange={handleSeedRarityChange}
-                value={seedRarity}
-                className="mt-1 p-2 rounded border border-gray-300 bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition ease-in-out duration-150"
-              >
-                <option value="">All</option>
-                <option value="COMMON">Common</option>
-                <option value="UNCOMMON">Uncommon</option>
-                <option value="RARE">Rare</option>
-                <option value="EPIC">Epic</option>
-                <option value="LEGENDARY">Legendary</option>
-              </select>
-            </label>
-            <label className="flex flex-col text-lg font-medium">
-              Status:
-              <select
-                name="growthStatus"
-                value={growthStatus}
-                onChange={handleGrowthStatusChange}
-                className="mt-1 p-2 rounded border border-gray-300 bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition ease-in-out duration-150"
-              >
-                <option value="">All</option>
-                <option value="GROWING">Growing</option>
-                <option value="READY_TO_HARVEST">Ready to harvest</option>
-                <option value="WITHERED">Withered</option>
-                <option value="WATER_NEEDED">Need Water</option>
-              </select>
-            </label>
-          </div>
-        </div>
+        {/* Contenedor con la imagen de fondo */}
+        <div className="relative w-full">
+          <Image
+            src={bgStore}
+            alt="Store Background"
+            fill
+            style={{ objectFit: 'cover' }}
+            className="absolute inset-0 z-0 rounded-lg border-4 opacity-80 border-[#703517] shadow-lg shadow-black"
+          />
 
-        {/* Mensaje para cuando no hay slots con estos filtros */}
-        {/* {message && <div className="text-red-500 text-lg mb-4">{message}</div>} */}
-
-        {/* Grid de los slots */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 sm:w-2/3 md:w-full">
-          {filteredSlots.length > 0 ? (
-            filteredSlots?.map((slot: Slot, index: number) => (
-              <div key={index} className="w-full max-w-sm mx-auto">
-                <FarmSlot
-                  slot={slot}
-                  index={index}
-                  farmId={slots.farmId}
-                  isPlanting={isPlanting}
-                  isWatering={isWatering}
-                  isHarvesting={isHarvesting}
-                  isDeleting={isDeleting}
-                  handleOpenInventory={handleOpenInventory}
-                  handleHarvestPlant={handleHarvestPlant}
-                  handleDeletePlant={handleDeletePlant}
-                  formatLastWatered={formatLastWatered}
-                  formatGrowthStatus={formatGrowthStatus}
-                  filters={{ seedRarity: 'COMMON', growthStatus: 'GROWING' }}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center text-lg">
-              No plants available.
+          {/* Filtros */}
+          <div className="relative z-10 flex flex-col mb-8 w-full sm:items-center xl:items-start p-4">
+            <div className="flex flex-col md:w-1/2 lg:w-1/3 xl:w-1/4 md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+              <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
+                Rarity:
+                <select
+                  name="rarity"
+                  onChange={handleSeedRarityChange}
+                  value={seedRarity}
+                  className="mt-1 p-2 rounded border border-[#c76936] bg-[#d67947] focus:outline-none focus:ring-2 focus:ring-[#e2824e] transition ease-in-out duration-150"
+                >
+                  <option value="">All</option>
+                  <option value="COMMON">Common</option>
+                  <option value="UNCOMMON">Uncommon</option>
+                  <option value="RARE">Rare</option>
+                  <option value="EPIC">Epic</option>
+                  <option value="LEGENDARY">Legendary</option>
+                </select>
+              </label>
+              <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
+                Status:
+                <select
+                  name="growthStatus"
+                  value={growthStatus}
+                  onChange={handleGrowthStatusChange}
+                  className="mt-1 p-2 rounded border border-[#c76936] bg-[#d67947] focus:outline-none focus:ring-2 focus:ring-[#e2824e] transition ease-in-out duration-150"
+                >
+                  <option value="">All</option>
+                  <option value="GROWING">Growing</option>
+                  <option value="READY_TO_HARVEST">Ready to harvest</option>
+                  <option value="WITHERED">Withered</option>
+                  <option value="WATER_NEEDED">Need Water</option>
+                </select>
+              </label>
             </div>
-          )}
+          </div>
+
+          {/* Grid de los slots */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 sm:w-2/3 md:w-full bg-opacity-90 pb-12 rounded-lg shadow-lg">
+            {filteredSlots.length > 0 ? (
+              filteredSlots.map((slot: Slot, index: number) => (
+                <div key={index} className="w-full max-w-sm mx-auto">
+                  <FarmSlot
+                    slot={slot}
+                    index={index}
+                    farmId={slots.farmId}
+                    isPlanting={isPlanting}
+                    isWatering={isWatering}
+                    isHarvesting={isHarvesting}
+                    isDeleting={isDeleting}
+                    handleOpenInventory={handleOpenInventory}
+                    handleHarvestPlant={handleHarvestPlant}
+                    handleDeletePlant={handleDeletePlant}
+                    formatLastWatered={formatLastWatered}
+                    formatGrowthStatus={formatGrowthStatus}
+                    filters={{ seedRarity: 'COMMON', growthStatus: 'GROWING' }}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center text-lg">
+                No plants available.
+              </div>
+            )}
+          </div>
         </div>
 
         {isInventoryOpen && (
@@ -316,14 +326,6 @@ const Farm = () => {
             onWaterSelect={handleWaterSelect}
             selectedSlot={selectedSlot}
             action={action}
-          />
-        )}
-
-        {showPopup && (
-          <Popup
-            message="Plant harvested successfully!"
-            onClose={() => setShowPopup(false)}
-            isOpen={true}
           />
         )}
       </div>

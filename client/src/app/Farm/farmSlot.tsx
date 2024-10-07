@@ -40,11 +40,13 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
   formatGrowthStatus,
 }) => {
   return (
-    <div className="border-4 border-[#FFB385] bg-[#FDE8C9] p-4 flex flex-col items-center justify-between rounded-lg shadow-lg transition-transform transform hover:scale-105">
+    <div className="border-4 border-[#C76936] bg-[#fce0c0] p-4 flex flex-col items-center justify-between rounded-lg shadow-md shadow-amber-950 transition-transform transform hover:scale-105">
       {slot.seedName ? (
         <>
-          <div className="font-bold text-xl mb-2">{slot.seedName}</div>
-          <span className="font-bold text-sm my-1">
+          <div className="font-extrabold text-2xl mb-2 text-[#8B4513]">
+            {slot.seedName}
+          </div>
+          <span className="font-extrabold text-sm my-1 text-[#8B4513]">
             Rarity:&nbsp;
             <span
               className={`${
@@ -62,7 +64,7 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
               {slot.seedRarity || 'Unknown'}
             </span>
           </span>
-          <span className="font-bold text-sm my-1">
+          <span className="font-extrabold text-sm my-1 text-[#8B4513]">
             Status:&nbsp;
             <span
               className={`${
@@ -82,16 +84,16 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
               {formatGrowthStatus(slot.growthStatus)}
             </span>
           </span>
-          <span className="font-medium text-sm my-1">
+          <span className="font-medium text-sm my-1 text-[#8B4513]">
             Last Watered:&nbsp;
-            <span className="text-gray-700 font-bold">
+            <span className="text-[#8B4513] font-extrabold">
               {formatLastWatered(slot.lastWatered)}
             </span>
           </span>
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-2">
             {slot.growthStatus === SeedStatus.WATER_NEEDED && (
               <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
                 onClick={() => handleOpenInventory(index, 'water')}
                 disabled={isWatering}
               >
@@ -100,7 +102,7 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
             )}
             {slot.growthStatus === SeedStatus.READY_TO_HARVEST && (
               <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
                 onClick={() => handleHarvestPlant(index)}
                 disabled={isHarvesting}
               >
@@ -109,7 +111,7 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
             )}
             {slot.growthStatus === SeedStatus.WITHERED && (
               <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
                 onClick={() => handleDeletePlant(index)}
                 disabled={isDeleting}
               >
@@ -120,7 +122,7 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
         </>
       ) : (
         <button
-          className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#398b5a] text-white hover:bg-[#276844]"
+          className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
           onClick={() => handleOpenInventory(index, 'plant')}
           disabled={isPlanting}
         >

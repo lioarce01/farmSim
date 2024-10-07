@@ -29,7 +29,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
               cacheLocation="localstorage"
             >
               <AuthWrapper>
-                <div className="bg-[#FFF5D1] min-h-screen">{children}</div>
+                <div>{children}</div>
               </AuthWrapper>
             </Auth0Provider>
           </PersistGate>

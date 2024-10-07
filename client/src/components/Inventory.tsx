@@ -97,7 +97,7 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
                       className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
                       onClick={() => {
                         onSeedSelect(seed);
-                        onClose(); // Cierra el popup al seleccionar una semilla
+                        onClose();
                       }}
                     >
                       Plant
@@ -124,7 +124,7 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
                   className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
                   onClick={() => {
                     onWaterSelect(water);
-                    onClose(); // Cierra el popup al seleccionar agua
+                    onClose();
                   }}
                 >
                   Use

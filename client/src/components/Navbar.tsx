@@ -2,99 +2,132 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import UserMenu from './UserMenu';
-import LoginButton from './LoginButton';
 import { useAuth0 } from '@auth0/auth0-react';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { HiMenu, HiX } from 'react-icons/hi';
+import nav from '../app/assets/nav.jpg';
+import UserMenu from './UserMenu';
+import LoginButton from './LoginButton';
+import { useRouter } from 'next/navigation';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user } = useAuth0();
   const { fetchedUser } = useFetchUser(user);
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  return (
-    <nav className="bg-[#A8D5BA] p-4 shadow-lg fixed w-full top-0 z-10 flex items-center justify-between transition duration-300">
-      <div className="text-3xl font-bold text-[#333] hover:text-[#FFB385] transition duration-300">
-        <Link href="/">FarmSim</Link>
-      </div>
+  const handleCLick = () => {
+    router.push('/Store');
+  };
 
-      <ul className="hidden md:flex space-x-8 ml-auto items-center">
-        <li>
-          <Link
-            href="/Home"
-            className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
-          >
-            Home
-          </Link>
-        </li>
-        {isAuthenticated && user?.role === 'ADMIN' && (
+  return (
+    <nav className="fixed w-full top-0 z-20 flex items-center justify-center">
+      <div
+        className="shadow-lg mt-4 rounded-lg min-w-[80%] flex items-center flex-row max-w-7xl p-4 bg-[#522a0f] bg-cover bg-center h-18 relative"
+        style={{
+          backgroundImage: `url('${nav.src}')`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: 'cover',
+        }}
+      >
+        <div
+          className="absolute inset-0 z-0 shadow-md shadow-black border-b-4 border-r-4 border-[#4b2312] transition duration-300 rounded-lg min-w-[80%] opacity-[70%]"
+          style={{
+            backgroundImage: `url('${nav.src}')`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: 'cover',
+          }}
+        />
+
+        <div className="relative z-10 text-4xl font-extrabold text-[#ffb98e] hover:text-[#fae3d8] transition duration-300">
+          <Link href="/">FarmSim</Link>
+        </div>
+
+        <ul className="hidden md:flex space-x-12 ml-auto items-center relative z-10">
           <li>
             <Link
-              href="/Users"
-              className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
+              href="/About"
+              className="text-lg text-[#f8d7c6] font-extrabold hover:text-[#faebe3] transition duration-300"
             >
-              Users
+              About Us
             </Link>
           </li>
-        )}
-        <li>
-          <Link
-            href="/Store"
-            className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
-          >
-            Store
-          </Link>
-        </li>
-        <li>{isAuthenticated ? <UserMenu /> : <LoginButton />}</li>
-      </ul>
+          {isAuthenticated && fetchedUser?.role === 'ADMIN' && (
+            <li>
+              <Link
+                href="/Users"
+                className="text-lg text-[#f8d7c6] font-extrabold hover:text-[#faebe3] transition duration-300"
+              >
+                Users
+              </Link>
+            </li>
+          )}
+          {isAuthenticated ? <UserMenu /> : <LoginButton />}
+          <li>
+            <button
+              onClick={handleCLick}
+              className="px-6 py-3 bg-[#8d3c19] border-r-4 border-b-4 border-[#632911] text-[#FDE8C9] font-extrabold rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-[#7c3617] hover:text-[#ffb98e]"
+            >
+              Marketplace
+            </button>
+          </li>
+        </ul>
 
-      <div className="md:hidden flex items-center">
         <button
           onClick={toggleMenu}
-          className="text-3xl text-[#333] focus:outline-none"
+          className="md:hidden text-3xl text-[#FFB385] focus:outline-none relative z-10"
         >
           {isOpen ? <HiX /> : <HiMenu />}
         </button>
       </div>
 
       {isOpen && (
-        <ul className="absolute top-16 left-0 w-full bg-[#A8D5BA] flex flex-col items-center space-y-4 py-4 shadow-lg">
-          <li>
-            <Link
-              href="/Home"
-              className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
-              onClick={toggleMenu}
-            >
-              Home
-            </Link>
-          </li>
-          {isAuthenticated && user?.role === 'ADMIN' && (
+        <div className="absolute top-16 left-0 w-full mx-4 mt-6 bg-[#FFF5D1] flex flex-col items-center space-y-4 py-4 shadow-lg rounded-lg">
+          <ul className="w-full flex flex-col items-center">
             <li>
               <Link
-                href="/Users"
-                className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
+                href="/About"
+                className="text-lg text-[#5f380c] hover:text-[#FFC1A1] transition duration-300 font-medium"
                 onClick={toggleMenu}
               >
-                Users
+                About Us
               </Link>
             </li>
-          )}
-          <li>
-            <Link
-              href="/Store"
-              className="text-lg text-[#333] hover:text-[#FFB385] transition duration-300"
-              onClick={toggleMenu}
-            >
-              Store
-            </Link>
-          </li>
-          <li>{isAuthenticated ? <UserMenu /> : <LoginButton />}</li>
-        </ul>
+            <li>
+              <Link
+                href="/Store"
+                className="text-lg text-[#333] hover:text-[#FFC1A1] transition duration-300 font-medium"
+                onClick={toggleMenu}
+              >
+                Store
+              </Link>
+            </li>
+            {isAuthenticated && fetchedUser?.role === 'ADMIN' && (
+              <li>
+                <Link
+                  href="/Users"
+                  className="text-lg text-[#333] hover:text-[#FFC1A1] transition duration-300 font-medium"
+                  onClick={toggleMenu}
+                >
+                  Users
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link
+                href="/Store"
+                className="bg-[#B5EAD7] border-2 border-[#4b2312] text-[#333] font-extrabold px-4 py-3 rounded-lg hover:bg-[#4b2312] hover:text-white transition duration-300"
+                onClick={toggleMenu}
+              >
+                Marketplace
+              </Link>
+            </li>
+          </ul>
+        </div>
       )}
     </nav>
   );

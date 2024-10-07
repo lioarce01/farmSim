@@ -236,12 +236,12 @@ const Farm = () => {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col items-center xl:w-2/3 mx-auto pt-24">
+      <div className="flex flex-col items-center xl:w-2/3 mx-auto pt-24 pb-20">
         <h1 className="text-4xl font-bold mb-8">My Farm</h1>
 
         {/* Filtros */}
-        <div className="flex flex-col mb-8 w-full">
-          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 mb-4">
+        <div className="flex flex-col mb-8 w-full sm:items-center xl:items-start">
+          <div className="flex flex-col md:w-1/2 lg:w-1/3 xl:w-1/4 md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
             <label className="flex flex-col text-lg font-medium">
               Rarity:
               <select
@@ -280,7 +280,7 @@ const Farm = () => {
         {/* {message && <div className="text-red-500 text-lg mb-4">{message}</div>} */}
 
         {/* Grid de los slots */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-3 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 sm:w-2/3 md:w-full">
           {filteredSlots.length > 0 ? (
             filteredSlots?.map((slot: Slot, index: number) => (
               <div key={index} className="w-full max-w-sm mx-auto">

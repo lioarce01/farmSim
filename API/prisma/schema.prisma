@@ -53,6 +53,7 @@ model Slot {
   seedDescription String?
   seedRarity String?
   seedTokensGenerated Int?
+  seedImg  String?
 }
 
 model Seed {
@@ -64,6 +65,7 @@ model Seed {
   quantity Int @default(0)
   rarity Rarity
   tokensGenerated Int? @default(0)
+  img String?
   Slot Slot[]
 }
 
@@ -86,6 +88,7 @@ model StoreItem {
   stock Int
   tokensGenerated Int?
   quantity Int?
+  img String?
 }
 
 enum Rarity {

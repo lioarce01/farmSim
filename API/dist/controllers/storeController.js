@@ -55,6 +55,22 @@ const priceRangesByRarity = {
     EPIC: [100, 200],
     LEGENDARY: [200, 500],
 };
+const getImageForRarity = (rarity) => {
+    switch (rarity) {
+        case 'COMMON':
+            return '/utils/assets/commonPlant.png';
+        case 'UNCOMMON':
+            return '/utils/assets/uncommonPlant.png';
+        case 'RARE':
+            return '/utils/assets/rarePlant.png';
+        case 'EPIC':
+            return '/utils/assets/epicPlant.png';
+        case 'LEGENDARY':
+            return '/utils/assets/legendaryPlant.png';
+        default:
+            return '/utils/assets/commonPlant.png';
+    }
+};
 // Probabilidades de aparición para cada rareza
 const rarityProbabilities = {
     COMMON: 50,
@@ -116,6 +132,7 @@ function seedStoreWithRandomSeeds() {
             const price = getPriceByRarity(rarity);
             const stock = getStockByRarity(rarity);
             const tokensGenerated = getTokensByRarity(rarity);
+            const imageUrl = getImageForRarity(rarity);
             const storeSeed = yield prisma.storeItem.create({
                 data: {
                     name: uniqueName,
@@ -125,6 +142,7 @@ function seedStoreWithRandomSeeds() {
                     itemType: 'seed',
                     rarity: rarity,
                     tokensGenerated: tokensGenerated,
+                    img: imageUrl,
                 },
             });
             createdSeeds.push(storeSeed);

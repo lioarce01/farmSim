@@ -7,6 +7,7 @@ import { auth } from 'express-openid-connect';
 
 const app = express();
 
+// Configuración de CORS
 app.use(
   cors({
     origin: 'http://localhost:3000',
@@ -16,16 +17,20 @@ app.use(
   }),
 );
 
+// Configuración de body-parser
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
+// Rutas de la API
 app.use('/', routes);
 
+// Manejador de errores
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
 
+// Configuración de autenticación de Auth0
 app.use(
   auth({
     issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
@@ -37,6 +42,7 @@ app.use(
   }),
 );
 
+// Ruta de prueba
 app.get('/test', (req, res) => {
   res.send('server running');
 });

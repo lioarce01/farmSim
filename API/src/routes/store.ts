@@ -141,6 +141,7 @@ router.post('/buy', async (req, res) => {
             rarity: storeItem.rarity as Rarity,
             inventoryId: user.inventory!.id,
             tokensGenerated: storeItem.tokensGenerated,
+            img: storeItem.img,
           },
         });
       }

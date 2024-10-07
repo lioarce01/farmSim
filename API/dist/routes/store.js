@@ -135,6 +135,7 @@ router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                         rarity: storeItem.rarity,
                         inventoryId: user.inventory.id,
                         tokensGenerated: storeItem.tokensGenerated,
+                        img: storeItem.img,
                     },
                 });
             }

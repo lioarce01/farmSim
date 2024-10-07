@@ -96,6 +96,7 @@ router.post('/plant-seed', async (req, res) => {
         seedDescription: seed.description,
         seedRarity: seed.rarity,
         seedTokensGenerated: seed.tokensGenerated,
+        seedImg: seed.img,
       },
     });
 

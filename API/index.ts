@@ -5,6 +5,8 @@ import { updateGrowthStatus } from './src/utils/updateGrowthStatus';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { updateStoreWithNewSeeds } from './src/controllers/storeController';
+import express from 'express'; // Asegúrate de importar express
+import path from 'path'; // Asegúrate de importar path
 
 dotenv.config();
 
@@ -33,6 +35,9 @@ io.on('connection', (socket) => {
 
 // Asigna la instancia de Socket.IO a locals
 app.locals.io = io;
+
+// ** Agrega esta línea para servir archivos estáticos **
+app.use('/assets', express.static(path.join(__dirname, 'src/public/assets')));
 
 server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);

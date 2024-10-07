@@ -33,7 +33,6 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //logica para traer farm por id
     const { id } = req.params;
     try {
         const farm = yield prisma.farm.findUnique({
@@ -53,18 +52,14 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 // Ruta para obtener slots filtrados de una granja
 router.get('/:id/slots', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const { rarity, growthStatus, needsWater } = req.query;
+    const { rarity, growthStatus } = req.query;
     try {
-        // Construir condiciones de búsqueda
         const filters = { farmId: id };
         if (rarity) {
             filters.seedRarity = rarity;
         }
         if (growthStatus) {
             filters.growthStatus = growthStatus;
-        }
-        if (needsWater === 'true') {
-            filters.growthStatus = 'WATER_NEEDED';
         }
         const slots = yield prisma.slot.findMany({
             where: filters,
@@ -79,7 +74,6 @@ router.get('/:id/slots', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ message: 'Error al obtener los slots' });
     }
 }));
-// Ruta para plantar semilla
 router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { farmId, slotId, seedId, sub } = req.body;
     if (!farmId || !slotId || !seedId || !sub) {
@@ -102,6 +96,7 @@ router.post('/plant-seed', (req, res) => __awaiter(void 0, void 0, void 0, funct
                 seedDescription: seed.description,
                 seedRarity: seed.rarity,
                 seedTokensGenerated: seed.tokensGenerated,
+                seedImg: seed.img,
             },
         });
         const userInventory = yield prisma.user.findUnique({
@@ -155,7 +150,6 @@ router.put('/water-plant', (req, res) => __awaiter(void 0, void 0, void 0, funct
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
-        // Verificar que el slot existe
         const slot = yield prisma.slot.findUnique({
             where: { id: slotId },
         });

@@ -5,6 +5,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import { usersApi } from '../api/users';
 import userReducer from '../slices/userSlice';
 import slotReducer from '../slices/slotSlice';
+import filterReducer from '../slices/filtersSlice';
 import { storeItemsApi } from '../api/store';
 import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
@@ -34,12 +35,13 @@ const storage =
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'slots', 'timer'],
+  whitelist: ['user', 'slots', 'timer', 'filters'],
 };
 
 const rootReducer = combineReducers({
   user: userReducer,
   slot: slotReducer,
+  filters: filterReducer,
   [storeItemsApi.reducerPath]: storeItemsApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
   [farmApi.reducerPath]: farmApi.reducer,

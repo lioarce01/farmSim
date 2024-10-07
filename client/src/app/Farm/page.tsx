@@ -12,14 +12,18 @@ import {
   useWaterPlantMutation,
   useGetFarmSlotsQuery,
 } from '../../redux/api/farm';
-import { Slot } from 'src/types';
+import { Rarity, SeedStatus, Slot } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
 import Popup from '../../components/PopUp';
 import { useAuth0 } from '@auth0/auth0-react';
 import { formatGrowthStatus, formatLastWatered } from './formatGrowthStatus';
 import FarmSlot from './farmSlot';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store/store';
+import { setGrowthStatus, setSeedRarity } from 'src/redux/slices/filtersSlice';
 
 const Farm = () => {
+  const dispatch = useDispatch();
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const { user } = useAuth0();
   const {
@@ -34,13 +38,9 @@ const Farm = () => {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [action, setAction] = useState<'plant' | 'water' | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [filters, setFilters] = useState({
-    rarity: '',
-    growthStatus: '',
-    needsWater: false,
-  });
-  const [filteredSlots, setFilteredSlots] = useState<Slot[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const { seedRarity, growthStatus } = useSelector(
+    (state: RootState) => state.filters,
+  );
 
   const farmId = fetchedUser?.farm?.id;
 
@@ -54,11 +54,33 @@ const Farm = () => {
   });
 
   const {
-    data: slots,
+    data: slots = [],
     error: slotError,
     isLoading: isSlotLoading,
     refetch: refetchFarmSlots,
-  } = useGetFarmSlotsQuery({ farmId, filters }, { skip: !farmId });
+  } = useGetFarmSlotsQuery({ farmId }, { skip: !farmId });
+
+  const filteredSlots = slots.filter((slot: Slot) => {
+    const matchesRarity = !seedRarity || slot.seedRarity === seedRarity;
+    const matchesStatus = !growthStatus || slot.growthStatus === growthStatus;
+
+    return matchesRarity && matchesStatus;
+  });
+
+  const message =
+    filteredSlots.length === 0
+      ? 'No slots available with the selected filters.'
+      : '';
+
+  const handleSeedRarityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    dispatch(setSeedRarity(e.target.value as Rarity));
+  };
+
+  const handleGrowthStatusChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    dispatch(setGrowthStatus(e.target.value as SeedStatus));
+  };
 
   const socket = useSocket('http://localhost:3002');
 
@@ -184,39 +206,6 @@ const Farm = () => {
     }
   };
 
-  const handleFilterChange = (e: any) => {
-    const { name, value } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
-
-  useEffect(() => {
-    const applyFilters = () => {
-      if (slots) {
-        const filtered = slots.filter((slot: Slot) => {
-          const matchesRarity =
-            !filters.rarity || slot.seedRarity === filters.rarity;
-          const matchesStatus =
-            !filters.growthStatus || slot.growthStatus === filters.growthStatus;
-
-          return matchesRarity && matchesStatus;
-        });
-
-        setFilteredSlots(filtered);
-
-        if (filtered.length === 0) {
-          setMessage('No slots available with the selected filters.');
-        } else {
-          setMessage('');
-        }
-      }
-    };
-
-    applyFilters();
-  }, [filters, slots]);
-
   if (userLoading)
     return <div className="text-center text-lg">Loading user...</div>;
   if (userError) {
@@ -257,7 +246,8 @@ const Farm = () => {
               Rarity:
               <select
                 name="rarity"
-                onChange={handleFilterChange}
+                onChange={handleSeedRarityChange}
+                value={seedRarity}
                 className="mt-1 p-2 rounded border border-gray-300 bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition ease-in-out duration-150"
               >
                 <option value="">All</option>
@@ -272,10 +262,11 @@ const Farm = () => {
               Status:
               <select
                 name="growthStatus"
-                onChange={handleFilterChange}
+                value={growthStatus}
+                onChange={handleGrowthStatusChange}
                 className="mt-1 p-2 rounded border border-gray-300 bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition ease-in-out duration-150"
               >
-                <option value="">Todos</option>
+                <option value="">All</option>
                 <option value="GROWING">Growing</option>
                 <option value="READY_TO_HARVEST">Ready to harvest</option>
                 <option value="WITHERED">Withered</option>
@@ -332,7 +323,7 @@ const Farm = () => {
           <Popup
             message="Plant harvested successfully!"
             onClose={() => setShowPopup(false)}
-            isOpen={false}
+            isOpen={true}
           />
         )}
       </div>

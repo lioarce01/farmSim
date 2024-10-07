@@ -99,6 +99,7 @@ export enum Role {
 
 // Enum para Rarity
 export enum Rarity {
+  ALL = '',
   COMMON = 'COMMON',
   UNCOMMON = 'UNCOMMON',
   RARE = 'RARE',
@@ -113,6 +114,7 @@ export enum ItemType {
 
 // Enum para SeedStatus
 export enum SeedStatus {
+  ALL = '',
   NONE = 'NONE',
   GROWING = 'GROWING',
   READY_TO_HARVEST = 'READY_TO_HARVEST',

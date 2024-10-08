@@ -58,17 +58,17 @@ const priceRangesByRarity = {
 const getImageForRarity = (rarity) => {
     switch (rarity) {
         case 'COMMON':
-            return '/utils/assets/commonPlant.png';
+            return '/assets/commonPlant.png';
         case 'UNCOMMON':
-            return '/utils/assets/uncommonPlant.png';
+            return '/assets/uncommonPlant.png';
         case 'RARE':
-            return '/utils/assets/rarePlant.png';
+            return '/assets/rarePlant.png';
         case 'EPIC':
-            return '/utils/assets/epicPlant.png';
+            return '/assets/epicPlant.png';
         case 'LEGENDARY':
-            return '/utils/assets/legendaryPlant.png';
+            return '/assets/legendaryPlant.png';
         default:
-            return '/utils/assets/commonPlant.png';
+            return '/assets/commonPlant.png';
     }
 };
 // Probabilidades de aparición para cada rareza

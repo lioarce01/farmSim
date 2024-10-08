@@ -53,10 +53,10 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       <button
         onClick={handleBuy}
         disabled={isBuying || stock <= 0}
-        className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors duration-300 ${
+        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513] ${
           isBuying || stock <= 0
-            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-            : 'bg-[#398b5a] text-white hover:bg-[#276844]'
+            ? 'bg-[#fac59e] text-white cursor-not-allowed'
+            : 'bg-[#C76936] text-white hover:bg-[#8B4513]'
         }`}
       >
         {stock <= 0 ? 'No Stock' : isBuying ? 'Buying...' : 'Buy'}

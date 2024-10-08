@@ -9,6 +9,7 @@ export interface Seed {
   rarity: Rarity;
   status: SeedStatus;
   tokensGenerated?: number;
+  img?: string;
 }
 
 export interface Water {
@@ -44,6 +45,7 @@ export interface Slot {
   seedDescription: string | null;
   seedRarity: string | null;
   seedTokensGenerated: number | null;
+  seedImg: string | null;
 }
 
 export interface PurchaseButtonProps {
@@ -66,6 +68,7 @@ export interface StoreItem {
   stock: number;
   tokensGenerated?: number;
   quantity?: number;
+  img: string;
 }
 
 export interface User {

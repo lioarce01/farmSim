@@ -29,7 +29,7 @@ const LandingPage = () => {
           style={{ objectFit: 'cover' }}
           className="absolute top-0 left-0 z-0 opacity-85"
         />
-        <h1 className="text-6xl font-bold text-[#FDE8C9] drop-shadow-lg">
+        <h1 className="text-6xl font-extrabold text-[#FDE8C9] drop-shadow-lg shadow-amber-950">
           Welcome to FarmSim
         </h1>
         <p className="mt-4 text-2xl text-[#FDE8C9] drop-shadow-lg">
@@ -50,7 +50,7 @@ const LandingPage = () => {
 
       <section
         ref={featuresSectionRef}
-        className="relative h-screen flex flex-col items-center justify-center z-10"
+        className="relative h-screen flex flex-col items-center justify-center z-10 scroll-smooth"
       >
         <Image
           alt="Features Background"

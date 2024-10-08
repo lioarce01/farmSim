@@ -66,16 +66,16 @@ const Navbar: React.FC = () => {
               </Link>
             </li>
           )}
-          {isAuthenticated ? <UserMenu /> : <LoginButton />}
           <li>
             <button
               onClick={handleCLick}
-              className="px-6 py-3 bg-[#8d3c19] border-r-4 border-b-4 border-[#632911] text-[#FDE8C9] font-extrabold rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-[#7c3617] hover:text-[#ffb98e]"
+              className="px-6 py-3 bg-[#8d3c19] border-r-4 border-b-4 border-[#632911] text-[#FDE8C9] font-extrabold rounded-lg shadow-lg transition mx-4 duration-300 transform hover:scale-105 hover:bg-[#7c3617] hover:text-[#ffb98e]"
             >
               Marketplace
             </button>
           </li>
         </ul>
+        {isAuthenticated ? <UserMenu /> : <LoginButton />}
 
         <button
           onClick={toggleMenu}

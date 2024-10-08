@@ -30,9 +30,9 @@ const Timer = () => {
   }, [timeRemaining, dispatch, refetchStoreItems]);
 
   return (
-    <div className="flex justify-center mb-4">
-      <p className="text-lg font-bold text-[#3e5f4c]">
-        Tiempo restante: <span className="text-[#398b5a]">{timeRemaining}</span>{' '}
+    <div className="flex justify-center mb-4 p-4 bg-[#79411d] rounded-lg border-4 border-[#703517] shadow-md w-auto">
+      <p className="text-lg font-bold text-[#ffe6da]">
+        Tiempo restante: <span className="text-[#f18d5b]">{timeRemaining}</span>{' '}
         segundos
       </p>
     </div>

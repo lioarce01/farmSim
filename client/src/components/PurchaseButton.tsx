@@ -13,7 +13,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   itemType: propItemType,
   stock,
   price,
-  refetchStoreItems,
+  refetchStoreItems, // Modificar este callback para pasar el nuevo stock
 }) => {
   const [buyItem, { isLoading: isBuying, error }] = useGetStoreBuyMutation();
   const { data: user, refetch } = useGetUserBySubQuery(userSub);
@@ -40,8 +40,10 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
         quantity: purchaseQuantity,
         itemType: propItemType || derivedItemType,
       }).unwrap();
+
       refetch();
       refetchStoreItems();
+
       console.log('Compra exitosa', response);
     } catch (err) {
       console.error('Error al realizar la compra', err);

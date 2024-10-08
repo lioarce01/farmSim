@@ -9,6 +9,10 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  background-color: #2b231b; /* o cualquier otro color que desees */
+}
+
 .fade-in {
   animation: fadeIn 0.5s;
 }
@@ -33,10 +37,6 @@ html {
   100% {
     transform: rotate(360deg);
   }
-}
-
-body {
-  background-image: linear-gradient(to bottom right, #a8d5ba, #fde8c9);
 }
 
 /* Estilo general para el scroll */

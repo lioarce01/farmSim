@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react'; // Importa useState
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetStoreItemsQuery } from '../../redux/api/store';
 import { RootState } from '../../redux/store/store';
@@ -12,22 +12,25 @@ import Timer from './Timer';
 import { setTimeRemaining } from 'src/redux/slices/timerSlice';
 import bgPlant from '../assets/bgplant.jpg';
 import Image from 'next/image';
-
-const rarityColors: { [key: string]: string } = {
-  common: '#6c6d70',
-  uncommon: '#808080',
-  rare: '#0000ff',
-  epic: '#800080',
-  legendary: '#ffd700',
-};
+import ItemPopup from './ItemPopUp';
+import useFetchUser from 'src/hooks/useFetchUser';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const StorePage: React.FC = () => {
   const { data: storeItems, refetch: refetchStoreItems } =
     useGetStoreItemsQuery();
-  const userSub = useSelector((state: RootState) => state.user.sub);
+  const { user } = useAuth0();
+  const {
+    fetchedUser,
+    fetchError: userError,
+    isLoading: userLoading,
+  } = useFetchUser(user);
+  const userSub = fetchedUser?.sub;
 
   const socket = useSocket('http://localhost:3002');
   const dispatch = useDispatch();
+
+  const [selectedItem, setSelectedItem] = useState<StoreItem | null>(null);
 
   useEffect(() => {
     if (socket) {
@@ -43,9 +46,18 @@ const StorePage: React.FC = () => {
     }
   }, [socket, storeItems]);
 
+  const handleCardClick = (item: StoreItem) => {
+    console.log('Selected item:', item);
+    setSelectedItem(item);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedItem(null);
+  };
+
   if (!storeItems) return <div>Loading...</div>;
 
-  if (!userSub) return <div>need to login to purchase an item</div>;
+  if (!userSub) return <div>Need to login to purchase an item</div>;
 
   return (
     <div className="min-h-screen bg-[#4d2612]">
@@ -59,6 +71,7 @@ const StorePage: React.FC = () => {
             src={bgPlant}
             alt="Store Background"
             fill
+            priority
             style={{ objectFit: 'cover' }}
             className="absolute inset-0 z-0 opacity-80 rounded-lg"
           />
@@ -92,43 +105,33 @@ const StorePage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <p className="mt-2 text-[#8B4513] font-extrabold">
-                    Stock: {item.stock}
+                  <p className="mt-2 text-[#8B4513] font-extrabold text-center">
+                    {item.description}
                   </p>
-                  <p className="mt-2 text-lg font-extrabold text-[#8B4513]">
-                    Price: T$ {item.price}
+                  <p className="mt-2 text-[#8B4513] font-extrabold text-center">
+                    Price: T$
+                    <span className="text-amber-600">{item.price}</span>
                   </p>
-                  {(item.itemType as unknown as string) !== 'seeds' &&
-                  item.rarity ? (
-                    <p className="mb-2 mt-2 text-sm font-extrabold text-[#8B4513] flex">
-                      Rarity:
-                      <span
-                        style={{
-                          color: rarityColors[item.rarity.toLowerCase()],
-                          marginLeft: '0.5rem',
-                        }}
-                      >
-                        {item.rarity}
-                      </span>
-                    </p>
-                  ) : null}
-                  <div className="mt-auto flex items-center justify-center">
-                    <PurchaseButton
-                      userSub={userSub}
-                      itemId={item.id}
-                      quantity={1}
-                      itemType={item.itemType}
-                      stock={item.stock}
-                      refetchStoreItems={refetchStoreItems}
-                      price={item.price}
-                    />
-                  </div>
+                  <button
+                    className="mt-2 px-4 py-2 rounded-lg font-extrabold transition-colors duration-300 bg-[#C76936] text-[#ffdecc] hover:bg-[#8B4513] mr-4"
+                    onClick={() => handleCardClick(item)}
+                  >
+                    Info
+                  </button>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+      {selectedItem && (
+        <ItemPopup
+          item={selectedItem}
+          onClose={handleClosePopup}
+          userSub={userSub}
+          refetchStoreItems={refetchStoreItems}
+        />
+      )}
     </div>
   );
 };

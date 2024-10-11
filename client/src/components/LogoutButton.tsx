@@ -12,8 +12,8 @@ const LogoutButton = () => {
     dispatch(clearUser());
 
     logout({
-      returnTo: window.location.origin,
-    } as any);
+      logoutParams: { returnTo: window.location.origin },
+    });
   };
 
   return (

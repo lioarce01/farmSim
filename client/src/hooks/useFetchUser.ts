@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useGetUserBySubQuery } from '../redux/api/users';
 import { useDispatch } from 'react-redux';
@@ -20,46 +20,41 @@ const useFetchUser = (user: any) => {
     skip: !user || !user.sub,
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user?.sub) {
-        try {
-          const accessToken = await getAccessTokenSilently();
-          const response = await refetchUser();
+  const fetchUserData = useCallback(async () => {
+    if (user?.sub && !isLoading) {
+      try {
+        const accessToken = await getAccessTokenSilently();
+        const response = await refetchUser();
 
-          if (response.data) {
-            const fetchedData: User = response.data;
+        if (response.data) {
+          const fetchedData: User = response.data;
 
-            if (fetchedData.nickname && fetchedData.email) {
-              dispatch(
-                setUser({
-                  nickname: fetchedData.nickname,
-                  email: fetchedData.email,
-                  token: accessToken,
-                  sub: fetchedData.sub,
-                  balanceToken: fetchedData.balanceToken || 0,
-                  role: fetchedData.role as Role,
-                }),
-              );
-            } else {
-              console.warn('Datos de usuario incompletos:', fetchedData);
-            }
+          if (fetchedData.nickname && fetchedData.email) {
+            const userData = {
+              nickname: fetchedData.nickname,
+              email: fetchedData.email,
+              token: accessToken,
+              sub: fetchedData.sub,
+              balanceToken: fetchedData.balanceToken || 0,
+              role: fetchedData.role as Role,
+            };
+            dispatch(setUser(userData));
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
           } else {
-            console.warn('Usuario no registrado aún en el backend');
+            console.warn('Incomplete user data:', fetchedData);
           }
-        } catch (err) {
-          console.error('Error obteniendo el usuario:', err);
+        } else {
+          console.warn('User not yet registered in the backend');
         }
+      } catch (err) {
+        console.error('Error fetching user:', err);
       }
-    };
+    }
+    return null;
+  }, [user?.sub, isLoading, refetchUser, getAccessTokenSilently, dispatch]);
 
-    fetchUserData();
-
-    const intervalId = setInterval(fetchUserData, 5000);
-    return () => clearInterval(intervalId);
-  }, [user?.sub, refetchUser]);
-
-  return { fetchedUser: data, fetchError: error, isLoading, refetchUser };
+  return { fetchedUser: data, fetchError: error, isLoading, fetchUserData };
 };
 
 export default useFetchUser;

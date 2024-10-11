@@ -79,7 +79,7 @@ export interface User {
   email: string;
   balanceToken?: number;
   inventory?: Inventory;
-  refetch: () => void;
+  // refetch: () => void;
   farm: Farm;
 }
 

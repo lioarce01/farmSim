@@ -37,7 +37,7 @@ router.get('/item/:id', (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!item) {
             return res.status(404).json({ message: 'Item not found' });
         }
-        res.json({ message: 'Item:', item });
+        res.json(item);
     }
     catch (e) {
         res.status(500).json({ message: 'Error retrieving item', error: e });

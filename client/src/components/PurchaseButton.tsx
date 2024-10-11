@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetStoreBuyMutation } from '../redux/api/store';
+import {
+  useGetStoreBuyMutation,
+  useGetStoreItemByIdQuery,
+} from '../redux/api/store';
 import { ItemType, PurchaseButtonProps } from 'src/types';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
 import Popup from './PopUp';
@@ -13,10 +16,11 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   itemType: propItemType,
   stock,
   price,
-  refetchStoreItems, // Modificar este callback para pasar el nuevo stock
+  refetchStoreItems,
 }) => {
-  const [buyItem, { isLoading: isBuying, error }] = useGetStoreBuyMutation();
-  const { data: user, refetch } = useGetUserBySubQuery(userSub);
+  const [buyItem, { isLoading: isBuying }] = useGetStoreBuyMutation();
+  const { data: user } = useGetUserBySubQuery(userSub);
+  const { refetch: refetchItem } = useGetStoreItemByIdQuery(itemId);
 
   const [purchaseQuantity, setPurchaseQuantity] = useState<number>(
     quantity || 1,
@@ -26,7 +30,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     purchaseQuantity > 0 ? ItemType.seed : ItemType.water;
 
   const handleBuy = async () => {
-    if (user && user?.balanceToken !== undefined) {
+    if (user && user.balanceToken !== undefined) {
       if (user.balanceToken < price) {
         setShowPopup(true);
         return;
@@ -34,17 +38,16 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     }
 
     try {
-      const response = await buyItem({
+      await buyItem({
         userSub,
         itemId,
         quantity: purchaseQuantity,
         itemType: propItemType || derivedItemType,
       }).unwrap();
 
-      refetch();
-      refetchStoreItems();
+      refetchItem();
 
-      console.log('Compra exitosa', response);
+      console.log('Compra exitosa');
     } catch (err) {
       console.error('Error al realizar la compra', err);
     }

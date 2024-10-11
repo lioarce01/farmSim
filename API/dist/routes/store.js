@@ -28,41 +28,21 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
     }
 }));
-// function formatTimeRemaining(ms: number): string {
-//   const totalSeconds = Math.floor(ms / 1000);
-//   const minutes = Math.floor(totalSeconds / 60);
-//   const seconds = totalSeconds % 60;
-//   return `${minutes} minutos y ${seconds} segundos`;
-// }
-// router.get('/refreshStore', (req, res) => {
-//   const currentTime = Date.now();
-//   if (lastUpdateTime) {
-//     const timeSinceLastUpdate = currentTime - lastUpdateTime;
-//     const timeRemaining = updateInterval - timeSinceLastUpdate;
-//     if (timeRemaining > 0) {
-//       res.status(200).json({
-//         message: 'Tiempo hasta la próxima actualización',
-//         timeRemaining: formatTimeRemaining(timeRemaining),
-//         timeRemainingInMs: timeRemaining,
-//         canUpdate: false,
-//       });
-//     } else {
-//       res.status(200).json({
-//         message: 'La tienda puede ser actualizada ahora.',
-//         timeRemaining: '0 minutos y 0 segundos',
-//         timeRemainingInMs: 0,
-//         canUpdate: true,
-//       });
-//     }
-//   } else {
-//     res.status(200).json({
-//       message: 'La tienda puede ser actualizada ahora.',
-//       timeRemaining: '0 minutos y 0 segundos',
-//       timeRemainingInMs: 0,
-//       canUpdate: true,
-//     });
-//   }
-// });
+router.get('/item/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const itemId = req.params.id;
+    try {
+        const item = yield prisma.storeItem.findUnique({
+            where: { id: itemId },
+        });
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+        res.json({ message: 'Item:', item });
+    }
+    catch (e) {
+        res.status(500).json({ message: 'Error retrieving item', error: e });
+    }
+}));
 router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userSub, itemId, quantity, itemType } = req.body;
     try {

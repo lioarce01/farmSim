@@ -23,6 +23,9 @@ export const storeItemsApi = createApi({
         body: purchaseData,
       }),
     }),
+    getStoreItemById: builder.query<StoreItem, string>({
+      query: (id) => `store/item/${id}`,
+    }),
   }),
 });
 
@@ -30,4 +33,5 @@ export const {
   useGetStoreItemsQuery,
   useGetRemainingTimeQuery,
   useGetStoreBuyMutation,
+  useGetStoreItemByIdQuery,
 } = storeItemsApi;

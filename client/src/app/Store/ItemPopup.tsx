@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StoreItem } from 'src/types';
 import PurchaseButton from 'src/components/PurchaseButton';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { useAuth0 } from '@auth0/auth0-react';
-import { FaTimes } from 'react-icons/fa'; // Importa el ícono de "X"
+import { FaTimes } from 'react-icons/fa';
+import { useGetFarmByIdQuery } from 'src/redux/api/farm';
+import { useGetStoreItemByIdQuery } from 'src/redux/api/store';
 
 interface ItemPopupProps {
   item: StoreItem;
   onClose: () => void;
   userSub: string;
+  stock: number;
   refetchStoreItems: () => void;
 }
 
@@ -20,8 +23,11 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
   userSub,
   refetchStoreItems,
 }) => {
-  const { user } = useAuth0();
-  const { fetchedUser } = useFetchUser(user);
+  const { data: updatedItem, refetch: refetchItem } = useGetStoreItemByIdQuery(
+    item.id,
+  );
+
+  console.log('Popup item:', updatedItem);
 
   const rarityColors: { [key: string]: string } = {
     common: '#6c6d70',
@@ -32,8 +38,10 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
   };
 
   useEffect(() => {
-    refetchStoreItems();
-  }, [refetchStoreItems]);
+    refetchItem();
+  }, [refetchItem]);
+
+  const itemData = updatedItem || item;
 
   if (!userSub) return <div>Need to login to purchase.</div>;
 
@@ -66,7 +74,7 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
         </div>
         <div className="mb-4">
           <p className="text-[#FFD700] font-semibold">
-            Stock: <span className="font-extrabold">{item.stock}</span>
+            Stock: <span className="font-extrabold">{itemData.stock}</span>
           </p>
           <p className="text-lg font-extrabold text-[#FFD700]">
             Price: T$ {item.price}

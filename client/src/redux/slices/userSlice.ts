@@ -42,7 +42,6 @@ const userSlice = createSlice({
         role: Role;
       }>,
     ) => {
-      console.log('Dispatching setUser with: ', action.payload);
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;
@@ -69,7 +68,6 @@ const userSlice = createSlice({
       state.loading = action.payload;
     },
     setError: (state, action: PayloadAction<string | null>) => {
-      console.log('Estableciendo error:', action.payload);
       state.error = action.payload;
       state.loading = false;
     },

@@ -30,6 +30,7 @@ const Farm = () => {
   const { user } = useAuth0();
   const {
     fetchedUser,
+    fetchUserData,
     fetchError: userError,
     isLoading: userLoading,
   } = useFetchUser(user);
@@ -86,8 +87,6 @@ const Farm = () => {
 
   const socket = useSocket('http://localhost:3002');
 
-  console.log('slots:', slots);
-
   useEffect(() => {
     if (socket) {
       socket.on('seed-planted', () => refetchFarmSlots());
@@ -113,6 +112,7 @@ const Farm = () => {
     setSelectedSlot(slotIndex);
     setAction(action);
     setIsInventoryOpen(true);
+    fetchUserData();
   };
 
   const handleCloseInventory = () => {
@@ -247,6 +247,7 @@ const Farm = () => {
             src={bgStore}
             alt="Store Background"
             fill
+            priority
             style={{ objectFit: 'cover' }}
             className="absolute inset-0 z-0 rounded-lg border-4 opacity-80 border-[#703517] shadow-lg shadow-black"
           />

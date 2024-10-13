@@ -5,8 +5,12 @@ import { updateGrowthStatus } from './src/utils/updateGrowthStatus';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { updateStoreWithNewSeeds } from './src/controllers/storeController';
-import express from 'express'; // Asegúrate de importar express
-import path from 'path'; // Asegúrate de importar path
+import express from 'express';
+import path from 'path';
+import { ClimateEventType, PrismaClient } from '@prisma/client';
+import { applyClimateEffectToAllFarms } from './src/utils/climateEvents';
+
+const prisma = new PrismaClient();
 
 dotenv.config();
 
@@ -59,4 +63,27 @@ cron.schedule('* * * * *', async () => {
   } catch (error) {
     console.error('Error updating store:', error);
   }
+});
+
+//TAREA PARA EVENTOS CLIMÁTICOS (SEMANAL)
+cron.schedule('0 0 * * 0', async () => {
+  const eventType =
+    Object.values(ClimateEventType)[Math.floor(Math.random() * 4)];
+  const intensity = Math.floor(Math.random() * 5) + 1;
+
+  const event = await prisma.climateEvent.create({
+    data: {
+      type: eventType,
+      duration: 1,
+      intensity: intensity,
+    },
+  });
+
+  await applyClimateEffectToAllFarms(event);
+
+  io.emit('climateEvent', event);
+
+  console.log(
+    `Nuevo evento climático generado: ${event.type} con intensidad ${event.intensity}`,
+  );
 });

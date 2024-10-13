@@ -54,6 +54,7 @@ model Slot {
   seedRarity String?
   seedTokensGenerated Int?
   seedImg  String?
+  climateEffect Int? @default(0)
 }
 
 model Seed {
@@ -89,6 +90,22 @@ model StoreItem {
   tokensGenerated Int?
   quantity Int?
   img String?
+}
+
+model ClimateEvent {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  type ClimateEventType
+  duration Int
+  intensity Int
+  startTime DateTime @default(now())
+  endTime DateTime?
+}
+
+enum ClimateEventType {
+  RAIN
+  DROUGHT
+  SNOW
+  SUNNY
 }
 
 enum Rarity {

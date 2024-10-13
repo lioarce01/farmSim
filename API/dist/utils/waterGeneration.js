@@ -29,6 +29,9 @@ function getRandomStock() {
 function getRandomQuantity() {
     return Math.floor(Math.random() * (2 - 1 + 1)) + 1;
 }
+const getImageForWater = () => {
+    return '/assets/wateringCan.png';
+};
 // Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 function seedStoreWithRandomWaters() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -50,6 +53,7 @@ function seedStoreWithRandomWaters() {
             const price = getRandomPrice();
             const stock = getRandomStock();
             const quantity = getRandomQuantity();
+            const imageUrl = getImageForWater();
             const storeWater = yield prisma.storeItem.create({
                 data: {
                     name: name,
@@ -58,6 +62,7 @@ function seedStoreWithRandomWaters() {
                     stock: stock,
                     quantity: quantity,
                     itemType: 'water',
+                    img: imageUrl,
                 },
             });
             createdWaters.push(storeWater);

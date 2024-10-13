@@ -50,7 +50,7 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
       <div className="bg-[#2b231b] p-6 rounded-lg shadow-lg w-11/12 max-w-md border-4 border-[#8B4513]">
         <div className=" flex justify-between">
           <h2 className="text-3xl font-extrabold text-center text-[#FFD700] mb-4">
-            {item.name}
+            {itemData.name}
           </h2>
           <button
             className="text-[#FFD700] p-2 rounded hover:bg-[#703517] transition duration-300 mb-4"
@@ -60,10 +60,10 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
           </button>
         </div>
         <div className="relative rounded-lg overflow-hidden flex items-center justify-center mb-4 border-2 border-[#C76936] p-2 bg-[#3e342a]">
-          {item.img ? (
+          {itemData.img ? (
             <img
-              src={`http://localhost:3002${item.img}`}
-              alt={item.name}
+              src={`http://localhost:3002${itemData.img}`}
+              alt={itemData.name}
               className="object-contain"
             />
           ) : (
@@ -77,30 +77,33 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
             Stock: <span className="font-extrabold">{itemData.stock}</span>
           </p>
           <p className="text-lg font-extrabold text-[#FFD700]">
-            Price: T$ {item.price}
+            Price: T$ {itemData.price}
           </p>
-          {(item.itemType as unknown as string) !== 'seeds' && item.rarity ? (
+          {(itemData.itemType as unknown as string) !== 'seeds' &&
+          itemData.rarity ? (
             <p className="mt-2 text-sm font-extrabold text-[#FFD700]">
               Rarity:{' '}
-              <span style={{ color: rarityColors[item.rarity.toLowerCase()] }}>
-                {item.rarity}
+              <span
+                style={{ color: rarityColors[itemData.rarity.toLowerCase()] }}
+              >
+                {itemData.rarity}
               </span>
             </p>
           ) : null}
         </div>
-        {item.description && (
-          <p className="text-[#C76936] italic mb-4">{item.description}</p>
+        {itemData.description && (
+          <p className="text-[#C76936] italic mb-4">{itemData.description}</p>
         )}
 
         <div className="flex items-center justify-center">
           <div className="flex justify-between items-center mb-4">
             <PurchaseButton
               userSub={userSub}
-              itemId={item.id}
+              itemId={itemData.id}
               quantity={1}
-              itemType={item.itemType}
-              stock={item.stock}
-              price={item.price}
+              itemType={itemData.itemType}
+              stock={itemData.stock}
+              price={itemData.price}
               refetchStoreItems={refetchStoreItems}
             />
           </div>

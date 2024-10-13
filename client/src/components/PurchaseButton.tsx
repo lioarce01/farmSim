@@ -8,6 +8,7 @@ import {
 import { ItemType, PurchaseButtonProps } from 'src/types';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
 import Popup from './PopUp';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   userSub,
@@ -16,11 +17,11 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   itemType: propItemType,
   stock,
   price,
-  refetchStoreItems,
 }) => {
   const [buyItem, { isLoading: isBuying }] = useGetStoreBuyMutation();
   const { data: user } = useGetUserBySubQuery(userSub);
   const { refetch: refetchItem } = useGetStoreItemByIdQuery(itemId);
+  const { fetchUserData } = useFetchUser(user);
 
   const [purchaseQuantity, setPurchaseQuantity] = useState<number>(
     quantity || 1,
@@ -46,6 +47,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       }).unwrap();
 
       refetchItem();
+      fetchUserData();
 
       console.log('Compra exitosa');
     } catch (err) {
@@ -58,7 +60,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       <button
         onClick={handleBuy}
         disabled={isBuying || stock <= 0}
-        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513] ${
+        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white ${
           isBuying || stock <= 0
             ? 'bg-[#fac59e] text-white cursor-not-allowed'
             : 'bg-[#C76936] text-white hover:bg-[#8B4513]'

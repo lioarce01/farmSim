@@ -32,6 +32,13 @@ export const usersApi = createApi({
         body: body,
       }),
     }),
+    addTokens: builder.mutation({
+      query: (body) => ({
+        url: '/users/addTokens',
+        method: 'POST',
+        body: body,
+      }),
+    }),
   }),
 });
 
@@ -40,4 +47,5 @@ export const {
   useRegisterUserMutation,
   useConvertUserMutation,
   useGetUserBySubQuery,
+  useAddTokensMutation,
 } = usersApi;

@@ -38,6 +38,11 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       }
     }
 
+    if (purchaseQuantity > stock) {
+      setShowPopup(true);
+      return;
+    }
+
     try {
       await buyItem({
         userSub,
@@ -52,6 +57,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       console.log('Compra exitosa');
     } catch (err) {
       console.error('Error al realizar la compra', err);
+      setShowPopup(true);
     }
   };
 
@@ -71,7 +77,13 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
 
       {showPopup && (
         <Popup
-          message="Not enough balance."
+          message={
+            user?.balanceToken === undefined || user.balanceToken < price
+              ? 'Saldo insuficiente.'
+              : purchaseQuantity > stock
+                ? 'Cantidad excede el stock disponible.'
+                : 'Error al realizar la compra. Intente nuevamente.'
+          }
           onClose={() => setShowPopup(false)}
           isOpen={showPopup}
         />

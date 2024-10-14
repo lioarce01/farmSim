@@ -99,6 +99,7 @@ model ClimateEvent {
   intensity Int
   startTime DateTime @default(now())
   endTime DateTime?
+  isActive Boolean @default(true)
 }
 
 enum ClimateEventType {

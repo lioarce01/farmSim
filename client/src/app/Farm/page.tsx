@@ -14,7 +14,7 @@ import {
   useWaterPlantMutation,
   useGetFarmSlotsQuery,
 } from '../../redux/api/farm';
-import { Rarity, SeedStatus, Slot } from 'src/types';
+import { ClimateEvent, Rarity, SeedStatus, Slot } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
 import Popup from '../../components/PopUp';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -23,6 +23,11 @@ import FarmSlot from './farmSlot';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store/store';
 import { setGrowthStatus, setSeedRarity } from 'src/redux/slices/filtersSlice';
+import {
+  clearClimateEvent,
+  setClimateEvent,
+} from 'src/redux/slices/climateEventSlice';
+import ClimateEventDisplay from './ClimateEventDisplay';
 
 const Farm = () => {
   const dispatch = useDispatch();
@@ -87,6 +92,12 @@ const Farm = () => {
 
   const socket = useSocket('http://localhost:3002');
 
+  const currentEvent = useSelector(
+    (state: RootState) => state.climateEvent.currentEvent,
+  );
+
+  console.log('current event', currentEvent);
+
   useEffect(() => {
     if (socket) {
       socket.on('seed-planted', () => refetchFarmSlots());
@@ -94,6 +105,14 @@ const Farm = () => {
       socket.on('seed-watered', () => refetchFarmSlots());
       socket.on('seed-harvested', () => refetchFarmSlots());
       socket.on('seed-deleted', () => refetchFarmSlots());
+      socket.on('climateEvent', (event: ClimateEvent) => {
+        console.log('evento climatico recibido: ', event);
+        dispatch(setClimateEvent(event));
+      });
+      socket.on('climateEventEnd', () => {
+        dispatch(clearClimateEvent());
+        refetchFarmSlots();
+      });
 
       return () => {
         socket.off('seed-planted');
@@ -101,9 +120,11 @@ const Farm = () => {
         socket.off('seed-watered');
         socket.off('seed-harvested');
         socket.off('seed-deleted');
+        socket.off('climateEvent');
+        socket.off('climateEventEnd');
       };
     }
-  }, [socket, refetchFarmSlots]);
+  }, [socket, refetchFarmSlots, dispatch]);
 
   const handleOpenInventory = (
     slotIndex: number | null = null,
@@ -180,7 +201,9 @@ const Farm = () => {
           slotId: farm.slots[slotIndex].id,
           sub: user?.sub,
         };
-        const response = await harvestPlant(slotData).unwrap();
+        const response = await harvestPlant(slotData)
+          .unwrap()
+          .then(() => fetchUserData());
         console.log('Plant harvested:', response);
       } catch (e) {
         const error = e as Error;
@@ -238,11 +261,13 @@ const Farm = () => {
   return (
     <div className="bg-[#4d2612] min-h-screen pt-20">
       <Navbar />
-      <div className="flex flex-col items-center xl:w-2/3 mx-auto pt-24 pb-20">
-        <h1 className="text-4xl font-bold mb-8 text-[#c76936]">My Farm</h1>
+      <div className="flex flex-col items-center xl:w-2/3 w-full mx-auto pt-16 pb-20">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-[#c76936] text-center">
+          My Farm
+        </h1>
 
         {/* Contenedor con la imagen de fondo */}
-        <div className="relative w-full">
+        <div className="relative w-full px-4 md:px-0">
           <Image
             src={bgStore}
             alt="Store Background"
@@ -252,9 +277,15 @@ const Farm = () => {
             className="absolute inset-0 z-0 rounded-lg border-4 opacity-80 border-[#703517] shadow-lg shadow-black"
           />
 
-          {/* Filtros */}
-          <div className="relative z-10 flex flex-col mb-8 w-full sm:items-center xl:items-start p-4">
-            <div className="flex flex-col md:w-1/2 lg:w-1/3 xl:w-1/4 md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+          {/* Contenedor de los filtros y ClimateEventDisplay */}
+          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between w-full p-4 space-y-4 md:space-y-0 md:space-x-4 bg-opacity-80 mb-8">
+            {/* Climate Event Display */}
+            <div className="w-full md:w-1/3">
+              <ClimateEventDisplay event={currentEvent} />
+            </div>
+
+            {/* Filtros */}
+            <div className="flex flex-col w-full md:w-2/3 xl:w-1/4 space-y-4">
               <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
                 Rarity:
                 <select
@@ -271,6 +302,7 @@ const Farm = () => {
                   <option value="LEGENDARY">Legendary</option>
                 </select>
               </label>
+
               <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
                 Status:
                 <select
@@ -290,7 +322,7 @@ const Farm = () => {
           </div>
 
           {/* Grid de los slots */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 sm:w-2/3 md:w-full bg-opacity-90 pb-12 rounded-lg shadow-lg">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 w-full bg-opacity-90 pb-12 rounded-lg shadow-lg">
             {filteredSlots.length > 0 ? (
               filteredSlots.map((slot: Slot, index: number) => (
                 <div key={index} className="w-full max-w-sm mx-auto">
@@ -312,7 +344,7 @@ const Farm = () => {
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center text-lg">
+              <div className="col-span-full text-center text-lg text-[#f8d7c6]">
                 No plants available.
               </div>
             )}

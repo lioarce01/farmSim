@@ -25,7 +25,7 @@ const UsersPage = () => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-screen text-[#B5EAD7] text-lg">
-        Cargando...
+        Loading...
       </div>
     );
 

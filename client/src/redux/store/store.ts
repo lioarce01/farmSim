@@ -10,6 +10,7 @@ import { storeItemsApi } from '../api/store';
 import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
 import { farmApi } from '../api/farm';
+import climateEventReducer from '../slices/climateEventSlice';
 
 console.log('Running on client:', typeof window !== 'undefined');
 
@@ -35,13 +36,14 @@ const storage =
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'slots', 'timer', 'filters'],
+  whitelist: ['user', 'slots', 'timer', 'filters', 'climateEvent'],
 };
 
 const rootReducer = combineReducers({
   user: userReducer,
   slot: slotReducer,
   filters: filterReducer,
+  climateEvent: climateEventReducer,
   [storeItemsApi.reducerPath]: storeItemsApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
   [farmApi.reducerPath]: farmApi.reducer,

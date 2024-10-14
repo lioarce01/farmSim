@@ -95,6 +95,19 @@ export interface RemainingTimeData {
   canUpdate: boolean;
 }
 
+export interface ClimateEvent {
+  type: ClimateEventType;
+  intensity: number;
+  endTime: Date;
+}
+
+export enum ClimateEventType {
+  RAIN = 'RAIN',
+  DROUGHT = 'DROUGHT',
+  SNOW = 'SNOW',
+  SUNNY = 'SUNNY',
+}
+
 export enum Role {
   admin = 'ADMIN',
   user = 'USER',

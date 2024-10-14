@@ -16,13 +16,12 @@ const applyClimateEffectToAllFarms = (event) => __awaiter(void 0, void 0, void 0
     var _a, _b;
     const farms = yield prisma.farm.findMany({
         include: {
-            slots: true, // Obtiene todos los slots de cada granja
+            slots: true,
         },
     });
     for (const farm of farms) {
         for (const slot of farm.slots) {
             let newClimateEffect = (_a = slot.climateEffect) !== null && _a !== void 0 ? _a : 0;
-            // Ajuste de tokens generados según el tipo de evento
             let newTokensGenerated = (_b = slot.seedTokensGenerated) !== null && _b !== void 0 ? _b : 0;
             switch (event.type) {
                 case client_1.ClimateEventType.DROUGHT:

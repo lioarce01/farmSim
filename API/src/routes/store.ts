@@ -37,122 +37,130 @@ router.get('/item/:id', async (req, res) => {
 router.post('/buy', async (req, res) => {
   const { userSub, itemId, quantity, itemType } = req.body;
 
+  if (!['seed', 'water'].includes(itemType)) {
+    return res.status(400).json({ message: 'Tipo de ítem no válido' });
+  }
+
   try {
-    const storeItem = await prisma.storeItem.findUnique({
-      where: { id: itemId },
-    });
+    const result = await prisma.$transaction(async (prisma) => {
+      const storeItem = await prisma.storeItem.findUnique({
+        where: { id: itemId },
+      });
 
-    if (!storeItem) {
-      return res
-        .status(404)
-        .json({ message: 'El ítem no existe en la tienda' });
-    }
+      if (!storeItem) {
+        throw new Error('El ítem no existe en la tienda');
+      }
 
-    if (storeItem.stock < quantity) {
-      return res.status(400).json({ message: 'Stock insuficiente' });
-    }
+      if (storeItem.stock < quantity) {
+        throw new Error('Stock insuficiente');
+      }
 
-    let user = await prisma.user.findUnique({
-      where: { sub: userSub },
-      include: { inventory: { include: { seeds: true, waters: true } } },
-    });
+      let user = await prisma.user.findUnique({
+        where: { sub: userSub },
+        include: { inventory: true },
+      });
 
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
 
-    if (!user.inventory) {
-      user = await prisma.user.update({
+      if (!user.inventory) {
+        user = await prisma.user.update({
+          where: { sub: userSub },
+          data: {
+            inventory: {
+              create: {},
+            },
+          },
+          include: { inventory: true },
+        });
+      }
+
+      const totalPrice = storeItem.price * quantity;
+      if (user.balanceToken < totalPrice) {
+        throw new Error('Saldo insuficiente de tokens');
+      }
+
+      await prisma.storeItem.update({
+        where: { id: itemId },
+        data: {
+          stock: { decrement: quantity },
+        },
+      });
+
+      await prisma.user.update({
         where: { sub: userSub },
         data: {
-          inventory: {
-            create: {},
-          },
-        },
-        include: { inventory: { include: { seeds: true, waters: true } } },
-      });
-    }
-
-    const totalPrice = storeItem.price * quantity;
-    if (user.balanceToken < totalPrice) {
-      return res.status(400).json({ message: 'Saldo insuficiente de tokens' });
-    }
-
-    await prisma.storeItem.update({
-      where: { id: itemId },
-      data: {
-        stock: { decrement: quantity },
-      },
-    });
-
-    await prisma.user.update({
-      where: { sub: userSub },
-      data: {
-        balanceToken: { decrement: totalPrice },
-      },
-    });
-
-    if (itemType === 'seed') {
-      const existingSeed = await prisma.seed.findFirst({
-        where: {
-          inventoryId: user.inventory!.id,
-          name: storeItem.name,
+          balanceToken: { decrement: totalPrice },
         },
       });
 
-      if (existingSeed) {
-        await prisma.seed.update({
-          where: { id: existingSeed.id },
-          data: {
-            quantity: { increment: quantity },
-          },
-        });
-      } else {
+      if (itemType === 'seed') {
+        const inventoryId = user.inventory?.id;
+        if (!inventoryId) {
+          throw new Error('ID de inventario no encontrado');
+        }
         await prisma.seed.create({
           data: {
             name: storeItem.name,
             description: storeItem.description,
-            quantity: quantity,
             rarity: storeItem.rarity as Rarity,
-            inventoryId: user.inventory!.id,
-            tokensGenerated: storeItem.tokensGenerated,
-            img: storeItem.img,
+            inventoryId,
+            tokensGenerated: storeItem.tokensGenerated ?? 0,
+            img: storeItem.img ?? '',
           },
         });
-      }
-    } else if (itemType === 'water') {
-      const existingWater = await prisma.water.findFirst({
-        where: {
-          inventoryId: user.inventory!.id,
-          name: storeItem.name,
-        },
-      });
-
-      if (existingWater) {
-        await prisma.water.update({
-          where: { id: existingWater.id },
-          data: {
-            quantity: { increment: quantity },
-          },
-        });
-      } else {
-        await prisma.water.create({
-          data: {
+      } else if (itemType === 'water') {
+        const existingWater = await prisma.water.findFirst({
+          where: {
+            inventoryId: user.inventory?.id,
             name: storeItem.name,
-            description: storeItem.description,
-            quantity: quantity,
-            inventoryId: user.inventory!.id,
           },
         });
-      }
-    } else {
-      return res.status(400).json({ message: 'Tipo de ítem no válido' });
-    }
 
-    res.status(200).json({ message: 'Compra realizada con éxito' });
+        if (existingWater) {
+          await prisma.water.update({
+            where: { id: existingWater.id },
+            data: {
+              quantity: { increment: quantity },
+            },
+          });
+        } else {
+          const inventoryId = user.inventory?.id;
+          if (!inventoryId) {
+            throw new Error('ID de inventario no encontrado');
+          }
+          await prisma.water.create({
+            data: {
+              name: storeItem.name,
+              description: storeItem.description,
+              quantity,
+              inventoryId,
+            },
+          });
+        }
+
+        return {
+          message: 'Compra realizada con éxito',
+          item: storeItem,
+          quantity,
+        };
+      }
+
+      return {
+        message: 'Compra realizada con éxito',
+        item: storeItem,
+        quantity,
+      };
+    });
+
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al realizar la compra.' });
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : 'Error al realizar la compra.',
+    });
   }
 });
 

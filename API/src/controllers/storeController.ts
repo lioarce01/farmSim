@@ -169,20 +169,9 @@ async function seedStoreWithRandomSeeds() {
   );
 }
 
-// Funciones auxiliares para obtener stock y tokens según rareza
+//EL Stock de todas las rarezas siempre debe ser 1
 function getStockByRarity(rarity: Rarity): number {
-  switch (rarity) {
-    case 'COMMON':
-    case 'UNCOMMON':
-    case 'RARE':
-      return Math.floor(Math.random() * 3) + 1;
-    case 'EPIC':
-      return Math.floor(Math.random() * 2) + 1;
-    case 'LEGENDARY':
-      return 1; // Stock fijo de 1
-    default:
-      return 1; // Valor predeterminado
-  }
+  return 1;
 }
 
 function getTokensByRarity(rarity: Rarity): number {

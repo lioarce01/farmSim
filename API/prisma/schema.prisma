@@ -22,6 +22,7 @@ model User {
   balanceToken Int @default(200)
   farm Farm?
   role String
+  marketListings MarketListing[]
 }
 
 model Inventory {
@@ -61,13 +62,13 @@ model Seed {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
-  inventoryId String @db.ObjectId
-  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  quantity Int @default(0)
+  inventoryId String? @db.ObjectId
+  inventory Inventory? @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   rarity Rarity
   tokensGenerated Int? @default(0)
   img String?
   Slot Slot[]
+  marketListing MarketListing?
 }
 
 model Water {
@@ -90,6 +91,21 @@ model StoreItem {
   tokensGenerated Int?
   quantity Int?
   img String?
+}
+
+model MarketListing {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  price Int
+  sellerId String @db.ObjectId
+  seller User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  seedId String @db.ObjectId @unique
+  seed Seed @relation(fields: [seedId], references: [id], onDelete: Cascade)
+  listedAt DateTime? @default(now())
+  seedName String?
+  seedDescription String?
+  seedRarity Rarity?
+  seedTokensGenerated Int?
+  seedImg String?
 }
 
 model ClimateEvent {

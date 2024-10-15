@@ -12,7 +12,7 @@ import Timer from './Timer';
 import { setTimeRemaining } from 'src/redux/slices/timerSlice';
 import bgPlant from '../assets/bgplant.jpg';
 import Image from 'next/image';
-import ItemPopup from './ItemPopUp';
+import ItemPopup from './ItemPopup';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -36,7 +36,9 @@ const StorePage: React.FC = () => {
     if (socket) {
       socket.on('storeUpdated', (timeRemaining) => {
         console.log('store update event received:', timeRemaining);
-        refetchStoreItems();
+        refetchStoreItems().then((res) => {
+          console.log('Updated store items:', res);
+        });
         dispatch(setTimeRemaining(timeRemaining));
       });
 
@@ -46,9 +48,23 @@ const StorePage: React.FC = () => {
     }
   }, [socket, storeItems]);
 
-  const handleCardClick = (item: StoreItem) => {
-    console.log('Selected item:', item);
-    setSelectedItem(item);
+  const handleCardClick = async (item: StoreItem) => {
+    try {
+      const response = await refetchStoreItems();
+      const updatedStoreItems = response?.data;
+
+      const updatedItem = updatedStoreItems?.find(
+        (storeItem) => storeItem.id === item.id,
+      );
+
+      if (updatedItem) {
+        setSelectedItem(updatedItem);
+      } else {
+        setSelectedItem(item);
+      }
+    } catch (error) {
+      console.error('Error al obtener items de la tienda:', error);
+    }
   };
 
   const handleClosePopup = () => {
@@ -126,9 +142,11 @@ const StorePage: React.FC = () => {
       </div>
       {selectedItem && (
         <ItemPopup
+          key={selectedItem.id}
           item={selectedItem}
           onClose={handleClosePopup}
           userSub={userSub}
+          stock={selectedItem.stock}
           refetchStoreItems={refetchStoreItems}
         />
       )}

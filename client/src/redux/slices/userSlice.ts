@@ -42,7 +42,6 @@ const userSlice = createSlice({
         role: Role;
       }>,
     ) => {
-      // console.log('Dispatching setUser with: ', action.payload)
       state.nickname = action.payload.nickname;
       state.email = action.payload.email;
       state.token = action.payload.token;

@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RootState } from '../redux/store/store'; // Asegúrate de importar el tipo RootState correctamente
+import { RootState } from '../redux/store/store';
 import { useSelector } from 'react-redux';
 
 const ProtectAdminRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user);
-  const [isRedirecting, setIsRedirecting] = useState(false); // Estado para controlar la redirección
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (user?.role !== 'ADMIN' && !isRedirecting) {

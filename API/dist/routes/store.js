@@ -28,152 +28,136 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
     }
 }));
-// function formatTimeRemaining(ms: number): string {
-//   const totalSeconds = Math.floor(ms / 1000);
-//   const minutes = Math.floor(totalSeconds / 60);
-//   const seconds = totalSeconds % 60;
-//   return `${minutes} minutos y ${seconds} segundos`;
-// }
-// router.get('/refreshStore', (req, res) => {
-//   const currentTime = Date.now();
-//   if (lastUpdateTime) {
-//     const timeSinceLastUpdate = currentTime - lastUpdateTime;
-//     const timeRemaining = updateInterval - timeSinceLastUpdate;
-//     if (timeRemaining > 0) {
-//       res.status(200).json({
-//         message: 'Tiempo hasta la próxima actualización',
-//         timeRemaining: formatTimeRemaining(timeRemaining),
-//         timeRemainingInMs: timeRemaining,
-//         canUpdate: false,
-//       });
-//     } else {
-//       res.status(200).json({
-//         message: 'La tienda puede ser actualizada ahora.',
-//         timeRemaining: '0 minutos y 0 segundos',
-//         timeRemainingInMs: 0,
-//         canUpdate: true,
-//       });
-//     }
-//   } else {
-//     res.status(200).json({
-//       message: 'La tienda puede ser actualizada ahora.',
-//       timeRemaining: '0 minutos y 0 segundos',
-//       timeRemainingInMs: 0,
-//       canUpdate: true,
-//     });
-//   }
-// });
+router.get('/item/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const itemId = req.params.id;
+    try {
+        const item = yield prisma.storeItem.findUnique({
+            where: { id: itemId },
+        });
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+        res.json(item);
+    }
+    catch (e) {
+        res.status(500).json({ message: 'Error retrieving item', error: e });
+    }
+}));
 router.post('/buy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userSub, itemId, quantity, itemType } = req.body;
+    if (!['seed', 'water'].includes(itemType)) {
+        return res.status(400).json({ message: 'Tipo de ítem no válido' });
+    }
     try {
-        const storeItem = yield prisma.storeItem.findUnique({
-            where: { id: itemId },
-        });
-        if (!storeItem) {
-            return res
-                .status(404)
-                .json({ message: 'El ítem no existe en la tienda' });
-        }
-        if (storeItem.stock < quantity) {
-            return res.status(400).json({ message: 'Stock insuficiente' });
-        }
-        let user = yield prisma.user.findUnique({
-            where: { sub: userSub },
-            include: { inventory: { include: { seeds: true, waters: true } } },
-        });
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        if (!user.inventory) {
-            user = yield prisma.user.update({
+        const result = yield prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a, _b, _c, _d, _e;
+            const storeItem = yield prisma.storeItem.findUnique({
+                where: { id: itemId },
+            });
+            if (!storeItem) {
+                throw new Error('El ítem no existe en la tienda');
+            }
+            if (storeItem.stock < quantity) {
+                throw new Error('Stock insuficiente');
+            }
+            let user = yield prisma.user.findUnique({
                 where: { sub: userSub },
-                data: {
-                    inventory: {
-                        create: {},
-                    },
-                },
-                include: { inventory: { include: { seeds: true, waters: true } } },
+                include: { inventory: true },
             });
-        }
-        const totalPrice = storeItem.price * quantity;
-        if (user.balanceToken < totalPrice) {
-            return res.status(400).json({ message: 'Saldo insuficiente de tokens' });
-        }
-        yield prisma.storeItem.update({
-            where: { id: itemId },
-            data: {
-                stock: { decrement: quantity },
-            },
-        });
-        yield prisma.user.update({
-            where: { sub: userSub },
-            data: {
-                balanceToken: { decrement: totalPrice },
-            },
-        });
-        if (itemType === 'seed') {
-            const existingSeed = yield prisma.seed.findFirst({
-                where: {
-                    inventoryId: user.inventory.id,
-                    name: storeItem.name,
-                },
-            });
-            if (existingSeed) {
-                yield prisma.seed.update({
-                    where: { id: existingSeed.id },
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+            if (!user.inventory) {
+                user = yield prisma.user.update({
+                    where: { sub: userSub },
                     data: {
-                        quantity: { increment: quantity },
+                        inventory: {
+                            create: {},
+                        },
                     },
+                    include: { inventory: true },
                 });
             }
-            else {
+            const totalPrice = storeItem.price * quantity;
+            if (user.balanceToken < totalPrice) {
+                throw new Error('Saldo insuficiente de tokens');
+            }
+            yield prisma.storeItem.update({
+                where: { id: itemId },
+                data: {
+                    stock: { decrement: quantity },
+                },
+            });
+            yield prisma.user.update({
+                where: { sub: userSub },
+                data: {
+                    balanceToken: { decrement: totalPrice },
+                },
+            });
+            if (itemType === 'seed') {
+                const inventoryId = (_a = user.inventory) === null || _a === void 0 ? void 0 : _a.id;
+                if (!inventoryId) {
+                    throw new Error('ID de inventario no encontrado');
+                }
                 yield prisma.seed.create({
                     data: {
                         name: storeItem.name,
                         description: storeItem.description,
-                        quantity: quantity,
                         rarity: storeItem.rarity,
-                        inventoryId: user.inventory.id,
-                        tokensGenerated: storeItem.tokensGenerated,
-                        img: storeItem.img,
+                        inventoryId,
+                        tokensGenerated: (_b = storeItem.tokensGenerated) !== null && _b !== void 0 ? _b : 0,
+                        img: (_c = storeItem.img) !== null && _c !== void 0 ? _c : '',
                     },
                 });
             }
-        }
-        else if (itemType === 'water') {
-            const existingWater = yield prisma.water.findFirst({
-                where: {
-                    inventoryId: user.inventory.id,
-                    name: storeItem.name,
-                },
-            });
-            if (existingWater) {
-                yield prisma.water.update({
-                    where: { id: existingWater.id },
-                    data: {
-                        quantity: { increment: quantity },
-                    },
-                });
-            }
-            else {
-                yield prisma.water.create({
-                    data: {
+            else if (itemType === 'water') {
+                const existingWater = yield prisma.water.findFirst({
+                    where: {
+                        inventoryId: (_d = user.inventory) === null || _d === void 0 ? void 0 : _d.id,
                         name: storeItem.name,
-                        description: storeItem.description,
-                        quantity: quantity,
-                        inventoryId: user.inventory.id,
                     },
                 });
+                if (existingWater) {
+                    yield prisma.water.update({
+                        where: { id: existingWater.id },
+                        data: {
+                            quantity: { increment: quantity },
+                        },
+                    });
+                }
+                else {
+                    const inventoryId = (_e = user.inventory) === null || _e === void 0 ? void 0 : _e.id;
+                    if (!inventoryId) {
+                        throw new Error('ID de inventario no encontrado');
+                    }
+                    yield prisma.water.create({
+                        data: {
+                            name: storeItem.name,
+                            description: storeItem.description,
+                            quantity,
+                            inventoryId,
+                        },
+                    });
+                }
+                return {
+                    message: 'Compra realizada con éxito',
+                    item: storeItem,
+                    quantity,
+                };
             }
-        }
-        else {
-            return res.status(400).json({ message: 'Tipo de ítem no válido' });
-        }
-        res.status(200).json({ message: 'Compra realizada con éxito' });
+            return {
+                message: 'Compra realizada con éxito',
+                item: storeItem,
+                quantity,
+            };
+        }));
+        res.status(200).json(result);
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error al realizar la compra.' });
+        res.status(500).json({
+            message: error instanceof Error ? error.message : 'Error al realizar la compra.',
+        });
     }
 }));
 exports.default = router;

@@ -79,7 +79,7 @@ export interface User {
   email: string;
   balanceToken?: number;
   inventory?: Inventory;
-  refetch: () => void;
+  // refetch: () => void;
   farm: Farm;
 }
 
@@ -93,6 +93,19 @@ export interface RemainingTimeData {
   timeRemaining: string;
   timeRemainingInMs: number;
   canUpdate: boolean;
+}
+
+export interface ClimateEvent {
+  type: ClimateEventType;
+  intensity: number;
+  endTime: Date;
+}
+
+export enum ClimateEventType {
+  RAIN = 'RAIN',
+  DROUGHT = 'DROUGHT',
+  SNOW = 'SNOW',
+  SUNNY = 'SUNNY',
 }
 
 export enum Role {

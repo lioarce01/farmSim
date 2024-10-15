@@ -63,7 +63,7 @@ router.get('/:sub', async (req, res) => {
 router.post('/register', async (req, res) => {
   const { nickname, email, sub } = req.body;
 
-  if (!email || !nickname) {
+  if (!email || !nickname || !sub) {
     return res.status(400).json({ message: 'Todos los campos son requeridos' });
   }
 
@@ -84,32 +84,35 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ message: 'Email ya está registrado' });
     }
 
-    const newUser = await prisma.user.create({
-      data: {
-        nickname,
-        email,
-        sub,
-        role: 'USER',
-        inventory: {
-          create: {
-            seeds: {},
-            waters: {},
+    const newUser = await prisma.$transaction(async (prisma) => {
+      const user = await prisma.user.create({
+        data: {
+          nickname,
+          email,
+          sub,
+          role: 'USER',
+          inventory: {
+            create: {
+              seeds: {},
+              waters: {},
+            },
           },
-        },
-        farm: {
-          create: {
-            slots: {
-              create: Array(8)
-                .fill(null)
-                .map(() => ({
-                  seedId: null,
-                  plantingTime: null,
-                  growthStatus: 'NONE',
-                })),
+          farm: {
+            create: {
+              slots: {
+                create: Array(8)
+                  .fill(null)
+                  .map(() => ({
+                    seedId: null,
+                    plantingTime: null,
+                    growthStatus: 'NONE',
+                  })),
+              },
             },
           },
         },
-      },
+      });
+      return user;
     });
 
     res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
@@ -141,12 +144,10 @@ router.post('/addTokens', async (req, res) => {
       },
     });
 
-    return res
-      .status(200)
-      .json({
-        message: 'Tokens agregados con exito',
-        newBalance: user.balanceToken + tokensToAdd,
-      });
+    return res.status(200).json({
+      message: 'Tokens agregados con exito',
+      newBalance: user.balanceToken + tokensToAdd,
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Error al agregar tokens al usuario' });

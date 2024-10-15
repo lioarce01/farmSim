@@ -70,7 +70,7 @@ router.get('/:sub', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { nickname, email, sub } = req.body;
-    if (!email || !nickname) {
+    if (!email || !nickname || !sub) {
         return res.status(400).json({ message: 'Todos los campos son requeridos' });
     }
     try {
@@ -86,33 +86,36 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (existingUserByEmail) {
             return res.status(409).json({ message: 'Email ya está registrado' });
         }
-        const newUser = yield prisma.user.create({
-            data: {
-                nickname,
-                email,
-                sub,
-                role: 'USER',
-                inventory: {
-                    create: {
-                        seeds: {},
-                        waters: {},
+        const newUser = yield prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield prisma.user.create({
+                data: {
+                    nickname,
+                    email,
+                    sub,
+                    role: 'USER',
+                    inventory: {
+                        create: {
+                            seeds: {},
+                            waters: {},
+                        },
                     },
-                },
-                farm: {
-                    create: {
-                        slots: {
-                            create: Array(8)
-                                .fill(null)
-                                .map(() => ({
-                                seedId: null,
-                                plantingTime: null,
-                                growthStatus: 'NONE',
-                            })),
+                    farm: {
+                        create: {
+                            slots: {
+                                create: Array(8)
+                                    .fill(null)
+                                    .map(() => ({
+                                    seedId: null,
+                                    plantingTime: null,
+                                    growthStatus: 'NONE',
+                                })),
+                            },
                         },
                     },
                 },
-            },
-        });
+            });
+            return user;
+        }));
         res.status(201).json({ message: 'Usuario creado exitosamente', newUser });
     }
     catch (error) {
@@ -138,9 +141,7 @@ router.post('/addTokens', (req, res) => __awaiter(void 0, void 0, void 0, functi
                 balanceToken: { increment: tokensToAdd },
             },
         });
-        return res
-            .status(200)
-            .json({
+        return res.status(200).json({
             message: 'Tokens agregados con exito',
             newBalance: user.balanceToken + tokensToAdd,
         });

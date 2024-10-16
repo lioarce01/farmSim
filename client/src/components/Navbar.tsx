@@ -67,12 +67,20 @@ const Navbar: React.FC = () => {
             </li>
           )}
           <li>
-            <button
-              onClick={handleCLick}
+            <Link
+              href="/Marketplace"
               className="px-6 py-3 bg-[#8d3c19] border-r-4 border-b-4 border-[#632911] text-[#FDE8C9] font-extrabold rounded-lg shadow-lg transition mx-4 duration-300 transform hover:scale-105 hover:bg-[#7c3617] hover:text-[#ffb98e]"
             >
               Marketplace
-            </button>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/Store"
+              className="px-6 py-3 bg-[#8d3c19] border-r-4 border-b-4 border-[#632911] text-[#FDE8C9] font-extrabold rounded-lg shadow-lg transition mx-4 duration-300 transform hover:scale-105 hover:bg-[#7c3617] hover:text-[#ffb98e]"
+            >
+              Store
+            </Link>
           </li>
         </ul>
         {isAuthenticated ? <UserMenu /> : <LoginButton />}
@@ -97,15 +105,6 @@ const Navbar: React.FC = () => {
                 About Us
               </Link>
             </li>
-            <li>
-              <Link
-                href="/Store"
-                className="text-lg text-[#333] hover:text-[#FFC1A1] transition duration-300 font-medium"
-                onClick={toggleMenu}
-              >
-                Store
-              </Link>
-            </li>
             {isAuthenticated && fetchedUser?.role === 'ADMIN' && (
               <li>
                 <Link
@@ -119,11 +118,20 @@ const Navbar: React.FC = () => {
             )}
             <li>
               <Link
-                href="/Store"
+                href="/Marketplace"
                 className="bg-[#B5EAD7] border-2 border-[#4b2312] text-[#333] font-extrabold px-4 py-3 rounded-lg hover:bg-[#4b2312] hover:text-white transition duration-300"
                 onClick={toggleMenu}
               >
                 Marketplace
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/Store"
+                className="bg-[#B5EAD7] border-2 border-[#4b2312] text-[#333] font-extrabold px-4 py-3 rounded-lg hover:bg-[#4b2312] hover:text-white transition duration-300"
+                onClick={toggleMenu}
+              >
+                Store
               </Link>
             </li>
           </ul>

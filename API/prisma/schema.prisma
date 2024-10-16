@@ -98,6 +98,7 @@ model MarketListing {
   price Int
   sellerId String @db.ObjectId
   seller User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerSub String
   seedId String @db.ObjectId @unique
   seed Seed @relation(fields: [seedId], references: [id], onDelete: Cascade)
   listedAt DateTime? @default(now())

@@ -25,6 +25,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+//GET MARKET LISTING BY ID
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const marketListing = await prisma.marketListing.findUnique({
+      where: { id },
+    });
+    if (!marketListing) {
+      return res.status(404).json({ message: 'Listado no encontrado' });
+    }
+    res.status(200).json(marketListing);
+  } catch (e) {
+    console.error('Error al obtener el listado de mercado:', e);
+    res.status(500).json({
+      message: 'Error al obtener el listado de mercado',
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
+});
+
 //GET MARKET LISTINGS BY SELLER ID
 router.get('/seller/:sellerId', async (req, res) => {
   const { sellerId } = req.params;
@@ -49,7 +69,7 @@ router.get('/seller/:sellerId', async (req, res) => {
 
 //CREATE MARKET LISTING
 router.post('/', async (req, res) => {
-  const { price, sellerId, seedId } = req.body;
+  const { price, sellerId, seedId, sellerSub } = req.body;
 
   try {
     const result = await prisma.$transaction(async (prisma) => {
@@ -71,6 +91,7 @@ router.post('/', async (req, res) => {
         data: {
           price,
           seller: { connect: { id: sellerId } },
+          sellerSub: sellerSub,
           seed: { connect: { id: seedId } },
           seedName: userSeed.name,
           seedDescription: userSeed.description,

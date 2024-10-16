@@ -23,13 +23,16 @@ export const marketApi = createApi({
         body: marketListing,
       }),
     }),
+    getMarketListingById: builder.query({
+      query: (id) => `/market/${id}`,
+    }),
     deleteMarketListing: builder.mutation({
       query: (marketListingId) => ({
         url: `/market/${marketListingId}`,
         method: 'DELETE',
       }),
     }),
-    buySeed: builder.mutation({
+    getBuySeed: builder.mutation({
       query: ({ marketListingId, buyerId }) => ({
         url: `/market/buy/${marketListingId}`,
         method: 'POST',
@@ -42,7 +45,8 @@ export const marketApi = createApi({
 export const {
   useGetMarketListingsQuery,
   useGetMarketListingsBySellerIdQuery,
+  useGetMarketListingByIdQuery,
   useCreateMarketListingMutation,
   useDeleteMarketListingMutation,
-  useBuySeedMutation,
+  useGetBuySeedMutation,
 } = marketApi;

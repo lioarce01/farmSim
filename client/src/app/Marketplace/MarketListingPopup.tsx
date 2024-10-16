@@ -18,6 +18,8 @@ import bgPlant from '../assets/bgplant.jpg';
 import { Star, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
+import RemoveListing from './removeListing';
+import { formatDistanceToNow } from 'date-fns';
 
 interface MarketListingPageProps {
   listingId: string;
@@ -50,6 +52,7 @@ export default function MarketListingPage({
   } = useGetMarketListingByIdQuery(listingId);
   const sellerSub = listing?.sellerSub;
   const { data: owner } = useGetUserBySubQuery(sellerSub);
+  console.log('owner:', owner);
 
   useEffect(() => {
     setIsVisible(true);
@@ -66,6 +69,10 @@ export default function MarketListingPage({
       router.back();
     }, 300);
   };
+
+  const formattedDate = formatDistanceToNow(new Date(listing.listedAt), {
+    addSuffix: true,
+  });
 
   return (
     <div
@@ -104,10 +111,11 @@ export default function MarketListingPage({
                 className="relative z-10 object-contain w-3/4 h-3/4 "
               />
             </div>
-            <div className="space-y-4 py-1 transition-all duration-500 ease-in-out">
+            <div className="space-y-3 py-1 transition-all duration-500 ease-in-out">
               <p className="text-2xl sm:text-3xl md:text-4xl font-bold">
                 ${listing.price}
               </p>
+              <p className="text-gray-600">Listed: {formattedDate}</p>
               <p
                 className="text-sm flex items-center"
                 style={{
@@ -129,10 +137,15 @@ export default function MarketListingPage({
           </CardContent>
           <CardFooter className="flex justify-center">
             {fetchedUser?.id && (
-              <div className="w-full sm:w-auto transition-all duration-500 ease-in-out transform hover:scale-105">
+              <div className="w-full flex flex-row justify-between">
                 <BuyListing
                   marketListingId={listingId}
                   buyerId={fetchedUser.id.toString()}
+                  refetchMarketListings={refetchMarketListings}
+                />
+                <RemoveListing
+                  marketListingId={listingId}
+                  sellerId={fetchedUser.id.toString()}
                   refetchMarketListings={refetchMarketListings}
                 />
               </div>

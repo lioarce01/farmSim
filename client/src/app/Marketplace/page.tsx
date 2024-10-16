@@ -51,6 +51,7 @@ export default function Marketplace() {
     fetchedUser,
     fetchError: userError,
     isLoading: userLoading,
+    fetchUserData,
   } = useFetchUser(user);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortedListings, setSortedListings] = useState(marketListings);
@@ -85,12 +86,11 @@ export default function Marketplace() {
   );
 
   const handleOpenPopup = (id: string) => {
-    router.push(`/Marketplace?listingId=${id}`); //
+    router.push(`/Marketplace?listingId=${id}`);
   };
 
   const handleClosePopup = () => {
     router.push('/Marketplace');
-    router.refresh();
   };
 
   if (isLoading || userLoading) {

@@ -42,9 +42,4 @@ app.use(
   }),
 );
 
-// Ruta de prueba
-app.get('/test', (req, res) => {
-  res.send('server running');
-});
-
 export default app;

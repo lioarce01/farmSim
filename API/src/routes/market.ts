@@ -7,20 +7,7 @@ const prisma = new PrismaClient();
 //GET ALL MARKET LISTINGS
 router.get('/', async (req, res) => {
   try {
-    const marketListings = await prisma.marketListing.findMany({
-      select: {
-        id: true,
-        price: true,
-        sellerId: true,
-        seedId: true,
-        seedName: true,
-        seedDescription: true,
-        seedRarity: true,
-        seedTokensGenerated: true,
-        seedImg: true,
-        listedAt: true,
-      },
-    });
+    const marketListings = await prisma.marketListing.findMany();
 
     if (marketListings.length === 0) {
       return res

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -32,6 +33,8 @@ import {
   SheetTrigger,
 } from '../../../components/ui/sheet';
 import { Star, Info, Menu } from 'lucide-react';
+import { useGetMarketListingsQuery } from 'src/redux/api/market';
+import bgPlant from '../assets/bgplant.jpg';
 
 // Mock data
 const items = Array.from({ length: 50 }, (_, i) => ({
@@ -54,66 +57,69 @@ export default function Marketplace() {
   const [sortBy, setSortBy] = useState('name');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const itemsPerPage = 12;
+  const {
+    data: marketListings,
+    isLoading,
+    isError,
+  } = useGetMarketListingsQuery();
 
-  const filteredItems = items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedCategories.length === 0 ||
-        selectedCategories.includes(item.category)),
-  );
+  console.log('market listings', marketListings);
 
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (sortBy === 'price') return a.price - b.price;
-    if (sortBy === 'rating') return b.rating - a.rating;
-    return a.name.localeCompare(b.name);
-  });
+  if (!marketListings || marketListings.length === 0)
+    return <div>No market listings</div>;
+
+  // const sortedItems = marketListings?.sort((a, b) => {
+  //   if (sortBy === 'price') return a.price - b.price;
+  //   if (sortBy === 'rarity') return b.seedRarity - a.seedRarity;
+  //   return a?.seedName.localeCompare(b?.seedName || '');
+  // });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
+  //   const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
 
-  const pageCount = Math.ceil(sortedItems.length / itemsPerPage);
+  //   const pageCount = Math.ceil(sortedItems.length / itemsPerPage);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category],
-    );
-  };
+  //   const handleCategoryChange = (category: string) => {
+  //     setSelectedCategories((prev) =>
+  //       prev.includes(category)
+  //         ? prev.filter((c) => c !== category)
+  //         : [...prev, category],
+  //     );
+  //   };
 
-  const Sidebar = () => (
-    <div className="space-y-6">
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle>Search</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </CardContent>
-      </Card>
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle>Categories</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {categories.map((category) => (
-            <label key={category} className="flex items-center space-x-2">
-              <Checkbox
-                checked={selectedCategories.includes(category)}
-                onCheckedChange={() => handleCategoryChange(category)}
-              />
-              <span>{category}</span>
-            </label>
-          ))}
-        </CardContent>
-      </Card>
-    </div>
-  );
+  //   const Sidebar = () => (
+  //     <div className="space-y-6">
+  //       <Card className="bg-white">
+  //         <CardHeader>
+  //           <CardTitle>Search</CardTitle>
+  //         </CardHeader>
+  //         <CardContent>
+  //           <Input
+  //             placeholder="Search products..."
+  //             value={searchTerm}
+  //             onChange={(e) => setSearchTerm(e.target.value)}
+  //           />
+  //         </CardContent>
+  //       </Card>
+  //       <Card className="bg-white">
+  //         <CardHeader>
+  //           <CardTitle>Categories</CardTitle>
+  //         </CardHeader>
+  //         <CardContent className="space-y-2">
+  //           {categories.map((category) => (
+  //             <label key={category} className="flex items-center space-x-2">
+  //               <Checkbox
+  //                 checked={selectedCategories.includes(category)}
+  //                 onCheckedChange={() => handleCategoryChange(category)}
+  //               />
+  //               <span>{category}</span>
+  //             </label>
+  //           ))}
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   );
 
   return (
     <div className="container mx-auto p-4 bg-[#101016] text-[#0e0e0f]">
@@ -129,20 +135,20 @@ export default function Marketplace() {
             side="left"
             className="w-[300px] sm:w-[400px] bg-[#0e0e0f]"
           >
-            <Sidebar />
+            {/* <Sidebar /> */}
           </SheetContent>
         </Sheet>
       </header>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="hidden md:block w-64 transition-all duration-300 ease-in-out">
-          <Sidebar />
+          {/* <Sidebar /> */}
         </aside>
         <main className="flex-1">
           <div className="flex justify-between items-center mb-4">
             <p className="text-sm text-muted-foreground text-gray-500">
               Showing {indexOfFirstItem + 1}-
-              {Math.min(indexOfLastItem, sortedItems.length)} of{' '}
-              {sortedItems.length} results
+              {Math.min(indexOfLastItem, marketListings.length)} of{' '}
+              {marketListings.length} results
             </p>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px] bg-white">
@@ -156,29 +162,41 @@ export default function Marketplace() {
             </Select>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentItems.map((item) => (
+            {marketListings?.map((item) => (
               <Card
                 key={item.id}
                 className="bg-white transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105"
               >
                 <CardHeader>
-                  <CardTitle>{item.name}</CardTitle>
+                  <CardTitle>{item.seedName}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-square bg-muted rounded-md mb-4 bg-slate-200"></div>
+                  <div className="aspect-square bg-muted rounded-md mb-4 relative flex items-center justify-center border-2 border-[#262630]">
+                    <img
+                      src={bgPlant.src}
+                      alt="bgPlant"
+                      className="absolute inset-0 w-full h-full object-cover rounded-md blur-sm opacity-70"
+                    />
+                    <img
+                      src={item?.seedImg || ''}
+                      alt={item?.seedName || ''}
+                      className="relative z-10 w-45 h-45 object-contain"
+                    />
+                  </div>
+
                   <p className="text-2xl font-bold">${item.price}</p>
                   <p className="text-sm text-muted-foreground">
-                    {item.category}
+                    {item.seedRarity}
                   </p>
-                  <div className="flex items-center mt-2">
+                  {/* <div className="flex items-center mt-2">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <Star
                         key={index}
-                        className={`h-4 w-4 ${index < item.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        className={`h-4 w-4 ${index < item?.seedRarity ? 'text-yellow-400' : 'text-gray-300'}`}
                         fill={index < item.rating ? 'currentColor' : 'none'}
                       />
                     ))}
-                  </div>
+                  </div> */}
                 </CardContent>
                 <CardFooter>
                   <Dialog>
@@ -190,7 +208,7 @@ export default function Marketplace() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] bg-white">
                       <DialogHeader>
-                        <DialogTitle>{item.name}</DialogTitle>
+                        <DialogTitle>{item.seedName}</DialogTitle>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -199,32 +217,19 @@ export default function Marketplace() {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                           <span className="font-bold">Category:</span>
-                          <span className="col-span-3">{item.category}</span>
+                          <span className="col-span-3">{item.seedRarity}</span>
                         </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <span className="font-bold">Rating:</span>
-                          <div className="col-span-3 flex items-center">
-                            {Array.from({ length: 5 }).map((_, index) => (
-                              <Star
-                                key={index}
-                                className={`h-4 w-4 ${index < item.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                fill={
-                                  index < item.rating ? 'currentColor' : 'none'
-                                }
-                              />
-                            ))}
-                          </div>
-                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4"></div>
                         <div className="grid grid-cols-4 items-start gap-4">
                           <span className="font-bold">Description:</span>
-                          <p className="col-span-3">{item.description}</p>
+                          <p className="col-span-3">{item.seedDescription}</p>
                         </div>
                       </div>
                       <DialogFooter>
                         <Button
                           className="bg-[#0e0e0f] text-white"
                           onClick={() =>
-                            alert(`You've purchased ${item.name}!`)
+                            alert(`You've purchased ${item.seedName}!`)
                           }
                         >
                           Buy Now
@@ -245,7 +250,7 @@ export default function Marketplace() {
             >
               Previous
             </Button>
-            {Array.from({ length: pageCount }, (_, i) => (
+            {/* {Array.from({ length: pageCount }, (_, i) => (
               <Button
                 key={i + 1}
                 className="bg-white"
@@ -264,7 +269,7 @@ export default function Marketplace() {
               disabled={currentPage === pageCount}
             >
               Next
-            </Button>
+            </Button> */}
           </div>
         </main>
       </div>

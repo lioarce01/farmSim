@@ -62,7 +62,7 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
         <div className="relative rounded-lg overflow-hidden flex items-center justify-center mb-4 border-2 border-[#C76936] p-2 bg-[#3e342a]">
           {itemData.img ? (
             <img
-              src={`http://localhost:3002${itemData.img}`}
+              src={itemData.img}
               alt={itemData.name}
               className="object-contain"
             />

@@ -109,7 +109,7 @@ const StorePage: React.FC = () => {
                   >
                     {item.img ? (
                       <Image
-                        src={`http://localhost:3002${item.img}`}
+                        src={item.img}
                         alt={item.name}
                         width={300}
                         height={300}

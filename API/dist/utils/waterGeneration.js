@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const { PrismaClient } = require('@prisma/client');
+const cloudinary = require('./cloudinary.js'); // Importa la configuración de Cloudinary
+const path = require('path'); // Para manejar rutas de archivos
+const fs = require('fs'); // Para manejar archivos
 const prisma = new PrismaClient();
 const waterNames = ['Spring Water', 'Rainwater', 'Well Water', 'Mineral Water'];
 const waterDescriptions = [
@@ -29,8 +32,22 @@ function getRandomStock() {
 function getRandomQuantity() {
     return Math.floor(Math.random() * (2 - 1 + 1)) + 1;
 }
+function readUrlsFromFile() {
+    const filePath = path.join(__dirname, 'imageUrls.json');
+    if (fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath);
+        return JSON.parse(data);
+    }
+    return {};
+}
 const getImageForWater = () => {
-    return '/assets/wateringCan.png';
+    const existingUrls = readUrlsFromFile();
+    const wateringCanUrl = existingUrls['WATERING_CAN'];
+    if (!wateringCanUrl) {
+        console.warn('Watering can image URL not found in imageUrls.json. Using default.');
+        return '../public/assets/wateringCan.png'; // Imagen predeterminada
+    }
+    return wateringCanUrl;
 };
 // Función para generar aguas aleatorias y asegurarse de que los nombres sean únicos
 function seedStoreWithRandomWaters() {
@@ -41,7 +58,7 @@ function seedStoreWithRandomWaters() {
             let name;
             let unique = false;
             while (!unique) {
-                name = `${waterNames[Math.floor(Math.random() * waterNames.length)]}-${Date.now()}`;
+                name = `${waterNames[Math.floor(Math.random() * waterNames.length)]}-${Math.random().toString(36).substring(2, 9)}`;
                 const existingItem = yield prisma.storeItem.findUnique({
                     where: { name: name },
                 });
@@ -72,4 +89,5 @@ function seedStoreWithRandomWaters() {
 }
 module.exports = {
     seedStoreWithRandomWaters,
+    getImageForWater,
 };

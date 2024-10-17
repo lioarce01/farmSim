@@ -3,6 +3,8 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch } from 'react-redux';
 import { clearUser } from 'src/redux/slices/userSlice';
+import { Button } from '../../components/ui/button';
+import { LogOut } from 'lucide-react';
 
 const LogoutButton = () => {
   const { logout } = useAuth0();
@@ -17,12 +19,13 @@ const LogoutButton = () => {
   };
 
   return (
-    <button
+    <Button
       onClick={handleLogout}
-      className="px-4 py-2 w-full text-left text-[#663b1e] font-extrabold bg-[#FFF5D1] hover:bg-[#FFB385] hover:text-[#FFF5D1] transition duration-300 rounded-b-lg"
+      className="text-white transition duration-300 rounded-b-lg"
     >
+      <LogOut className="mr-4" size={15} />
       Logout
-    </button>
+    </Button>
   );
 };
 

@@ -89,6 +89,19 @@ export interface Farm {
   slots: Slot[];
 }
 
+export interface MarketListing {
+  id: string;
+  price: number;
+  sellerId: string;
+  seedId: string;
+  listedAt?: Date;
+  seedName?: string;
+  seedDescription?: string;
+  seedRarity?: string;
+  seedTokensGenerated?: number;
+  seedImg?: string;
+}
+
 export interface RemainingTimeData {
   timeRemaining: string;
   timeRemainingInMs: number;

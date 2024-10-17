@@ -22,10 +22,11 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['my-custom-header'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   },
+  transports: ['polling', 'websocket'],
 });
 
 // Maneja las conexiones de Socket.IO

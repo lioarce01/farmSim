@@ -7,20 +7,7 @@ const prisma = new PrismaClient();
 //GET ALL MARKET LISTINGS
 router.get('/', async (req, res) => {
   try {
-    const marketListings = await prisma.marketListing.findMany({
-      select: {
-        id: true,
-        price: true,
-        sellerId: true,
-        seedId: true,
-        seedName: true,
-        seedDescription: true,
-        seedRarity: true,
-        seedTokensGenerated: true,
-        seedImg: true,
-        listedAt: true,
-      },
-    });
+    const marketListings = await prisma.marketListing.findMany();
 
     if (marketListings.length === 0) {
       return res
@@ -33,6 +20,26 @@ router.get('/', async (req, res) => {
     console.error('Error al obtener listados de mercado:', e);
     res.status(500).json({
       message: 'Error al obtener listados de mercado',
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
+});
+
+//GET MARKET LISTING BY ID
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const marketListing = await prisma.marketListing.findUnique({
+      where: { id },
+    });
+    if (!marketListing) {
+      return res.status(404).json({ message: 'Listado no encontrado' });
+    }
+    res.status(200).json(marketListing);
+  } catch (e) {
+    console.error('Error al obtener el listado de mercado:', e);
+    res.status(500).json({
+      message: 'Error al obtener el listado de mercado',
       error: e instanceof Error ? e.message : String(e),
     });
   }
@@ -73,6 +80,13 @@ router.post('/', async (req, res) => {
             userId: sellerId,
           },
         },
+        include: {
+          inventory: {
+            include: {
+              user: true,
+            },
+          },
+        },
       });
 
       if (!userSeed) {
@@ -90,10 +104,10 @@ router.post('/', async (req, res) => {
           seedRarity: userSeed.rarity,
           seedTokensGenerated: userSeed.tokensGenerated,
           seedImg: userSeed.img,
+          sellerSub: userSeed.inventory?.user.sub ?? '',
         },
       });
 
-      // Desconectar la semilla del inventario del usuario
       await prisma.seed.update({
         where: { id: seedId },
         data: { inventoryId: null },

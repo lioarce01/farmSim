@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StoreItem } from 'src/types';
 import PurchaseButton from 'src/components/PurchaseButton';
-import useFetchUser from 'src/hooks/useFetchUser';
 import { useAuth0 } from '@auth0/auth0-react';
-import { FaTimes } from 'react-icons/fa';
-import { useGetFarmByIdQuery } from 'src/redux/api/farm';
 import { useGetStoreItemByIdQuery } from 'src/redux/api/store';
+import { X } from 'lucide-react';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
 
 interface ItemPopupProps {
   item: StoreItem;
@@ -17,24 +24,22 @@ interface ItemPopupProps {
   refetchStoreItems: () => void;
 }
 
-const ItemPopup: React.FC<ItemPopupProps> = ({
+export default function ItemPopup({
   item,
   onClose,
   userSub,
   refetchStoreItems,
-}) => {
+}: ItemPopupProps) {
   const { data: updatedItem, refetch: refetchItem } = useGetStoreItemByIdQuery(
     item.id,
   );
 
-  console.log('Popup item:', updatedItem);
-
   const rarityColors: { [key: string]: string } = {
-    common: '#6c6d70',
-    uncommon: '#808080',
-    rare: '#0000ff',
-    epic: '#800080',
-    legendary: '#ffd700',
+    common: 'bg-gray-500',
+    uncommon: 'bg-green-500',
+    rare: 'bg-blue-500',
+    epic: 'bg-purple-500',
+    legendary: 'bg-yellow-500',
   };
 
   useEffect(() => {
@@ -43,74 +48,72 @@ const ItemPopup: React.FC<ItemPopupProps> = ({
 
   const itemData = updatedItem || item;
 
-  if (!userSub) return <div>Need to login to purchase.</div>;
+  if (!userSub)
+    return (
+      <div className="text-center text-xl text-white">
+        Need to login to purchase.
+      </div>
+    );
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-[#2b231b] p-6 rounded-lg shadow-lg w-11/12 max-w-md border-4 border-[#8B4513]">
-        <div className=" flex justify-between">
-          <h2 className="text-3xl font-extrabold text-center text-[#FFD700] mb-4">
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px] bg-[#1a1a25] text-white border-[#1a1a25]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-center">
             {itemData.name}
-          </h2>
-          <button
-            className="text-[#FFD700] p-2 rounded hover:bg-[#703517] transition duration-300 mb-4"
+          </DialogTitle>
+          <Button
+            variant="ghost"
+            className="absolute right-4 top-4 rounded-full p-2 hover:bg-[#262630]"
             onClick={onClose}
           >
-            <FaTimes size={24} />
-          </button>
-        </div>
-        <div className="relative rounded-lg overflow-hidden flex items-center justify-center mb-4 border-2 border-[#C76936] p-2 bg-[#3e342a]">
+            <X className="h-4 w-4" />
+          </Button>
+        </DialogHeader>
+        <div className="relative rounded-lg overflow-hidden flex items-center justify-center mb-4 border border-[#2a2a3b] bg-[#1a1a25] aspect-square">
           {itemData.img ? (
-            <img
-              src={`http://localhost:3002${itemData.img}`}
+            <Image
+              src={itemData.img}
               alt={itemData.name}
+              width={200}
+              height={200}
               className="object-contain"
             />
           ) : (
             <div className="flex justify-center items-center text-gray-500">
-              Sin imagen
+              No image
             </div>
           )}
         </div>
-        <div className="mb-4">
-          <p className="text-[#FFD700] font-semibold">
-            Stock: <span className="font-extrabold">{itemData.stock}</span>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">
+            Stock: <span className="font-bold">{itemData.stock}</span>
           </p>
-          <p className="text-lg font-extrabold text-[#FFD700]">
-            Price: T$ {itemData.price}
-          </p>
+          <p className="text-xl font-bold">Price: T$ {itemData.price}</p>
           {(itemData.itemType as unknown as string) !== 'seeds' &&
-          itemData.rarity ? (
-            <p className="mt-2 text-sm font-extrabold text-[#FFD700]">
-              Rarity:{' '}
-              <span
-                style={{ color: rarityColors[itemData.rarity.toLowerCase()] }}
+            itemData.rarity && (
+              <Badge
+                className={`${rarityColors[itemData.rarity.toLowerCase()]} text-white`}
               >
                 {itemData.rarity}
-              </span>
-            </p>
-          ) : null}
+              </Badge>
+            )}
         </div>
         {itemData.description && (
-          <p className="text-[#C76936] italic mb-4">{itemData.description}</p>
+          <p className="text-sm text-gray-400 italic">{itemData.description}</p>
         )}
-
-        <div className="flex items-center justify-center">
-          <div className="flex justify-between items-center mb-4">
-            <PurchaseButton
-              userSub={userSub}
-              itemId={itemData.id}
-              quantity={1}
-              itemType={itemData.itemType}
-              stock={itemData.stock}
-              price={itemData.price}
-              refetchStoreItems={refetchStoreItems}
-            />
-          </div>
+        <div className="flex justify-center mt-4">
+          <PurchaseButton
+            userSub={userSub}
+            itemId={itemData.id}
+            quantity={1}
+            itemType={itemData.itemType}
+            stock={itemData.stock}
+            price={itemData.price}
+            refetchStoreItems={refetchStoreItems}
+          />
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
-};
-
-export default ItemPopup;
+}

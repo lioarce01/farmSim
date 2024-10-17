@@ -13,6 +13,7 @@ exports.updateStoreWithNewSeeds = updateStoreWithNewSeeds;
 exports.seedStoreWithRandomSeeds = seedStoreWithRandomSeeds;
 const client_1 = require("@prisma/client");
 const waterGeneration_js_1 = require("../utils/waterGeneration.js");
+const uploadImages_js_1 = require("../utils/uploadImages.js");
 const prisma = new client_1.PrismaClient();
 // Modificadores para los nombres de las semillas
 const modifiers = [
@@ -54,22 +55,6 @@ const priceRangesByRarity = {
     RARE: [50, 100],
     EPIC: [100, 200],
     LEGENDARY: [200, 500],
-};
-const getImageForRarity = (rarity) => {
-    switch (rarity) {
-        case 'COMMON':
-            return '/assets/commonPlant.png';
-        case 'UNCOMMON':
-            return '/assets/uncommonPlant.png';
-        case 'RARE':
-            return '/assets/rarePlant.png';
-        case 'EPIC':
-            return '/assets/epicPlant.png';
-        case 'LEGENDARY':
-            return '/assets/legendaryPlant.png';
-        default:
-            return '/assets/commonPlant.png';
-    }
 };
 // Probabilidades de aparición para cada rareza
 const rarityProbabilities = {
@@ -132,7 +117,8 @@ function seedStoreWithRandomSeeds() {
             const price = getPriceByRarity(rarity);
             const stock = getStockByRarity(rarity);
             const tokensGenerated = getTokensByRarity(rarity);
-            const imageUrl = getImageForRarity(rarity);
+            const imageUrl = (0, uploadImages_js_1.getImageForRarity)(rarity);
+            const wateringCanUrl = (0, waterGeneration_js_1.getImageForWater)();
             const storeSeed = yield prisma.storeItem.create({
                 data: {
                     name: uniqueName,
@@ -142,7 +128,7 @@ function seedStoreWithRandomSeeds() {
                     itemType: 'seed',
                     rarity: rarity,
                     tokensGenerated: tokensGenerated,
-                    img: imageUrl,
+                    img: rarity ? imageUrl : wateringCanUrl,
                 },
             });
             createdSeeds.push(storeSeed);
@@ -150,20 +136,9 @@ function seedStoreWithRandomSeeds() {
         console.log(`Created ${createdSeeds.length} random unique seeds in the store.`);
     });
 }
-// Funciones auxiliares para obtener stock y tokens según rareza
+//EL Stock de todas las rarezas siempre debe ser 1
 function getStockByRarity(rarity) {
-    switch (rarity) {
-        case 'COMMON':
-        case 'UNCOMMON':
-        case 'RARE':
-            return Math.floor(Math.random() * 3) + 1;
-        case 'EPIC':
-            return Math.floor(Math.random() * 2) + 1;
-        case 'LEGENDARY':
-            return 1; // Stock fijo de 1
-        default:
-            return 1; // Valor predeterminado
-    }
+    return 1;
 }
 function getTokensByRarity(rarity) {
     switch (rarity) {

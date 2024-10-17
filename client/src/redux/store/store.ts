@@ -11,6 +11,7 @@ import timerReducer from '../slices/timerSlice';
 import createWebStorage from 'redux-persist/es/storage/createWebStorage';
 import { farmApi } from '../api/farm';
 import climateEventReducer from '../slices/climateEventSlice';
+import { marketApi } from '../api/market';
 
 console.log('Running on client:', typeof window !== 'undefined');
 
@@ -36,7 +37,7 @@ const storage =
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'slots', 'timer', 'filters', 'climateEvent'],
+  whitelist: ['user', 'slots', 'timer', 'filters', 'climateEvent', 'market'],
 };
 
 const rootReducer = combineReducers({
@@ -47,6 +48,7 @@ const rootReducer = combineReducers({
   [storeItemsApi.reducerPath]: storeItemsApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
   [farmApi.reducerPath]: farmApi.reducer,
+  [marketApi.reducerPath]: marketApi.reducer,
   timer: timerReducer,
 });
 
@@ -70,6 +72,7 @@ export const store = configureStore({
       usersApi.middleware,
       storeItemsApi.middleware,
       farmApi.middleware,
+      marketApi.middleware,
     ),
 });
 

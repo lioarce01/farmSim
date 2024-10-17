@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Rarity, SeedStatus } from 'src/types';
 
 interface FilterState {
-  seedRarity: Rarity;
-  growthStatus: SeedStatus;
+  seedRarity: Rarity | null;
+  growthStatus: SeedStatus | null;
 }
 
 const initialState: FilterState = {
@@ -11,14 +11,14 @@ const initialState: FilterState = {
   growthStatus: SeedStatus.ALL,
 };
 
-const filterSlice = createSlice({
+const filtersSlice = createSlice({
   name: 'filters',
   initialState,
   reducers: {
-    setSeedRarity(state, action: PayloadAction<Rarity>) {
+    setSeedRarity: (state, action: PayloadAction<Rarity | null>) => {
       state.seedRarity = action.payload;
     },
-    setGrowthStatus(state, action: PayloadAction<SeedStatus>) {
+    setGrowthStatus: (state, action: PayloadAction<SeedStatus | null>) => {
       state.growthStatus = action.payload;
     },
     resetFilters(state) {
@@ -29,5 +29,5 @@ const filterSlice = createSlice({
 });
 
 export const { setSeedRarity, setGrowthStatus, resetFilters } =
-  filterSlice.actions;
-export default filterSlice.reducer;
+  filtersSlice.actions;
+export default filtersSlice.reducer;

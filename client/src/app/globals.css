@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  background-color: #2b231b; /* o cualquier otro color que desees */
+  background-color: #101016;
 }
 
 .fade-in {
@@ -47,23 +47,23 @@ body {
 
 /* Estilo para el track (fondo de la barra de scroll) */
 ::-webkit-scrollbar-track {
-  background: #fde8c9; /* Color del fondo del scrollbar */
+  background: #15151d; /* Color del fondo del scrollbar */
 }
 
 /* Estilo para el pulgar (la parte de la barra que se mueve) */
 ::-webkit-scrollbar-thumb {
-  background-color: #8d3c19; /* Color del pulgar */
+  background-color: #292938; /* Color del pulgar */
   border-radius: 10px; /* Redondeo de los bordes */
-  border: 3px solid #fde8c9; /* Borde alrededor del pulgar */
+  border: 3px solid #15151d; /* Borde alrededor del pulgar */
 }
 
 /* Estilo para el pulgar al hacer hover */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #7c3617; /* Cambia el color cuando el usuario pasa el mouse */
+  background-color: #37374d; /* Cambia el color cuando el usuario pasa el mouse */
 }
 
 /* Cambiar el grosor del scrollbar en Firefox */
 body {
   scrollbar-width: thin; /* El grosor del scrollbar puede ser auto, thin o none */
-  scrollbar-color: #8d3c19 #fde8c9; /* Color del thumb (primero) y del track (segundo) */
+  scrollbar-color: #37374d #2d2d3f; /* Color del thumb (primero) y del track (segundo) */
 }

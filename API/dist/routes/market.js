@@ -19,23 +19,7 @@ const prisma = new client_1.PrismaClient();
 //GET ALL MARKET LISTINGS
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Obteniendo listados de mercado...');
-        const marketListings = yield prisma.marketListing.findMany({
-            select: {
-                id: true,
-                price: true,
-                sellerId: true,
-                seedId: true,
-                seedName: true,
-                seedDescription: true,
-                seedRarity: true,
-                seedTokensGenerated: true,
-                seedImg: true,
-                listedAt: true,
-            },
-        });
-        console.log(`Se encontraron ${marketListings.length} listados`);
-        console.log('Listados:', JSON.stringify(marketListings, null, 2));
+        const marketListings = yield prisma.marketListing.findMany();
         if (marketListings.length === 0) {
             return res
                 .status(404)
@@ -58,7 +42,7 @@ router.get('/seller/:sellerId', (req, res) => __awaiter(void 0, void 0, void 0, 
         const marketListings = yield prisma.marketListing.findMany({
             where: { sellerId },
         });
-        if (!marketListings) {
+        if (marketListings.length === 0) {
             res
                 .status(404)
                 .json({ message: 'No market listings found for this seller' });
@@ -73,6 +57,7 @@ router.get('/seller/:sellerId', (req, res) => __awaiter(void 0, void 0, void 0, 
             .json({ message: 'Error fetching market listings by seller' });
     }
 }));
+//CREATE MARKET LISTING
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { price, sellerId, seedId } = req.body;
     try {
@@ -86,10 +71,9 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             });
             if (!userSeed) {
-                return res.status(404).json({
-                    message: 'Semilla no encontrada en el inventario del usuario',
-                });
+                throw new Error('Semilla no encontrada en el inventario del usuario');
             }
+            // Crear el listado en el mercado
             const newListing = yield prisma.marketListing.create({
                 data: {
                     price,
@@ -102,6 +86,11 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     seedImg: userSeed.img,
                 },
             });
+            // Desconectar la semilla del inventario del usuario
+            yield prisma.seed.update({
+                where: { id: seedId },
+                data: { inventoryId: null },
+            });
             return newListing;
         }));
         res.status(201).json(result);
@@ -110,6 +99,104 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.error('Error al crear el listado:', e);
         res.status(500).json({
             message: 'Error al crear el listado',
+            error: e instanceof Error ? e.message : String(e),
+        });
+    }
+}));
+//DELETE MARKET LISTING
+router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const result = yield prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            const listing = yield prisma.marketListing.findUnique({
+                where: { id },
+                include: { seed: true, seller: { include: { inventory: true } } },
+            });
+            if (!listing) {
+                throw new Error('Listado no encontrado');
+            }
+            // Eliminar el listado del mercado
+            yield prisma.marketListing.delete({
+                where: { id },
+            });
+            // Devolver la semilla al inventario del vendedor
+            yield prisma.seed.create({
+                data: {
+                    name: listing.seedName,
+                    description: listing.seedDescription,
+                    rarity: listing.seedRarity,
+                    tokensGenerated: listing.seedTokensGenerated,
+                    img: listing.seedImg,
+                    inventory: { connect: { id: listing.seller.inventory.id } },
+                },
+            });
+            return { message: 'Listado eliminado y semilla devuelta al inventario' };
+        }));
+        res.status(200).json(result);
+    }
+    catch (e) {
+        console.error('Error al eliminar el listado:', e);
+        res.status(500).json({
+            message: 'Error al eliminar el listado',
+            error: e instanceof Error ? e.message : String(e),
+        });
+    }
+}));
+//BUY SEED FROM MARKET
+router.post('/buy/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { buyerId } = req.body;
+    try {
+        const result = yield prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            const listing = yield prisma.marketListing.findUnique({
+                where: { id },
+                include: { seller: true },
+            });
+            if (!listing) {
+                throw new Error('Listado no encontrado');
+            }
+            const buyer = yield prisma.user.findUnique({
+                where: { id: buyerId },
+                include: { inventory: true },
+            });
+            if (!buyer) {
+                throw new Error('Comprador no encontrado');
+            }
+            if (buyer.balanceToken < listing.price) {
+                throw new Error('Saldo insuficiente');
+            }
+            // Transferir tokens
+            yield prisma.user.update({
+                where: { id: buyerId },
+                data: { balanceToken: { decrement: listing.price } },
+            });
+            yield prisma.user.update({
+                where: { id: listing.sellerId },
+                data: { balanceToken: { increment: listing.price } },
+            });
+            // Transferir la semilla al inventario del comprador
+            yield prisma.seed.create({
+                data: {
+                    name: listing.seedName,
+                    description: listing.seedDescription,
+                    rarity: listing.seedRarity,
+                    tokensGenerated: listing.seedTokensGenerated,
+                    img: listing.seedImg,
+                    inventory: { connect: { id: buyer.inventory.id } },
+                },
+            });
+            // Eliminar el listado del mercado
+            yield prisma.marketListing.delete({
+                where: { id },
+            });
+            return { message: 'Compra realizada con éxito' };
+        }));
+        res.status(200).json(result);
+    }
+    catch (e) {
+        console.error('Error al comprar la semilla:', e);
+        res.status(500).json({
+            message: 'Error al comprar la semilla',
             error: e instanceof Error ? e.message : String(e),
         });
     }

@@ -1,5 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-import { seedStoreWithRandomWaters } from '../utils/waterGeneration.js';
+import { ItemType, PrismaClient } from '@prisma/client';
+import {
+  getImageForWater,
+  seedStoreWithRandomWaters,
+} from '../utils/waterGeneration.js';
+import { getImageForRarity } from '../utils/uploadImages.js';
 const prisma = new PrismaClient();
 
 // Definir el tipo Rarity
@@ -47,23 +51,6 @@ const priceRangesByRarity: Record<Rarity, number[]> = {
   RARE: [50, 100],
   EPIC: [100, 200],
   LEGENDARY: [200, 500],
-};
-
-const getImageForRarity = (rarity: string) => {
-  switch (rarity) {
-    case 'COMMON':
-      return '/assets/commonPlant.png';
-    case 'UNCOMMON':
-      return '/assets/uncommonPlant.png';
-    case 'RARE':
-      return '/assets/rarePlant.png';
-    case 'EPIC':
-      return '/assets/epicPlant.png';
-    case 'LEGENDARY':
-      return '/assets/legendaryPlant.png';
-    default:
-      return '/assets/commonPlant.png';
-  }
 };
 
 // Probabilidades de aparición para cada rareza
@@ -147,6 +134,7 @@ async function seedStoreWithRandomSeeds() {
     const tokensGenerated = getTokensByRarity(rarity);
 
     const imageUrl = getImageForRarity(rarity);
+    const wateringCanUrl = getImageForWater();
 
     const storeSeed = await prisma.storeItem.create({
       data: {
@@ -157,7 +145,7 @@ async function seedStoreWithRandomSeeds() {
         itemType: 'seed',
         rarity: rarity,
         tokensGenerated: tokensGenerated,
-        img: imageUrl,
+        img: rarity ? imageUrl : wateringCanUrl,
       },
     });
 

@@ -91,12 +91,10 @@ export default function StorePage() {
     );
 
   return (
-    <div className="min-h-screen bg-[#14141b] text-white">
+    <div className="min-h-screen max-h-screen bg-[#14141b] text-white">
       <Navbar />
-      <div className="container mx-auto p-4 pt-14">
-        <h1 className="text-3xl font-bold mb-6 text-center mt-16">
-          Store Items
-        </h1>
+      <div className="container mx-auto pt-20">
+        <h1 className="text-3xl font-bold text-center mb-2">Store Items</h1>
         <div className="relative w-full max-w-7xl mx-auto bg-[#1a1a25] mb-14 rounded-lg border border-[#2a2a3b] shadow-lg overflow-hidden">
           <Image
             src={bgPlant}
@@ -114,7 +112,7 @@ export default function StorePage() {
                 {storeItems?.map((item: StoreItem) => (
                   <Card
                     key={item.id}
-                    className="bg-[#14141b] border-[#2a2a3b] transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105"
+                    className="bg-[#1a1a25] border-[#2a2a3b] transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg text-center">
@@ -153,7 +151,7 @@ export default function StorePage() {
                     </CardContent>
                     <CardFooter>
                       <Button
-                        className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
+                        className="w-full bg-[#232331] text-white hover:bg-[#2a2a3b] transition duration-300"
                         onClick={() => handleCardClick(item)}
                       >
                         <Info className="mr-2 h-4 w-4" />

@@ -68,7 +68,7 @@ export default function FarmSlot({
   formatGrowthStatus,
 }: FarmSlotProps) {
   return (
-    <Card className="bg-[#2a2a3b] border-[#2a2a3b] transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105">
+    <Card className="bg-[#1a1a25] border-[#2a2a3b] transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105">
       <CardHeader>
         <CardTitle className="text-xl text-center">
           {slot.seedName || 'Empty Slot'}
@@ -106,7 +106,7 @@ export default function FarmSlot({
             {slot.growthStatus === SeedStatus.WATER_NEEDED && (
               <Button
                 variant="outline"
-                className="w-full bg-[#36364b]"
+                className="w-full bg-[#222231] hover:bg-[#29293b]"
                 onClick={() => handleOpenInventory(index, 'water')}
                 disabled={isWatering}
               >
@@ -117,7 +117,7 @@ export default function FarmSlot({
             {slot.growthStatus === SeedStatus.READY_TO_HARVEST && (
               <Button
                 variant="outline"
-                className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
+                className="w-full bg-[#222231] hover:bg-[#29293b] transition duration-300"
                 onClick={() => handleHarvestPlant(index)}
                 disabled={isHarvesting}
               >
@@ -127,7 +127,7 @@ export default function FarmSlot({
             {slot.growthStatus === SeedStatus.WITHERED && (
               <Button
                 variant="destructive"
-                className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
+                className="w-full bg-[#222231] hover:bg-[#29293b] transition duration-300"
                 onClick={() => handleDeletePlant(index)}
                 disabled={isDeleting}
               >
@@ -139,7 +139,7 @@ export default function FarmSlot({
         ) : (
           <Button
             variant="outline"
-            className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
+            className="w-full bg-[#222231] hover:bg-[#29293b] transition duration-300"
             onClick={() => handleOpenInventory(index, 'plant')}
             disabled={isPlanting}
           >

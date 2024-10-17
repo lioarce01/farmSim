@@ -80,7 +80,7 @@ export default function PurchaseButton({
       <Button
         onClick={handleBuy}
         disabled={isBuying || stock <= 0}
-        className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
+        className="w-full bg-[#232331] text-white hover:bg-[#2a2a3b] transition duration-300"
       >
         {isBuying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {stock <= 0 ? 'Out of Stock' : isBuying ? 'Buying...' : 'Buy'}

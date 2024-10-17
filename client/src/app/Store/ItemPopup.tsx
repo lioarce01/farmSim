@@ -57,7 +57,7 @@ export default function ItemPopup({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-[#14141b] text-white border-[#2a2a3b]">
+      <DialogContent className="sm:max-w-[425px] bg-[#1a1a25] text-white border-[#1a1a25]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             {itemData.name}

@@ -149,13 +149,13 @@ export default function Marketplace() {
               Showing {sortedListings?.length || 0} results
             </p>
           </div>
-          <ScrollArea className="h-[calc(100vh-300px)] rounded-md border border-[#2a2a3b]">
+          <ScrollArea className="h-[calc(100vh-300px)] rounded-md border border-[#1f1f2c]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
               {paginatedListings ? (
                 paginatedListings?.map((item) => (
                   <Card
                     key={item.id}
-                    className="transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 bg-[#14141b]"
+                    className="transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 bg-[#1a1a25]"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg">{item.seedName}</CardTitle>
@@ -191,7 +191,7 @@ export default function Marketplace() {
                     </CardContent>
                     <CardFooter>
                       <Button
-                        className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
+                        className="w-full bg-[#222231] hover:bg-[#29293b] text-white transition duration-300"
                         onClick={() => handleOpenPopup(item.id.toString())}
                       >
                         <Info className="mr-2 h-4 w-4" />

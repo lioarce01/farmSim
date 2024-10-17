@@ -94,7 +94,7 @@ export default function MarketListingPage({
       <div
         className={`w-full max-w-md mx-auto transition-all duration-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
       >
-        <Card className="bg-[#14141b] relative w-full mx-auto">
+        <Card className="bg-[#1a1a25] relative w-full mx-auto">
           <Button
             className="absolute top-2 right-2 bg-transparent hover:bg-[#262630] text-[#e4e4e4]"
             onClick={handleCloseListing}

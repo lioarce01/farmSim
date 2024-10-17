@@ -32,7 +32,7 @@ const BuyListing: React.FC<BuyListingProps> = ({
   return (
     <div>
       <Button
-        className="bg-[#1c1c25] text-[#e4e4e4] hover:bg-[#262630] transition duration-300 ease-in-out"
+        className="bg-[#222231] hover:bg-[#29293b] text-white transition duration-300 ease-in-out"
         onClick={handleBuyListing}
         disabled={isLoading}
       >

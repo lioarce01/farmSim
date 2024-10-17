@@ -40,7 +40,7 @@ const ClimateEventDisplay: React.FC<ClimateEventDisplayProps> = ({ event }) => {
   };
 
   return (
-    <Card className="bg-[#2a2a3b] border border-[#2d2d3f] shadow-xl rounded-lg max-w-sm max-h-sm">
+    <Card className="bg-[#1a1a25] shadow-xl rounded-lg max-w-sm max-h-sm">
       <CardHeader>
         <CardTitle className="text-white text-xl font-bold">
           {event ? 'Current Climate Event' : 'No current climate event'}

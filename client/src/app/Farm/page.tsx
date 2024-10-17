@@ -253,9 +253,9 @@ export default function Farm() {
   return (
     <div className="min-h-screen bg-[#14141b] text-white">
       <Navbar />
-      <div className="container mx-auto px-4 pt-28 pb-10">
-        <Card className="w-full bg-[#1a1a25] border-[#2a2a3b] shadow-lg overflow-hidden">
-          <CardContent className="p-6">
+      <div className="container mx-auto px-4 pt-14">
+        <Card className="w-full bg-[#14141b] border-[#2a2a3b] shadow-lg overflow-hidden">
+          <CardContent className="p-4">
             <div className="flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4 mb-8">
               <div className="w-full md:w-1/3">
                 <ClimateEventDisplay event={currentEvent} />
@@ -267,10 +267,10 @@ export default function Farm() {
                   onValueChange={handleRarityChange}
                   value={seedRarity || undefined}
                 >
-                  <SelectTrigger className="w-full bg-[#2a2a3b]">
+                  <SelectTrigger className="w-full bg-[#1a1a25]">
                     <SelectValue placeholder="Select Rarity" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#2a2a3b] text-white">
+                  <SelectContent className="bg-[#1a1a25] text-white">
                     <SelectItem value="ALL">All</SelectItem>
                     <SelectItem value="COMMON">Common</SelectItem>
                     <SelectItem value="UNCOMMON">Uncommon</SelectItem>
@@ -285,10 +285,10 @@ export default function Farm() {
                   onValueChange={handleGrowthStatusChange}
                   value={growthStatus || undefined}
                 >
-                  <SelectTrigger className="w-full bg-[#2a2a3b]">
+                  <SelectTrigger className="w-full bg-[#1a1a25]">
                     <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#2a2a3b] text-white">
+                  <SelectContent className="bg-[#1a1a25] text-white">
                     <SelectItem value="ALL">All</SelectItem>
                     <SelectItem value="GROWING">Growing</SelectItem>
                     <SelectItem value="READY_TO_HARVEST">

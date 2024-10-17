@@ -177,9 +177,9 @@ const UsersPage = () => {
                 value={tokensToAdd}
                 onChange={(e) => setTokensToAdd(e.target.value)}
                 className="border border-[#B5EAD7] rounded px-3 py-2 mb-4 w-full bg-white text-[#17271e] focus:outline-none focus:ring-2 focus:ring-[#A8D5BA]"
-                placeholder="Tokens to add"
+                placeholder="Cantidad de tokens"
               />
-              <div className="flex justify-center space-x-3">
+              <div className="flex justify-end space-x-3">
                 <button
                   onClick={handleAddTokens}
                   className="px-4 py-2 bg-[#B5EAD7] text-[#17271e] rounded-lg hover:bg-[#A8D5BA] transition duration-300 font-semibold"

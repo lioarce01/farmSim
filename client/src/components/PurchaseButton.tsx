@@ -7,17 +7,27 @@ import {
 } from '../redux/api/store';
 import { ItemType, PurchaseButtonProps } from 'src/types';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
-import Popup from './PopUp';
 import useFetchUser from 'src/hooks/useFetchUser';
+import { Button } from '../../components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../components/ui/alert-dialog';
+import { Loader2 } from 'lucide-react';
 
-const PurchaseButton: React.FC<PurchaseButtonProps> = ({
+export default function PurchaseButton({
   userSub,
   itemId,
   quantity,
   itemType: propItemType,
   stock,
   price,
-}) => {
+}: PurchaseButtonProps) {
   const [buyItem, { isLoading: isBuying }] = useGetStoreBuyMutation();
   const { data: user } = useGetUserBySubQuery(userSub);
   const { refetch: refetchItem } = useGetStoreItemByIdQuery(itemId);
@@ -27,18 +37,21 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     quantity || 1,
   );
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [popupMessage, setPopupMessage] = useState<string>('');
   const derivedItemType: ItemType =
     purchaseQuantity > 0 ? ItemType.seed : ItemType.water;
 
   const handleBuy = async () => {
     if (user && user.balanceToken !== undefined) {
       if (user.balanceToken < price) {
+        setPopupMessage('Insufficient balance.');
         setShowPopup(true);
         return;
       }
     }
 
     if (purchaseQuantity > stock) {
+      setPopupMessage('Quantity exceeds available stock.');
       setShowPopup(true);
       return;
     }
@@ -54,42 +67,43 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       refetchItem();
       fetchUserData();
 
-      console.log('Compra exitosa');
+      console.log('Purchase successful');
     } catch (err) {
-      console.error('Error al realizar la compra', err);
+      console.error('Error making purchase', err);
+      setPopupMessage('Error making purchase. Please try again.');
       setShowPopup(true);
     }
   };
 
   return (
     <>
-      <button
+      <Button
         onClick={handleBuy}
         disabled={isBuying || stock <= 0}
-        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white ${
-          isBuying || stock <= 0
-            ? 'bg-[#fac59e] text-white cursor-not-allowed'
-            : 'bg-[#C76936] text-white hover:bg-[#8B4513]'
-        }`}
+        className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
       >
-        {stock <= 0 ? 'No Stock' : isBuying ? 'Buying...' : 'Buy'}
-      </button>
+        {isBuying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {stock <= 0 ? 'Out of Stock' : isBuying ? 'Buying...' : 'Buy'}
+      </Button>
 
-      {showPopup && (
-        <Popup
-          message={
-            user?.balanceToken === undefined || user.balanceToken < price
-              ? 'Saldo insuficiente.'
-              : purchaseQuantity > stock
-                ? 'Cantidad excede el stock disponible.'
-                : 'Error al realizar la compra. Intente nuevamente.'
-          }
-          onClose={() => setShowPopup(false)}
-          isOpen={showPopup}
-        />
-      )}
+      <AlertDialog open={showPopup} onOpenChange={setShowPopup}>
+        <AlertDialogContent className="bg-[#14141b] border border-[#2a2a3b] text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Purchase Error</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              {popupMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setShowPopup(false)}
+              className="bg-[#1a1a25] text-white hover:bg-[#262630]"
+            >
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
-};
-
-export default PurchaseButton;
+}

@@ -3,6 +3,12 @@ import { ClimateEvent } from 'src/types';
 import { differenceInSeconds } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { selectCurrentEvent } from 'src/redux/slices/climateEventSlice';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '../../../components/ui/card';
 
 interface ClimateEventDisplayProps {
   event?: ClimateEvent | null;
@@ -24,32 +30,40 @@ const ClimateEventDisplay: React.FC<ClimateEventDisplayProps> = ({ event }) => {
     const days = Math.floor(diffInSeconds / (24 * 60 * 60));
     const hours = Math.floor((diffInSeconds % (24 * 60 * 60)) / (60 * 60));
     const minutes = Math.floor((diffInSeconds % (60 * 60)) / 60);
-    return `${days}d ${hours}h ${minutes}m`;
+
+    let result = '';
+    if (days > 0) result += `${days}d `;
+    if (hours > 0) result += `${hours}h `;
+    result += `${minutes}m`;
+
+    return result.trim();
   };
 
   return (
-    <div className="bg-[#f8d7c6] bg-opacity-90 border-4 border-[#703517] rounded-lg shadow-lg p-6 text-center text-[#4d2612]">
-      {event ? (
-        <>
-          <h2 className="text-2xl font-extrabold mb-4 text-[#c76936]">
-            Current Climate Event
-          </h2>
-          <p className="text-lg font-semibold">
-            <strong>{event.type}</strong>
-          </p>
-          <p className="text-lg font-semibold">
-            Intensity: <strong>{event.intensity}</strong>
-          </p>
-          <p className="text-lg font-semibold">
-            Time Remaining: {formatedEndDateTime()}
-          </p>
-        </>
-      ) : (
-        <p className="text-lg font-semibold text-[#c76936]">
-          No current climate event.
-        </p>
-      )}
-    </div>
+    <Card className="bg-[#2a2a3b] border border-[#2d2d3f] shadow-xl rounded-lg max-w-sm max-h-sm">
+      <CardHeader>
+        <CardTitle className="text-white text-xl font-bold">
+          {event ? 'Current Climate Event' : 'No current climate event'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {event ? (
+          <div className="text-white">
+            <p className="text-md">
+              <strong>{event.type}</strong>
+            </p>
+            <p className="text-md">
+              Intensity: <strong>{event.intensity}</strong>
+            </p>
+            <p className="text-md">
+              Tiempo restante: <strong>{formatedEndDateTime()}</strong>
+            </p>
+          </div>
+        ) : (
+          <p className="text-lg text-[#c76936]">No current climate event.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

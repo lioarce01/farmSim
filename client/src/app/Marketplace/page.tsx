@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../components/ui/select';
+import { Badge } from '../../../components/ui/badge';
+import { ScrollArea } from '../../../components/ui/scroll-area';
 import { Info, Menu, Star } from 'lucide-react';
 import { useGetMarketListingsQuery } from 'src/redux/api/market';
 import bgPlant from '../assets/bgplant.jpg';
@@ -26,13 +28,14 @@ import MarketListingPage from './MarketListingPopup';
 import Image from 'next/image';
 import LoadingSkeleton from './Skeleton';
 import { Pagination } from './Pagination';
+import { Rarity } from 'src/types';
 
-const rarityColors: { [key: string]: string } = {
-  common: '#6c6d70',
-  uncommon: '#808080',
-  rare: '#0000ff',
-  epic: '#800080',
-  legendary: '#ffd700',
+const rarityColors = {
+  [Rarity.LEGENDARY]: 'bg-yellow-500',
+  [Rarity.EPIC]: 'bg-purple-600',
+  [Rarity.RARE]: 'bg-blue-600',
+  [Rarity.UNCOMMON]: 'bg-gray-500',
+  [Rarity.COMMON]: 'bg-gray-700',
 };
 
 const ITEMS_PER_PAGE = 9;
@@ -112,7 +115,6 @@ export default function Marketplace() {
       </header>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="md:block w-64 transition-all duration-300 ease-in-out">
-          {/* Sidebar content goes here */}
           <div className="flex gap-4 flex-col w-full sm:w-auto">
             <Select value={selectedRarity} onValueChange={setSelectedRarity}>
               <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
@@ -147,76 +149,70 @@ export default function Marketplace() {
               Showing {sortedListings?.length || 0} results
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedListings ? (
-              paginatedListings?.map((item) => (
-                <Card
-                  key={item.id}
-                  className="transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 bg-[#14141b]"
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg">{item.seedName}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-square bg-muted rounded-md mb-4 relative flex items-center justify-center border-2 border-[#2a2a3b] overflow-hidden">
-                      <Image
-                        src={bgPlant}
-                        alt="bgPlant"
-                        sizes="50vw"
-                        fill
-                        priority
-                        className="absolute inset-0 rounded-md blur-sm opacity-70 object-cover"
-                      />
-                      <Image
-                        src={item.seedImg || ''}
-                        alt={item.seedName || ''}
-                        width={200}
-                        height={200}
-                        className="relative z-10 object-contain w-3/4 h-3/4 "
-                      />
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-2xl font-bold">
-                        ${item.price.toFixed(2)}
-                      </p>
-                      <p
-                        className="text-sm flex items-center"
-                        style={{
-                          color:
-                            rarityColors[item.seedRarity?.toLowerCase() || ''],
-                        }}
-                      >
-                        <Star
-                          className="w-4 h-4 mr-1 inline"
-                          fill="currentColor"
+          <ScrollArea className="h-[calc(100vh-300px)] rounded-md border border-[#2a2a3b]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+              {paginatedListings ? (
+                paginatedListings?.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 bg-[#14141b]"
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg">{item.seedName}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="aspect-square bg-muted rounded-md mb-4 relative flex items-center justify-center border-2 border-[#2a2a3b] overflow-hidden">
+                        <Image
+                          src={bgPlant}
+                          alt="bgPlant"
+                          sizes="50vw"
+                          fill
+                          priority
+                          className="absolute inset-0 rounded-md blur-sm opacity-70 object-cover"
                         />
-                        <strong>{item.seedRarity}</strong>
-                      </p>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
-                      onClick={() => handleOpenPopup(item.id.toString())}
-                    >
-                      <Info className="mr-2 h-4 w-4" />
-                      Details
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center text-xl">
-                <p>No listings found. Be the first to create one!</p>
-                <Button
-                  className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
-                  onClick={() => router.push('/CreateListing')}
-                >
-                  Create Listing
-                </Button>
-              </div>
-            )}
-          </div>
+                        <Image
+                          src={item.seedImg || ''}
+                          alt={item.seedName || ''}
+                          width={200}
+                          height={200}
+                          className="relative z-10 object-contain w-3/4 h-3/4 "
+                        />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <p className="text-2xl font-bold">
+                          ${item.price.toFixed(2)}
+                        </p>
+                        <Badge
+                          className={`${rarityColors[item.seedRarity as keyof typeof rarityColors] || 'bg-gray-600'}`}
+                        >
+                          {item.seedRarity || 'Unknown'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
+                        onClick={() => handleOpenPopup(item.id.toString())}
+                      >
+                        <Info className="mr-2 h-4 w-4" />
+                        Details
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center text-xl">
+                  <p>No listings found. Be the first to create one!</p>
+                  <Button
+                    className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
+                    onClick={() => router.push('/CreateListing')}
+                  >
+                    Create Listing
+                  </Button>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
           <div className="mt-8">
             <Pagination
               currentPage={currentPage}

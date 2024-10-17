@@ -64,6 +64,7 @@ model Seed {
   description String
   inventoryId String? @db.ObjectId
   inventory Inventory? @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  quantity Int @default(0)
   rarity Rarity
   tokensGenerated Int? @default(0)
   img String?
@@ -98,15 +99,9 @@ model MarketListing {
   price Int
   sellerId String @db.ObjectId
   seller User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  sellerSub String
-  seedId String @db.ObjectId @unique
+  seedId String @unique @db.ObjectId
   seed Seed @relation(fields: [seedId], references: [id], onDelete: Cascade)
-  listedAt DateTime? @default(now())
-  seedName String?
-  seedDescription String?
-  seedRarity Rarity?
-  seedTokensGenerated Int?
-  seedImg String?
+  listedAt DateTime @default(now())
 }
 
 model ClimateEvent {

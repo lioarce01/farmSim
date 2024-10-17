@@ -69,7 +69,7 @@ router.get('/seller/:sellerId', async (req, res) => {
 
 //CREATE MARKET LISTING
 router.post('/', async (req, res) => {
-  const { price, sellerId, seedId, sellerSub } = req.body;
+  const { price, sellerId, seedId } = req.body;
 
   try {
     const result = await prisma.$transaction(async (prisma) => {
@@ -78,6 +78,13 @@ router.post('/', async (req, res) => {
           id: seedId,
           inventory: {
             userId: sellerId,
+          },
+        },
+        include: {
+          inventory: {
+            include: {
+              user: true,
+            },
           },
         },
       });
@@ -91,17 +98,16 @@ router.post('/', async (req, res) => {
         data: {
           price,
           seller: { connect: { id: sellerId } },
-          sellerSub: sellerSub,
           seed: { connect: { id: seedId } },
           seedName: userSeed.name,
           seedDescription: userSeed.description,
           seedRarity: userSeed.rarity,
           seedTokensGenerated: userSeed.tokensGenerated,
           seedImg: userSeed.img,
+          sellerSub: userSeed.inventory?.user.sub ?? '',
         },
       });
 
-      // Desconectar la semilla del inventario del usuario
       await prisma.seed.update({
         where: { id: seedId },
         data: { inventoryId: null },

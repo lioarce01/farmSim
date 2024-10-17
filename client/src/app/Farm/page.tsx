@@ -16,7 +16,6 @@ import {
 } from '../../redux/api/farm';
 import { ClimateEvent, Rarity, SeedStatus, Slot } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
-import Popup from '../../components/PopUp';
 import { useAuth0 } from '@auth0/auth0-react';
 import { formatGrowthStatus, formatLastWatered } from './formatGrowthStatus';
 import FarmSlot from './farmSlot';
@@ -28,8 +27,22 @@ import {
   setClimateEvent,
 } from 'src/redux/slices/climateEventSlice';
 import ClimateEventDisplay from './ClimateEventDisplay';
+import { Card, CardContent } from '../../../components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
+import { ScrollArea } from '../../../components/ui/scroll-area';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '../../../components/ui/alert';
 
-const Farm = () => {
+export default function Farm() {
   const dispatch = useDispatch();
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const { user } = useAuth0();
@@ -45,7 +58,6 @@ const Farm = () => {
   const [deletePlant, { isLoading: isDeleting }] = useDeletePlantMutation();
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [action, setAction] = useState<'plant' | 'water' | null>(null);
-  const [showPopup, setShowPopup] = useState<boolean>(false);
   const { seedRarity, growthStatus } = useSelector(
     (state: RootState) => state.filters,
   );
@@ -71,32 +83,14 @@ const Farm = () => {
   const filteredSlots = slots.filter((slot: Slot) => {
     const matchesRarity = !seedRarity || slot.seedRarity === seedRarity;
     const matchesStatus = !growthStatus || slot.growthStatus === growthStatus;
-
     return matchesRarity && matchesStatus;
   });
-
-  const message =
-    filteredSlots.length === 0
-      ? 'No slots available with the selected filters.'
-      : '';
-
-  const handleSeedRarityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(setSeedRarity(e.target.value as Rarity));
-  };
-
-  const handleGrowthStatusChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    dispatch(setGrowthStatus(e.target.value as SeedStatus));
-  };
 
   const socket = useSocket('http://localhost:3002');
 
   const currentEvent = useSelector(
     (state: RootState) => state.climateEvent.currentEvent,
   );
-
-  console.log('current event', currentEvent);
 
   useEffect(() => {
     if (socket) {
@@ -106,7 +100,7 @@ const Farm = () => {
       socket.on('seed-harvested', () => refetchFarmSlots());
       socket.on('seed-deleted', () => refetchFarmSlots());
       socket.on('climateEvent', (event: ClimateEvent) => {
-        console.log('evento climatico recibido: ', event);
+        console.log('Climate event received: ', event);
         dispatch(setClimateEvent(event));
       });
       socket.on('climateEventEnd', () => {
@@ -181,9 +175,7 @@ const Farm = () => {
           userSub: user?.sub,
         };
 
-        await waterPlant(seedData)
-          .unwrap()
-          .then(() => setShowPopup(true));
+        await waterPlant(seedData).unwrap();
       } catch (e) {
         const error = e as Error;
         console.error('Error watering seed:', error.message);
@@ -201,9 +193,8 @@ const Farm = () => {
           slotId: farm.slots[slotIndex].id,
           sub: user?.sub,
         };
-        const response = await harvestPlant(slotData)
-          .unwrap()
-          .then(() => fetchUserData());
+        const response = await harvestPlant(slotData).unwrap();
+        fetchUserData();
         console.log('Plant harvested:', response);
       } catch (e) {
         const error = e as Error;
@@ -222,134 +213,127 @@ const Farm = () => {
           slotId: farm.slots[slotIndex].id,
           sub: user?.sub,
         };
-        const response = await deletePlant(slotData).unwrap();
+        await deletePlant(slotData).unwrap();
       } catch (e) {
         const error = e as Error;
         console.error('Error deleting plant:', error.message);
       }
-    } else {
     }
   };
 
-  if (userLoading)
-    return <div className="text-center text-lg">Loading user...</div>;
-  if (userError) {
-    const errorMessage =
-      'status' in userError
+  if (userLoading || farmLoading) {
+    return <div className="text-center text-lg">Loading...</div>;
+  }
+
+  if (userError || farmError) {
+    const errorMessage = userError
+      ? 'status' in userError
         ? `Error ${userError.status}: ${JSON.stringify(userError.data)}`
-        : userError.message || 'An unknown error occurred';
-    return (
-      <div className="text-center text-red-500">
-        Error loading user: {errorMessage}
-      </div>
-    );
-  }
-  if (farmLoading)
-    return <div className="text-center text-lg">Loading farm...</div>;
-  if (farmError) {
-    const errorMessage =
-      'status' in farmError
+        : userError.message || 'Un error desconocido ocurrió'
+      : farmError && 'status' in farmError
         ? `Error ${farmError.status}: ${JSON.stringify(farmError.data)}`
-        : (farmError as any).message || 'An unknown error occurred';
+        : (farmError as any)?.message || 'Un error desconocido ocurrió';
+
     return (
-      <div className="text-center text-red-500">
-        Error loading farm: {errorMessage}
-      </div>
+      <Alert variant="destructive">
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{errorMessage}</AlertDescription>
+      </Alert>
     );
   }
+
+  const handleRarityChange = (value: Rarity | 'ALL') => {
+    dispatch(setSeedRarity(value === 'ALL' ? null : value));
+  };
+
+  const handleGrowthStatusChange = (value: SeedStatus | 'ALL') => {
+    dispatch(setGrowthStatus(value === 'ALL' ? null : value));
+  };
 
   return (
-    <div className="bg-[#4d2612] min-h-screen pt-20">
+    <div className="min-h-screen bg-[#14141b] text-white">
       <Navbar />
-      <div className="flex flex-col items-center xl:w-2/3 w-full mx-auto pt-16 pb-20">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-[#c76936] text-center">
-          My Farm
-        </h1>
-
-        {/* Contenedor con la imagen de fondo */}
-        <div className="relative w-full px-4 md:px-0">
-          <Image
-            src={bgStore}
-            alt="Store Background"
-            fill
-            priority
-            style={{ objectFit: 'cover' }}
-            className="absolute inset-0 z-0 rounded-lg border-4 opacity-80 border-[#703517] shadow-lg shadow-black"
-          />
-
-          {/* Contenedor de los filtros y ClimateEventDisplay */}
-          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between w-full p-4 space-y-4 md:space-y-0 md:space-x-4 bg-opacity-80 mb-8">
-            {/* Climate Event Display */}
-            <div className="w-full md:w-1/3">
-              <ClimateEventDisplay event={currentEvent} />
-            </div>
-
-            {/* Filtros */}
-            <div className="flex flex-col w-full md:w-2/3 xl:w-1/4 space-y-4">
-              <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
-                Rarity:
-                <select
-                  name="rarity"
-                  onChange={handleSeedRarityChange}
-                  value={seedRarity}
-                  className="mt-1 p-2 rounded border border-[#c76936] bg-[#d67947] focus:outline-none focus:ring-2 focus:ring-[#e2824e] transition ease-in-out duration-150"
-                >
-                  <option value="">All</option>
-                  <option value="COMMON">Common</option>
-                  <option value="UNCOMMON">Uncommon</option>
-                  <option value="RARE">Rare</option>
-                  <option value="EPIC">Epic</option>
-                  <option value="LEGENDARY">Legendary</option>
-                </select>
-              </label>
-
-              <label className="flex flex-col text-lg font-extrabold text-[#f8d7c6]">
-                Status:
-                <select
-                  name="growthStatus"
-                  value={growthStatus}
-                  onChange={handleGrowthStatusChange}
-                  className="mt-1 p-2 rounded border border-[#c76936] bg-[#d67947] focus:outline-none focus:ring-2 focus:ring-[#e2824e] transition ease-in-out duration-150"
-                >
-                  <option value="">All</option>
-                  <option value="GROWING">Growing</option>
-                  <option value="READY_TO_HARVEST">Ready to harvest</option>
-                  <option value="WITHERED">Withered</option>
-                  <option value="WATER_NEEDED">Need Water</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
-          {/* Grid de los slots */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:px-10 xl:gap-8 w-full bg-opacity-90 pb-12 rounded-lg shadow-lg">
-            {filteredSlots.length > 0 ? (
-              filteredSlots.map((slot: Slot, index: number) => (
-                <div key={index} className="w-full max-w-sm mx-auto">
-                  <FarmSlot
-                    slot={slot}
-                    index={index}
-                    farmId={slots.farmId}
-                    isPlanting={isPlanting}
-                    isWatering={isWatering}
-                    isHarvesting={isHarvesting}
-                    isDeleting={isDeleting}
-                    handleOpenInventory={handleOpenInventory}
-                    handleHarvestPlant={handleHarvestPlant}
-                    handleDeletePlant={handleDeletePlant}
-                    formatLastWatered={formatLastWatered}
-                    formatGrowthStatus={formatGrowthStatus}
-                    filters={{ seedRarity: 'COMMON', growthStatus: 'GROWING' }}
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center text-lg text-[#f8d7c6]">
-                No plants available.
+      <div className="container mx-auto px-4 pt-28 pb-10">
+        <Card className="w-full bg-[#1a1a25] border-[#2a2a3b] shadow-lg overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4 mb-8">
+              <div className="w-full md:w-1/3">
+                <ClimateEventDisplay event={currentEvent} />
               </div>
-            )}
-          </div>
-        </div>
+
+              <div className="flex flex-col w-full md:w-2/3 xl:w-1/4 space-y-4">
+                <Select
+                  name="rarity"
+                  onValueChange={handleRarityChange}
+                  value={seedRarity || undefined}
+                >
+                  <SelectTrigger className="w-full bg-[#2a2a3b]">
+                    <SelectValue placeholder="Select Rarity" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#2a2a3b] text-white">
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="COMMON">Common</SelectItem>
+                    <SelectItem value="UNCOMMON">Uncommon</SelectItem>
+                    <SelectItem value="RARE">Rare</SelectItem>
+                    <SelectItem value="EPIC">Epic</SelectItem>
+                    <SelectItem value="LEGENDARY">Legendary</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  name="growthStatus"
+                  onValueChange={handleGrowthStatusChange}
+                  value={growthStatus || undefined}
+                >
+                  <SelectTrigger className="w-full bg-[#2a2a3b]">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#2a2a3b] text-white">
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="GROWING">Growing</SelectItem>
+                    <SelectItem value="READY_TO_HARVEST">
+                      Ready to harvest
+                    </SelectItem>
+                    <SelectItem value="WITHERED">Withered</SelectItem>
+                    <SelectItem value="WATER_NEEDED">Need Water</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <ScrollArea className="h-[calc(100vh-300px)] rounded-md border border-[#2a2a3b]">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+                {filteredSlots.length > 0 ? (
+                  filteredSlots.map((slot: Slot, index: number) => (
+                    <FarmSlot
+                      key={index}
+                      slot={slot}
+                      index={index}
+                      farmId={slots.farmId}
+                      isPlanting={isPlanting}
+                      isWatering={isWatering}
+                      isHarvesting={isHarvesting}
+                      isDeleting={isDeleting}
+                      handleOpenInventory={handleOpenInventory}
+                      handleHarvestPlant={handleHarvestPlant}
+                      handleDeletePlant={handleDeletePlant}
+                      formatLastWatered={formatLastWatered}
+                      formatGrowthStatus={formatGrowthStatus}
+                      filters={{
+                        seedRarity: 'COMMON',
+                        growthStatus: 'GROWING',
+                      }}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-lg">
+                    No plants available.
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
         {isInventoryOpen && (
           <InventoryPopup
@@ -364,6 +348,4 @@ const Farm = () => {
       </div>
     </div>
   );
-};
-
-export default Farm;
+}

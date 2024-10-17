@@ -20,6 +20,8 @@ import { useState, useEffect } from 'react';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
 import RemoveListing from './removeListing';
 import { formatDistanceToNow } from 'date-fns';
+import { Badge } from 'components/ui/badge';
+import { Rarity } from 'src/types';
 
 interface MarketListingPageProps {
   listingId: string;
@@ -50,9 +52,12 @@ export default function MarketListingPage({
     isLoading,
     isError,
   } = useGetMarketListingByIdQuery(listingId);
+
   const { data: owner } = useGetUserBySubQuery(listing?.sellerSub ?? '', {
     skip: !listing?.sellerSub,
   });
+
+  console.log('owner:', owner);
 
   useEffect(() => {
     setIsVisible(true);
@@ -73,6 +78,14 @@ export default function MarketListingPage({
   const formattedDate = formatDistanceToNow(new Date(listing.listedAt), {
     addSuffix: true,
   });
+
+  const rarityColors = {
+    [Rarity.LEGENDARY]: 'bg-yellow-500',
+    [Rarity.EPIC]: 'bg-purple-600',
+    [Rarity.RARE]: 'bg-blue-600',
+    [Rarity.UNCOMMON]: 'bg-gray-500',
+    [Rarity.COMMON]: 'bg-gray-700',
+  };
 
   return (
     <div
@@ -112,23 +125,18 @@ export default function MarketListingPage({
               />
             </div>
             <div className="space-y-3 py-1 transition-all duration-500 ease-in-out">
-              <div className="w-full flex items-center justify-between flex-row">
-                <div>
+              <div className="w-full flex justify-between flex-row items-center">
+                <div className="flex flex-col">
                   <p className="text-2xl sm:text-3xl md:text-4xl font-bold">
                     ${listing.price}
                   </p>
                   <p className="text-[#868686]">{formattedDate}</p>
                 </div>
-                <p
-                  className="text-sm flex items-center"
-                  style={{
-                    color:
-                      rarityColors[listing.seedRarity?.toLowerCase() || ''],
-                  }}
+                <Badge
+                  className={`${rarityColors[listing.seedRarity as keyof typeof rarityColors] || 'bg-gray-600'}`}
                 >
-                  <Star className="w-4 h-4 mr-1 inline" fill="currentColor" />
-                  <strong>{listing.seedRarity}</strong>
-                </p>
+                  {listing.seedRarity || 'Unknown'}
+                </Badge>
               </div>
               <p className="">
                 Owner: <strong>{owner?.nickname}</strong>

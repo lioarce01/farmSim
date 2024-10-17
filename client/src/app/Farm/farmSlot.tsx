@@ -1,8 +1,17 @@
 'use client';
 
-// components/FarmSlot.tsx
 import React from 'react';
 import { Slot, SeedStatus, Rarity } from 'src/types';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { Droplet, Trash2, Sprout } from 'lucide-react';
 
 interface FarmSlotProps {
   slot: Slot;
@@ -26,7 +35,26 @@ interface FarmSlotProps {
   };
 }
 
-const FarmSlot: React.FC<FarmSlotProps> = ({
+const rarityColors = {
+  [Rarity.LEGENDARY]: 'bg-yellow-500',
+  [Rarity.EPIC]: 'bg-purple-600',
+  [Rarity.RARE]: 'bg-blue-600',
+  [Rarity.UNCOMMON]: 'bg-gray-500',
+  [Rarity.COMMON]: 'bg-gray-700',
+};
+
+const statusColors: Record<SeedStatus, string> = {
+  [SeedStatus.GROWING]: 'bg-green-600',
+  [SeedStatus.READY_TO_HARVEST]: 'bg-emerald-600',
+  [SeedStatus.WATER_NEEDED]: 'bg-orange-500',
+  [SeedStatus.WITHERED]: 'bg-red-500',
+  [SeedStatus.INFECTED]: 'bg-red-700',
+  [SeedStatus.ALL]: 'bg-gray-600',
+  [SeedStatus.NONE]: 'bg-gray-400',
+  [SeedStatus.HARVESTED]: 'bg-blue-500',
+};
+
+export default function FarmSlot({
   slot,
   index,
   isPlanting,
@@ -38,99 +66,88 @@ const FarmSlot: React.FC<FarmSlotProps> = ({
   handleDeletePlant,
   formatLastWatered,
   formatGrowthStatus,
-}) => {
+}: FarmSlotProps) {
   return (
-    <div className="border-4 border-[#C76936] bg-[#fce0c0] p-4 flex flex-col items-center justify-between rounded-lg shadow-md shadow-amber-950 transition-transform transform hover:scale-105">
-      {slot.seedName ? (
-        <>
-          <div className="font-extrabold text-2xl mb-2 text-[#8B4513]">
-            {slot.seedName}
-          </div>
-          <span className="font-extrabold text-sm my-1 text-[#8B4513]">
-            Rarity:&nbsp;
-            <span
-              className={`${
-                slot.seedRarity === Rarity.LEGENDARY
-                  ? 'text-yellow-500'
-                  : slot.seedRarity === Rarity.EPIC
-                    ? 'text-purple-600'
-                    : slot.seedRarity === Rarity.RARE
-                      ? 'text-blue-600'
-                      : slot.seedRarity === Rarity.UNCOMMON
-                        ? 'text-gray-500'
-                        : 'text-gray-700'
-              }`}
+    <Card className="bg-[#2a2a3b] border-[#2a2a3b] transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105">
+      <CardHeader>
+        <CardTitle className="text-xl text-center">
+          {slot.seedName || 'Empty Slot'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col items-center space-y-4">
+        {slot.seedName ? (
+          <>
+            <Badge
+              className={`${rarityColors[slot.seedRarity as keyof typeof rarityColors] || 'bg-gray-600'}`}
             >
               {slot.seedRarity || 'Unknown'}
-            </span>
-          </span>
-          <span className="font-extrabold text-sm my-1 text-[#8B4513]">
-            Status:&nbsp;
-            <span
-              className={`${
-                slot.growthStatus === SeedStatus.GROWING
-                  ? 'text-green-600'
-                  : slot.growthStatus === SeedStatus.READY_TO_HARVEST
-                    ? 'text-[#399c7b]'
-                    : slot.growthStatus === SeedStatus.WATER_NEEDED
-                      ? 'text-orange-500'
-                      : slot.growthStatus === SeedStatus.WITHERED
-                        ? 'text-red-500'
-                        : slot.growthStatus === SeedStatus.INFECTED
-                          ? 'text-red-700'
-                          : 'text-gray-600'
-              }`}
+            </Badge>
+            <Badge
+              className={
+                statusColors[slot.growthStatus as SeedStatus] || 'bg-gray-600'
+              }
             >
               {formatGrowthStatus(slot.growthStatus)}
-            </span>
-          </span>
-          <span className="font-medium text-sm my-1 text-[#8B4513]">
-            Last Watered:&nbsp;
-            <span className="text-[#8B4513] font-extrabold">
-              {formatLastWatered(slot.lastWatered)}
-            </span>
-          </span>
-          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-2">
+            </Badge>
+            <p className="text-sm text-gray-400">
+              Last Watered:{' '}
+              <span className="font-semibold text-white">
+                {formatLastWatered(slot.lastWatered)}
+              </span>
+            </p>
+          </>
+        ) : (
+          <Sprout className="w-16 h-16 text-gray-600" />
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        {slot.seedName ? (
+          <div className="flex flex-col space-y-2 w-full">
             {slot.growthStatus === SeedStatus.WATER_NEEDED && (
-              <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
+              <Button
+                variant="outline"
+                className="w-full bg-[#36364b]"
                 onClick={() => handleOpenInventory(index, 'water')}
                 disabled={isWatering}
               >
+                <Droplet className="mr-2 h-4 w-4" />
                 Water
-              </button>
+              </Button>
             )}
             {slot.growthStatus === SeedStatus.READY_TO_HARVEST && (
-              <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
+              <Button
+                variant="outline"
+                className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
                 onClick={() => handleHarvestPlant(index)}
                 disabled={isHarvesting}
               >
                 {isHarvesting ? 'Harvesting...' : 'Harvest'}
-              </button>
+              </Button>
             )}
             {slot.growthStatus === SeedStatus.WITHERED && (
-              <button
-                className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
+              <Button
+                variant="destructive"
+                className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
                 onClick={() => handleDeletePlant(index)}
                 disabled={isDeleting}
               >
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
-              </button>
+              </Button>
             )}
           </div>
-        </>
-      ) : (
-        <button
-          className="mt-2 px-4 py-2 rounded-lg font-semibold transition-colors duration-300 bg-[#C76936] text-white hover:bg-[#8B4513]"
-          onClick={() => handleOpenInventory(index, 'plant')}
-          disabled={isPlanting}
-        >
-          Add Seed
-        </button>
-      )}
-    </div>
+        ) : (
+          <Button
+            variant="outline"
+            className="w-full bg-[#36364b] hover:bg-[#404058] transition duration-300"
+            onClick={() => handleOpenInventory(index, 'plant')}
+            disabled={isPlanting}
+          >
+            <Sprout className="mr-2 h-4 w-4" />
+            Add Seed
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
-};
-
-export default FarmSlot;
+}

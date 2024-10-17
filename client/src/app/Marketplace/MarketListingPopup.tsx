@@ -50,9 +50,9 @@ export default function MarketListingPage({
     isLoading,
     isError,
   } = useGetMarketListingByIdQuery(listingId);
-  const sellerSub = listing?.sellerSub;
-  const { data: owner } = useGetUserBySubQuery(sellerSub);
-  console.log('owner:', owner);
+  const { data: owner } = useGetUserBySubQuery(listing?.sellerSub ?? '', {
+    skip: !listing?.sellerSub,
+  });
 
   useEffect(() => {
     setIsVisible(true);
@@ -112,19 +112,24 @@ export default function MarketListingPage({
               />
             </div>
             <div className="space-y-3 py-1 transition-all duration-500 ease-in-out">
-              <p className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                ${listing.price}
-              </p>
-              <p className="text-gray-600">Listed: {formattedDate}</p>
-              <p
-                className="text-sm flex items-center"
-                style={{
-                  color: rarityColors[listing.seedRarity?.toLowerCase() || ''],
-                }}
-              >
-                <Star className="w-4 h-4 mr-1 inline" fill="currentColor" />
-                <strong>{listing.seedRarity}</strong>
-              </p>
+              <div className="w-full flex items-center justify-between flex-row">
+                <div>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                    ${listing.price}
+                  </p>
+                  <p className="text-[#868686]">{formattedDate}</p>
+                </div>
+                <p
+                  className="text-sm flex items-center"
+                  style={{
+                    color:
+                      rarityColors[listing.seedRarity?.toLowerCase() || ''],
+                  }}
+                >
+                  <Star className="w-4 h-4 mr-1 inline" fill="currentColor" />
+                  <strong>{listing.seedRarity}</strong>
+                </p>
+              </div>
               <p className="">
                 Owner: <strong>{owner?.nickname}</strong>
               </p>

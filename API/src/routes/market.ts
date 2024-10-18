@@ -1,27 +1,42 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Rarity } from '@prisma/client';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 //GET ALL MARKET LISTINGS
 router.get('/', async (req, res) => {
+  const { rarity, sortBy } = req.query;
+
   try {
-    const marketListings = await prisma.marketListing.findMany();
+    const filters: any = {};
+
+    // Solo agregar el filtro de `seedRarity` si tiene un valor válido
+    if (rarity && rarity !== 'null') {
+      filters.seedRarity = rarity;
+    }
+
+    const orderBy: any = {};
+
+    if (sortBy) {
+      orderBy.price = sortBy === 'asc' ? 'asc' : 'desc';
+    }
+
+    const marketListings = await prisma.marketListing.findMany({
+      where: filters,
+      orderBy: sortBy
+        ? { price: sortBy === 'asc' ? 'asc' : 'desc' }
+        : undefined,
+    });
 
     if (marketListings.length === 0) {
-      return res
-        .status(404)
-        .json({ message: 'No se encontraron listados de mercado' });
+      return res.status(404).json({ message: 'No market listings found' });
     }
 
     res.status(200).json(marketListings);
   } catch (e) {
-    console.error('Error al obtener listados de mercado:', e);
-    res.status(500).json({
-      message: 'Error al obtener listados de mercado',
-      error: e instanceof Error ? e.message : String(e),
-    });
+    console.error('Error getting filtered market listings:', e);
+    res.status(500).json({ message: 'Error getting filtered market listings' });
   }
 });
 

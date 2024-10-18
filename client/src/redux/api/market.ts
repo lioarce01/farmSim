@@ -10,8 +10,11 @@ export const marketApi = createApi({
   }),
 
   endpoints: (builder) => ({
-    getMarketListings: builder.query<MarketListing[], void>({
-      query: () => '/market',
+    getMarketListings: builder.query({
+      query: ({ rarity, sortBy }) => {
+        const queryString = new URLSearchParams({ rarity, sortBy }).toString();
+        return `/market?${queryString}`;
+      },
     }),
     getMarketListingsBySellerId: builder.query({
       query: (sellerId) => `/market/seller/${sellerId}`,

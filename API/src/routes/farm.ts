@@ -60,13 +60,13 @@ router.get('/:id/slots', async (req, res) => {
     });
 
     if (slots.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron slots' });
+      return res.status(404).json({ message: 'No slots found' });
     }
 
     res.status(200).json(slots);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ message: 'Error al obtener los slots' });
+    res.status(500).json({ message: 'Error getting slots' });
   }
 });
 

@@ -17,8 +17,6 @@ app.use((0, cors_1.default)({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 }));
-const io = app.locals.io;
-io.origins('*:*');
 // Configuración de body-parser
 app.use(body_parser_1.default.urlencoded({ extended: true, limit: '50mb' }));
 app.use(body_parser_1.default.json({ limit: '50mb' }));

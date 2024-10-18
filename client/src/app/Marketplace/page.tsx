@@ -18,7 +18,7 @@ import {
 } from '../../../components/ui/select';
 import { Badge } from '../../../components/ui/badge';
 import { ScrollArea } from '../../../components/ui/scroll-area';
-import { Info, Menu, Star } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { useGetMarketListingsQuery } from 'src/redux/api/market';
 import bgPlant from '../assets/bgplant.jpg';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -28,31 +28,33 @@ import MarketListingPage from './MarketListingPopup';
 import Image from 'next/image';
 import LoadingSkeleton from './Skeleton';
 import { Pagination } from './Pagination';
-import { Rarity } from 'src/types';
+import { MarketListing, Rarity } from 'src/types';
 import Navbar from 'src/components/Navbar';
 import useSocket from 'src/hooks/useSocket';
-import CreateListing from './createListing';
 import CreateListingPopup from './createListingPopup';
-
-const rarityColors = {
-  [Rarity.LEGENDARY]: 'bg-yellow-500',
-  [Rarity.EPIC]: 'bg-purple-600',
-  [Rarity.RARE]: 'bg-blue-600',
-  [Rarity.UNCOMMON]: 'bg-gray-500',
-  [Rarity.COMMON]: 'bg-gray-700',
-};
+import { setSeedRarity, setSortOrder } from 'src/redux/slices/filtersSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store/store';
 
 const ITEMS_PER_PAGE = 9;
 
 export default function Marketplace() {
-  const [sortBy, setSortBy] = useState('name');
-  const [selectedRarity, setSelectedRarity] = useState<string>('all');
+  const dispatch = useDispatch();
+  const { seedRarity, sortOrder } = useSelector(
+    (state: RootState) => state.filters,
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const listingId = searchParams.get('listingId') ?? undefined;
+  const router = useRouter();
+
   const {
-    data: marketListings,
+    data: marketListings = [],
     isLoading,
     isError,
     refetch: refetchMarketListings,
-  } = useGetMarketListingsQuery();
+  } = useGetMarketListingsQuery({ rarity: seedRarity, sortBy: sortOrder });
+
   const { user } = useAuth0();
   const {
     fetchedUser,
@@ -60,47 +62,13 @@ export default function Marketplace() {
     isLoading: userLoading,
     fetchUserData,
   } = useFetchUser(user);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortedListings, setSortedListings] = useState(marketListings);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const listingId = searchParams.get('listingId');
   const socket = useSocket('http://localhost:3002');
 
   useEffect(() => {
-    if (marketListings) {
-      let filtered = marketListings;
-      if (selectedRarity !== 'all') {
-        filtered = marketListings.filter(
-          (item) => item.seedRarity?.toLowerCase() === selectedRarity,
-        );
-      }
-      const sorted = [...filtered].sort((a, b) => {
-        if (sortBy === 'name')
-          return (a.seedName ?? '').localeCompare(b.seedName ?? '');
-        if (sortBy === 'lowToHigh') return a.price - b.price;
-        if (sortBy === 'highToLow') return b.price - a.price;
-        return 0;
-      });
-      setSortedListings(sorted);
-      setCurrentPage(1);
-    }
-  }, [marketListings, sortBy, selectedRarity]);
-
-  useEffect(() => {
     if (socket) {
-      socket.on('marketListingCreated', () => {
-        refetchMarketListings();
-        fetchUserData();
-      });
-      socket.on('marketListingBought', () => {
-        refetchMarketListings();
-        fetchUserData();
-      });
-      socket.on('marketListingDeleted', () => {
-        refetchMarketListings();
-        fetchUserData();
-      });
+      socket.on('marketListingCreated', refetchMarketListings);
+      socket.on('marketListingBought', refetchMarketListings);
+      socket.on('marketListingDeleted', refetchMarketListings);
 
       return () => {
         socket.off('marketListingCreated');
@@ -108,13 +76,19 @@ export default function Marketplace() {
         socket.off('marketListingDeleted');
       };
     }
-  }, [socket, refetchMarketListings, fetchUserData]);
+  }, [socket, refetchMarketListings]);
 
-  const totalPages = Math.ceil((sortedListings?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedListings = sortedListings?.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
+  // const totalPages = Math.ceil(marketListings.length / ITEMS_PER_PAGE);
+  // const paginatedListings = marketListings.slice(
+  //   (currentPage - 1) * ITEMS_PER_PAGE,
+  //   currentPage * ITEMS_PER_PAGE,
+  // );
+
+  const filteredListings = marketListings.filter((listing: MarketListing) => {
+    const matchesRarity = !seedRarity || listing.seedRarity === seedRarity;
+    const matchesPrice = !listing.price || listing.price === listing.price;
+    return matchesRarity && matchesPrice;
+  });
 
   const handleOpenPopup = (id: string) => {
     router.push(`/Marketplace?listingId=${id}`);
@@ -122,6 +96,19 @@ export default function Marketplace() {
 
   const handleClosePopup = () => {
     router.push('/Marketplace');
+  };
+
+  const handleRarityChange = (value: Rarity | 'ALL') => {
+    dispatch(setSeedRarity(value === 'ALL' ? null : value));
+  };
+
+  const handleSortChange = (value: string) => {
+    dispatch(setSortOrder(value));
+  };
+
+  const handleResetFilters = () => {
+    dispatch(setSeedRarity(null));
+    dispatch(setSortOrder('desc'));
   };
 
   if (isLoading || userLoading) {
@@ -146,29 +133,34 @@ export default function Marketplace() {
               <header className="mb-8 flex justify-between items-center">
                 <h1 className="text-3xl font-bold">Marketplace</h1>
               </header>
-              <Select value={selectedRarity} onValueChange={setSelectedRarity}>
+              <Select
+                name="rarity"
+                onValueChange={handleRarityChange}
+                value={seedRarity || undefined}
+              >
                 <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
                   <SelectValue placeholder="Select Rarity" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a25] text-white">
-                  <SelectItem value="all">All Rarities</SelectItem>
-                  {Object.entries(rarityColors).map(([rarity, color]) => (
-                    <SelectItem key={rarity} value={rarity}>
-                      <span style={{ color }}>
-                        {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-                      </span>
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="ALL">All</SelectItem>
+                  <SelectItem value="COMMON">Common</SelectItem>
+                  <SelectItem value="UNCOMMON">Uncommon</SelectItem>
+                  <SelectItem value="RARE">Rare</SelectItem>
+                  <SelectItem value="EPIC">Epic</SelectItem>
+                  <SelectItem value="LEGENDARY">Legendary</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select
+                name="sortOrder"
+                value={sortOrder || 'desc'}
+                onValueChange={handleSortChange}
+              >
                 <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a25] text-white text-center">
-                  <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="lowToHigh">Low to High</SelectItem>
-                  <SelectItem value="highToLow">High to Low</SelectItem>
+                  <SelectItem value="desc">Highest Price</SelectItem>
+                  <SelectItem value="asc">Lowest Price</SelectItem>
                 </SelectContent>
               </Select>
               <CreateListingPopup
@@ -178,14 +170,14 @@ export default function Marketplace() {
           </aside>
           <main className="flex-1">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-              <p className="text-sm text-muted-foreground">
-                Showing {sortedListings?.length || 0} results
+              <p className="text-md text-muted-foreground">
+                Plants: <strong>{marketListings.length}</strong>
               </p>
             </div>
             <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#1f1f2c]">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-                {paginatedListings ? (
-                  paginatedListings?.map((item) => (
+              {filteredListings.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                  {filteredListings.map((item: MarketListing) => (
                     <Card
                       key={item.id}
                       className="transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 bg-[#1a1a25]"
@@ -210,16 +202,14 @@ export default function Marketplace() {
                             alt={item.seedName || ''}
                             width={200}
                             height={200}
-                            className="relative z-10 object-contain w-3/4 h-3/4 "
+                            className="relative z-10 object-contain w-3/4 h-3/4"
                           />
                         </div>
                         <div className="flex justify-between items-center">
                           <p className="text-2xl font-bold">
                             ${item.price.toFixed(2)}
                           </p>
-                          <Badge
-                            className={`${rarityColors[item.seedRarity as keyof typeof rarityColors] || 'bg-gray-600'}`}
-                          >
+                          <Badge className="bg-[#222231] text-white">
                             {item.seedRarity || 'Unknown'}
                           </Badge>
                         </div>
@@ -234,27 +224,24 @@ export default function Marketplace() {
                         </Button>
                       </CardFooter>
                     </Card>
-                  ))
-                ) : (
-                  <div className="text-center text-xl">
-                    <p>No listings found. Be the first to create one!</p>
-                    <Button
-                      className="w-full bg-[#1a1a25] text-white hover:bg-[#262630] transition duration-300"
-                      onClick={() => router.push('/CreateListing')}
-                    >
-                      Create Listing
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-xl p-6">
+                  <p>No plants available for sale.</p>
+                  <Button onClick={handleResetFilters}>Reset Filters</Button>
+                </div>
+              )}
             </ScrollArea>
-            <div className="mt-8">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
+            {/* {marketListings.length > 0 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )} */}
             {listingId && (
               <MarketListingPage
                 listingId={listingId}

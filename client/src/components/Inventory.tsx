@@ -1,11 +1,20 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { X } from 'lucide-react';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { Rarity, Seed, Water } from '../types/index';
 import { useAuth0 } from '@auth0/auth0-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../../components/ui/dialog';
+import { Button } from '../../components/ui/button';
+import { ScrollArea } from '../../components/ui/scroll-area';
+import { Badge } from '../../components/ui/badge';
 
 interface InventoryPopupProps {
   isOpen: boolean;
@@ -35,108 +44,105 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
 
   if (!mounted) return null;
 
-  if (isLoading) {
-    return (
-      <span className="text-[#A8D5BA] font-semibold">Loading inventory...</span>
-    );
-  }
-
-  if (fetchError) {
-    const e = fetchError as Error;
-    console.error('Error fetching user:', e.message);
-    return (
-      <div className="text-red-500">Error: {e.message || 'Unknown error'}</div>
-    );
-  }
-
   const { seeds = [], waters = [] } = fetchedUser?.inventory || {};
 
-  if (!isOpen) return null;
+  const rarityColors: Record<Rarity, string> = {
+    [Rarity.LEGENDARY]: 'bg-yellow-500',
+    [Rarity.EPIC]: 'bg-purple-600',
+    [Rarity.RARE]: 'bg-blue-600',
+    [Rarity.UNCOMMON]: 'bg-gray-500',
+    [Rarity.COMMON]: 'bg-gray-700',
+    [Rarity.ALL]: 'bg-gradient-to-r from-yellow-500 via-purple-600 to-blue-600',
+  };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-[#FFF5D1] p-6 rounded-lg shadow-lg w-96 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-[#FFB385] hover:text-[#FFC1A1] transition duration-300"
-        >
-          <FaTimes size={24} />
-        </button>
-
-        <h2 className="text-center text-xl font-bold mb-4">Inventory</h2>
-
-        {pathname === '/Farm' && (
-          <>
-            <h3 className="font-semibold mb-2">Seeds:</h3>
-            {seeds.length > 0 ? (
-              <ul className="mb-4 space-y-2">
-                {seeds.map((seed: Seed) => (
-                  <li
-                    key={seed.id}
-                    className="flex justify-between items-center p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]"
-                  >
-                    <span className="text-[#398b5a] font-medium">
-                      {seed.name}
-                    </span>
-                    <span
-                      className={`text-sm font-bold ${
-                        seed.rarity === Rarity.LEGENDARY
-                          ? 'text-yellow-500'
-                          : seed.rarity === Rarity.EPIC
-                            ? 'text-purple-600'
-                            : seed.rarity === Rarity.RARE
-                              ? 'text-blue-600'
-                              : seed.rarity === Rarity.UNCOMMON
-                                ? 'text-gray-500'
-                                : 'text-gray-700'
-                      }`}
-                    >
-                      {seed.rarity}
-                    </span>
-                    <button
-                      className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
-                      onClick={() => {
-                        onSeedSelect(seed);
-                        onClose();
-                      }}
-                    >
-                      Plant
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-red-500 font-semibold">No seeds available.</p>
-            )}
-          </>
-        )}
-
-        <h3 className="font-semibold mb-2">Waters:</h3>
-        {waters.length > 0 ? (
-          <ul>
-            {waters.map((water: Water) => (
-              <li
-                key={water.id}
-                className="flex justify-between items-center mb-2 p-2 border border-[#FFC1A1] rounded-lg bg-[#FFEDDA]"
-              >
-                <span className="text-[#398b5a] font-medium">{water.name}</span>
-                <button
-                  className="bg-[#398b5a] text-white px-2 py-1 rounded hover:bg-[#276844] transition duration-300"
-                  onClick={() => {
-                    onWaterSelect(water);
-                    onClose();
-                  }}
-                >
-                  Use
-                </button>
-              </li>
-            ))}
-          </ul>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px] bg-[#1a1a25] text-white">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Inventory</DialogTitle>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="text-[#A8D5BA] font-semibold animate-pulse">
+            Loading inventory...
+          </div>
+        ) : fetchError ? (
+          <div className="text-red-500">
+            Error: {(fetchError as Error).message || 'Unknown error'}
+          </div>
         ) : (
-          <p className="text-red-500 font-semibold">No water available.</p>
+          <ScrollArea className="h-[60vh] pr-4">
+            {pathname === '/Farm' && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2 text-lg">Seeds:</h3>
+                {seeds.length > 0 ? (
+                  <ul className="space-y-2">
+                    {seeds.map((seed: Seed) => (
+                      <li
+                        key={seed.id}
+                        className="flex justify-between items-center p-3 rounded-lg bg-[#222231] transition-all duration-300 hover:bg-[#29293b]"
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">{seed.name}</span>
+                          <Badge
+                            className={`${rarityColors[seed.rarity]} text-xs mt-1`}
+                          >
+                            {seed.rarity}
+                          </Badge>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="bg-[#222231] hover:bg-[#29293b] text-white transition duration-300"
+                          onClick={() => {
+                            onSeedSelect(seed);
+                            onClose();
+                          }}
+                        >
+                          Plant
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-red-500 font-semibold">
+                    No seeds available.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div>
+              <h3 className="font-semibold mb-2 text-lg">Waters:</h3>
+              {waters.length > 0 ? (
+                <ul className="space-y-2">
+                  {waters.map((water: Water) => (
+                    <li
+                      key={water.id}
+                      className="flex justify-between items-center p-3 rounded-lg bg-[#222231] transition-all duration-300 hover:bg-[#29293b]"
+                    >
+                      <span className="font-medium">{water.name}</span>
+                      <Button
+                        variant="outline"
+                        className="bg-[#222231] hover:bg-[#29293b] text-white transition duration-300"
+                        onClick={() => {
+                          onWaterSelect(water);
+                          onClose();
+                        }}
+                      >
+                        Use
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-red-500 font-semibold">
+                  No water available.
+                </p>
+              )}
+            </div>
+          </ScrollArea>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

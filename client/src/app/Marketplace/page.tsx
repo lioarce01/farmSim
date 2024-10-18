@@ -140,12 +140,12 @@ export default function Marketplace() {
     <>
       <Navbar />
       <div className="container mx-auto p-4 bg-background text-foreground text-white pt-20">
-        <header className="mb-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Marketplace</h1>
-        </header>
         <div className="flex flex-col md:flex-row gap-8">
           <aside className="md:block w-64 transition-all duration-300 ease-in-out">
             <div className="flex gap-4 flex-col w-full sm:w-auto">
+              <header className="mb-8 flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Marketplace</h1>
+              </header>
               <Select value={selectedRarity} onValueChange={setSelectedRarity}>
                 <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
                   <SelectValue placeholder="Select Rarity" />
@@ -182,7 +182,7 @@ export default function Marketplace() {
                 Showing {sortedListings?.length || 0} results
               </p>
             </div>
-            <ScrollArea className="h-[calc(100vh-300px)] rounded-md border border-[#1f1f2c]">
+            <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#1f1f2c]">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
                 {paginatedListings ? (
                   paginatedListings?.map((item) => (

@@ -30,6 +30,9 @@ import LoadingSkeleton from './Skeleton';
 import { Pagination } from './Pagination';
 import { Rarity } from 'src/types';
 import Navbar from 'src/components/Navbar';
+import useSocket from 'src/hooks/useSocket';
+import CreateListing from './createListing';
+import CreateListingPopup from './createListingPopup';
 
 const rarityColors = {
   [Rarity.LEGENDARY]: 'bg-yellow-500',
@@ -62,6 +65,7 @@ export default function Marketplace() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const listingId = searchParams.get('listingId');
+  const socket = useSocket('http://localhost:3002');
 
   useEffect(() => {
     if (marketListings) {
@@ -82,6 +86,29 @@ export default function Marketplace() {
       setCurrentPage(1);
     }
   }, [marketListings, sortBy, selectedRarity]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('marketListingCreated', () => {
+        refetchMarketListings();
+        fetchUserData();
+      });
+      socket.on('marketListingBought', () => {
+        refetchMarketListings();
+        fetchUserData();
+      });
+      socket.on('marketListingDeleted', () => {
+        refetchMarketListings();
+        fetchUserData();
+      });
+
+      return () => {
+        socket.off('marketListingCreated');
+        socket.off('marketListingBought');
+        socket.off('marketListingDeleted');
+      };
+    }
+  }, [socket, refetchMarketListings, fetchUserData]);
 
   const totalPages = Math.ceil((sortedListings?.length || 0) / ITEMS_PER_PAGE);
   const paginatedListings = sortedListings?.slice(
@@ -144,6 +171,9 @@ export default function Marketplace() {
                   <SelectItem value="highToLow">High to Low</SelectItem>
                 </SelectContent>
               </Select>
+              <CreateListingPopup
+                refetchMarketListings={refetchMarketListings}
+              />
             </div>
           </aside>
           <main className="flex-1">

@@ -37,7 +37,6 @@ const removeListing: React.FC<RemoveListingProps> = ({
   const handleRemoveListing = async () => {
     try {
       await deleteMarketListing(marketListingId);
-      refetchMarketListings();
       router.push('/Marketplace');
     } catch (err) {
       console.error('Error al eliminar:', err);

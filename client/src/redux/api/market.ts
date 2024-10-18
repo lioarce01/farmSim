@@ -17,10 +17,10 @@ export const marketApi = createApi({
       query: (sellerId) => `/market/seller/${sellerId}`,
     }),
     createMarketListing: builder.mutation({
-      query: (marketListing) => ({
+      query: ({ price, sellerId, seedId }) => ({
         url: '/market',
         method: 'POST',
-        body: marketListing,
+        body: { price, sellerId, seedId },
       }),
     }),
     getMarketListingById: builder.query({

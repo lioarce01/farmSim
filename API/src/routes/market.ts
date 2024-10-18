@@ -116,6 +116,11 @@ router.post('/', async (req, res) => {
       return newListing;
     });
 
+    const io = req.app.locals.io;
+    if (io) {
+      io.emit('marketListingCreated', result);
+    }
+
     res.status(201).json(result);
   } catch (e) {
     console.error('Error al crear el listado:', e);
@@ -159,6 +164,11 @@ router.delete('/:id', async (req, res) => {
 
       return { message: 'Listado eliminado y semilla devuelta al inventario' };
     });
+
+    const io = req.app.locals.io;
+    if (io) {
+      io.emit('marketListingDeleted', { id });
+    }
 
     res.status(200).json(result);
   } catch (e) {
@@ -229,6 +239,11 @@ router.post('/buy/:id', async (req, res) => {
 
       return { message: 'Compra realizada con éxito' };
     });
+
+    const io = req.app.locals.io;
+    if (io) {
+      io.emit('marketListingBought', { id, buyerId });
+    }
 
     res.status(200).json(result);
   } catch (e) {

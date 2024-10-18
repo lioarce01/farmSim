@@ -29,12 +29,12 @@ interface MarketListingPageProps {
   refetchMarketListings: () => void;
 }
 
-const rarityColors: { [key: string]: string } = {
-  common: '#6c6d70',
-  uncommon: '#808080',
-  rare: '#0000ff',
-  epic: '#800080',
-  legendary: '#ffd700',
+const rarityColors = {
+  [Rarity.LEGENDARY]: 'bg-yellow-500',
+  [Rarity.EPIC]: 'bg-purple-600',
+  [Rarity.RARE]: 'bg-blue-600',
+  [Rarity.UNCOMMON]: 'bg-gray-500',
+  [Rarity.COMMON]: 'bg-gray-700',
 };
 
 export default function MarketListingPage({

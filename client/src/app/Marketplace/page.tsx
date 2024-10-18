@@ -38,6 +38,14 @@ import { RootState } from 'src/redux/store/store';
 
 const ITEMS_PER_PAGE = 9;
 
+const rarityColors = {
+  [Rarity.LEGENDARY]: 'bg-yellow-500',
+  [Rarity.EPIC]: 'bg-purple-600',
+  [Rarity.RARE]: 'bg-blue-600',
+  [Rarity.UNCOMMON]: 'bg-gray-500',
+  [Rarity.COMMON]: 'bg-gray-700',
+};
+
 export default function Marketplace() {
   const dispatch = useDispatch();
   const { seedRarity, sortOrder } = useSelector(
@@ -107,7 +115,7 @@ export default function Marketplace() {
   };
 
   const handleResetFilters = () => {
-    dispatch(setSeedRarity(null));
+    dispatch(setSeedRarity(Rarity.ALL));
     dispatch(setSortOrder('desc'));
   };
 
@@ -136,9 +144,9 @@ export default function Marketplace() {
               <Select
                 name="rarity"
                 onValueChange={handleRarityChange}
-                value={seedRarity || undefined}
+                value={seedRarity || Rarity.ALL}
               >
-                <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
+                <SelectTrigger className="w-full sm:w-[180px] md:w-full bg-[#1a1a25] text-white">
                   <SelectValue placeholder="Select Rarity" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a25] text-white">
@@ -155,7 +163,7 @@ export default function Marketplace() {
                 value={sortOrder || 'desc'}
                 onValueChange={handleSortChange}
               >
-                <SelectTrigger className="w-full sm:w-[180px] bg-[#1a1a25] text-white">
+                <SelectTrigger className="w-full sm:w-[180px] md:w-full bg-[#1a1a25] text-white">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a25] text-white text-center">
@@ -209,7 +217,9 @@ export default function Marketplace() {
                           <p className="text-2xl font-bold">
                             ${item.price.toFixed(2)}
                           </p>
-                          <Badge className="bg-[#222231] text-white">
+                          <Badge
+                            className={`${rarityColors[item.seedRarity as keyof typeof rarityColors] || 'bg-gray-600'}`}
+                          >
                             {item.seedRarity || 'Unknown'}
                           </Badge>
                         </div>
@@ -227,9 +237,14 @@ export default function Marketplace() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-xl p-6">
+                <div className="text-center text-xl p-6 space-y-4">
                   <p>No plants available for sale.</p>
-                  <Button onClick={handleResetFilters}>Reset Filters</Button>
+                  <Button
+                    className="bg-[#222231] hover:bg-[#29293b] text-white transition duration-300 ease-in-out"
+                    onClick={handleResetFilters}
+                  >
+                    Reset Filters
+                  </Button>
                 </div>
               )}
             </ScrollArea>

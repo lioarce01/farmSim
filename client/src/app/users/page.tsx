@@ -36,7 +36,8 @@ const UsersPage = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
-  const socket = useSocket('');
+
+  const socket = useSocket('http://localhost:3002');
 
   useEffect(() => {
     const handleAddTokens = () => {

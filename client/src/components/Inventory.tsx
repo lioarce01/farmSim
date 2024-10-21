@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { Rarity, Seed, Water } from '../types/index';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -30,8 +29,6 @@ const InventoryPopup: React.FC<InventoryPopupProps> = ({
   onClose,
   onSeedSelect,
   onWaterSelect,
-  selectedSlot,
-  action,
 }) => {
   const { user } = useAuth0();
   const { fetchedUser, fetchError, isLoading } = useFetchUser(user);

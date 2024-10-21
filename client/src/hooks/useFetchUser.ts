@@ -21,6 +21,8 @@ const useFetchUser = (user: any) => {
   });
 
   const fetchUserData = useCallback(async () => {
+    if (!user?.sub || isLoading) return null;
+
     if (user?.sub && !isLoading) {
       try {
         const accessToken = await getAccessTokenSilently();
@@ -52,7 +54,7 @@ const useFetchUser = (user: any) => {
       }
     }
     return null;
-  }, [user?.sub, isLoading, refetchUser, getAccessTokenSilently, dispatch]);
+  }, [user?.sub, refetchUser, getAccessTokenSilently, dispatch]);
 
   return { fetchedUser: data, fetchError: error, isLoading, fetchUserData };
 };

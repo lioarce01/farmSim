@@ -1,3 +1,5 @@
+'use client';
+
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from 'components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -14,23 +16,16 @@ interface RemoveListingProps {
   refetchMarketListings: () => void;
 }
 
-const removeListing: React.FC<RemoveListingProps> = ({
+const RemoveListing: React.FC<RemoveListingProps> = ({
   marketListingId,
   sellerId,
-  refetchMarketListings,
 }) => {
   const { user } = useAuth0();
   const { fetchedUser } = useFetchUser(user);
-  const {
-    data: listing,
-    isLoading,
-    isError,
-    error,
-  } = useGetMarketListingByIdQuery(marketListingId);
-  const [
-    deleteMarketListing,
-    { isLoading: isDeleting, isError: isDeleteError, error: deleteError },
-  ] = useDeleteMarketListingMutation();
+  const { isLoading, isError, error } =
+    useGetMarketListingByIdQuery(marketListingId);
+  const [deleteMarketListing, { isLoading: isDeleting }] =
+    useDeleteMarketListingMutation();
 
   const router = useRouter();
 
@@ -65,4 +60,4 @@ const removeListing: React.FC<RemoveListingProps> = ({
   );
 };
 
-export default removeListing;
+export default RemoveListing;

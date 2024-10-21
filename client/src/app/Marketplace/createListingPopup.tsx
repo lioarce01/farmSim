@@ -36,7 +36,6 @@ export default function CreateListingPopup({
     useCreateMarketListingMutation();
   const { fetchedUser, fetchUserData } = useFetchUser(user);
   const inventory = fetchedUser?.inventory;
-  console.log('user inventory', inventory);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +47,6 @@ export default function CreateListingPopup({
         sellerId: fetchedUser?.id,
         seedId: selectedSeedId,
       }).unwrap();
-      refetchMarketListings();
       setOpen(false);
       setPrice('');
       setSelectedSeedId('');

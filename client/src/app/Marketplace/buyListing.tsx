@@ -14,7 +14,6 @@ interface BuyListingProps {
 const BuyListing: React.FC<BuyListingProps> = ({
   marketListingId,
   buyerId,
-  refetchMarketListings,
 }) => {
   const router = useRouter();
   const [buySeed, { isLoading, isError, error }] = useGetBuySeedMutation();

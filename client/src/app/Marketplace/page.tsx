@@ -27,7 +27,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import MarketListingPage from './MarketListingPopup';
 import Image from 'next/image';
 import LoadingSkeleton from './Skeleton';
-import { Pagination } from './Pagination';
 import { MarketListing, Rarity } from 'src/types';
 import Navbar from 'src/components/Navbar';
 import useSocket from 'src/hooks/useSocket';
@@ -35,8 +34,7 @@ import CreateListingPopup from './createListingPopup';
 import { setSeedRarity, setSortOrder } from 'src/redux/slices/filtersSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store/store';
-
-const ITEMS_PER_PAGE = 9;
+import { useGetUserBySubQuery } from 'src/redux/api/users';
 
 const rarityColors = {
   [Rarity.LEGENDARY]: 'bg-yellow-500',
@@ -51,7 +49,6 @@ export default function Marketplace() {
   const { seedRarity, sortOrder } = useSelector(
     (state: RootState) => state.filters,
   );
-  const [currentPage, setCurrentPage] = useState(1);
   const searchParams = useSearchParams();
   const listingId = searchParams.get('listingId') ?? undefined;
   const router = useRouter();
@@ -59,24 +56,39 @@ export default function Marketplace() {
   const {
     data: marketListings = [],
     isLoading,
-    isError,
     refetch: refetchMarketListings,
   } = useGetMarketListingsQuery({ rarity: seedRarity, sortBy: sortOrder });
-
   const { user } = useAuth0();
+  const { refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
+    skip: !user || !user.sub,
+  });
   const {
     fetchedUser,
-    fetchError: userError,
     isLoading: userLoading,
     fetchUserData,
   } = useFetchUser(user);
   const socket = useSocket('http://localhost:3002');
 
   useEffect(() => {
+    const handleMarketListingBought = () => {
+      refetchUser();
+      refetchMarketListings();
+    };
+
+    const handleMarketListingCreated = () => {
+      refetchUser();
+      refetchMarketListings();
+    };
+
+    const handleMarketListingDeleted = () => {
+      refetchUser();
+      refetchMarketListings();
+    };
+
     if (socket) {
-      socket.on('marketListingCreated', refetchMarketListings);
-      socket.on('marketListingBought', refetchMarketListings);
-      socket.on('marketListingDeleted', refetchMarketListings);
+      socket.on('marketListingCreated', handleMarketListingCreated);
+      socket.on('marketListingBought', handleMarketListingBought);
+      socket.on('marketListingDeleted', handleMarketListingDeleted);
 
       return () => {
         socket.off('marketListingCreated');
@@ -85,12 +97,6 @@ export default function Marketplace() {
       };
     }
   }, [socket, refetchMarketListings]);
-
-  // const totalPages = Math.ceil(marketListings.length / ITEMS_PER_PAGE);
-  // const paginatedListings = marketListings.slice(
-  //   (currentPage - 1) * ITEMS_PER_PAGE,
-  //   currentPage * ITEMS_PER_PAGE,
-  // );
 
   const filteredListings = marketListings.filter((listing: MarketListing) => {
     const matchesRarity = !seedRarity || listing.seedRarity === seedRarity;

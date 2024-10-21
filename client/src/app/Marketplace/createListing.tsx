@@ -3,10 +3,7 @@
 import { Button } from 'components/ui/button';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import {
-  useCreateMarketListingMutation,
-  useGetBuySeedMutation,
-} from '../../redux/api/market';
+import { useCreateMarketListingMutation } from '../../redux/api/market';
 
 interface CreateListingProps {
   marketListingId: string;

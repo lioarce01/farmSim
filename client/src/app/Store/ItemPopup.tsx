@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { StoreItem } from 'src/types';
 import PurchaseButton from 'src/components/PurchaseButton';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useGetStoreItemByIdQuery } from 'src/redux/api/store';
 import { X } from 'lucide-react';
 import Image from 'next/image';

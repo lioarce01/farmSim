@@ -13,8 +13,7 @@ export default function Timer() {
   const timeRemaining = useSelector(
     (state: RootState) => state.timer.timeRemaining,
   );
-  const { data: storeItems, refetch: refetchStoreItems } =
-    useGetStoreItemsQuery();
+  const { refetch: refetchStoreItems } = useGetStoreItemsQuery();
 
   useEffect(() => {
     const intervalId = setInterval(() => {

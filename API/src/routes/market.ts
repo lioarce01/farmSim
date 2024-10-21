@@ -182,7 +182,7 @@ router.delete('/:id', async (req, res) => {
 
     const io = req.app.locals.io;
     if (io) {
-      io.emit('marketListingDeleted', { id });
+      io.emit('marketListingDeleted', result);
     }
 
     res.status(200).json(result);
@@ -257,7 +257,7 @@ router.post('/buy/:id', async (req, res) => {
 
     const io = req.app.locals.io;
     if (io) {
-      io.emit('marketListingBought', { id, buyerId });
+      io.emit('marketListingBought', result);
     }
 
     res.status(200).json(result);

@@ -33,9 +33,7 @@ export default function PurchaseButton({
   const { refetch: refetchItem } = useGetStoreItemByIdQuery(itemId);
   const { fetchUserData } = useFetchUser(user);
 
-  const [purchaseQuantity, setPurchaseQuantity] = useState<number>(
-    quantity || 1,
-  );
+  const [purchaseQuantity] = useState<number>(quantity || 1);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [popupMessage, setPopupMessage] = useState<string>('');
   const derivedItemType: ItemType =
@@ -65,7 +63,6 @@ export default function PurchaseButton({
       }).unwrap();
 
       refetchItem();
-      fetchUserData();
 
       console.log('Purchase successful');
     } catch (err) {

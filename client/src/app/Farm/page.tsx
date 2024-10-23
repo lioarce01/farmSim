@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import useFetchUser from '../../hooks/useFetchUser';
 import InventoryPopup from '../../components/Inventory';
 import Navbar from '../../components/Navbar';
-import bgStore from '../assets/bgstore.jpg';
-import Image from 'next/image';
 import {
   useDeletePlantMutation,
   useGetFarmByIdQuery,
@@ -14,7 +12,7 @@ import {
   useWaterPlantMutation,
   useGetFarmSlotsQuery,
 } from '../../redux/api/farm';
-import { ClimateEvent, Rarity, SeedStatus, Slot } from 'src/types';
+import { ClimateEvent, Rarity, Seed, SeedStatus, Slot, Water } from 'src/types';
 import useSocket from 'src/hooks/useSocket';
 import { useAuth0 } from '@auth0/auth0-react';
 import { formatGrowthStatus, formatLastWatered } from './formatGrowthStatus';
@@ -41,6 +39,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from '../../../components/ui/alert';
+import { useGetUserBySubQuery } from 'src/redux/api/users';
 
 export default function Farm() {
   const dispatch = useDispatch();
@@ -61,6 +60,9 @@ export default function Farm() {
   const { seedRarity, growthStatus } = useSelector(
     (state: RootState) => state.filters,
   );
+  const { refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
+    skip: !user || !user.sub,
+  });
 
   const farmId = fetchedUser?.farm?.id;
 
@@ -68,17 +70,14 @@ export default function Farm() {
     data: farm,
     error: farmError,
     isLoading: farmLoading,
-    refetch: refetchFarm,
   } = useGetFarmByIdQuery(farmId, {
     skip: !farmId,
   });
 
-  const {
-    data: slots = [],
-    error: slotError,
-    isLoading: isSlotLoading,
-    refetch: refetchFarmSlots,
-  } = useGetFarmSlotsQuery({ farmId }, { skip: !farmId });
+  const { data: slots = [], refetch: refetchFarmSlots } = useGetFarmSlotsQuery(
+    { farmId },
+    { skip: !farmId },
+  );
 
   const filteredSlots = slots.filter((slot: Slot) => {
     const matchesRarity = !seedRarity || slot.seedRarity === seedRarity;
@@ -93,20 +92,42 @@ export default function Farm() {
   );
 
   useEffect(() => {
+    const handleSeedHarvested = () => {
+      refetchUser();
+      refetchFarmSlots();
+    };
+
+    const handlePlantSeed = () => {
+      refetchUser();
+      refetchFarmSlots();
+    };
+
+    const handleWaterPlant = () => {
+      refetchUser();
+      refetchFarmSlots();
+    };
+
+    const handleDeletePlant = () => {
+      refetchUser();
+      refetchFarmSlots();
+    };
+
+    const handleClimateEvent = (event: ClimateEvent) => {
+      dispatch(setClimateEvent(event));
+    };
+
+    const handleClimateEventEnd = () => {
+      dispatch(clearClimateEvent());
+    };
+
     if (socket) {
-      socket.on('seed-planted', () => refetchFarmSlots());
+      socket.on('seed-planted', handlePlantSeed);
       socket.on('actualizacion-planta', () => refetchFarmSlots());
-      socket.on('seed-watered', () => refetchFarmSlots());
-      socket.on('seed-harvested', () => refetchFarmSlots());
-      socket.on('seed-deleted', () => refetchFarmSlots());
-      socket.on('climateEvent', (event: ClimateEvent) => {
-        console.log('Climate event received: ', event);
-        dispatch(setClimateEvent(event));
-      });
-      socket.on('climateEventEnd', () => {
-        dispatch(clearClimateEvent());
-        refetchFarmSlots();
-      });
+      socket.on('seed-watered', handleWaterPlant);
+      socket.on('seed-harvested', handleSeedHarvested);
+      socket.on('seed-deleted', handleDeletePlant);
+      socket.on('climateEvent', handleClimateEvent);
+      socket.on('climateEventEnd', handleClimateEventEnd);
 
       return () => {
         socket.off('seed-planted');
@@ -118,7 +139,7 @@ export default function Farm() {
         socket.off('climateEventEnd');
       };
     }
-  }, [socket, refetchFarmSlots, dispatch]);
+  }, [socket, refetchFarmSlots, dispatch, fetchUserData]);
 
   const handleOpenInventory = (
     slotIndex: number | null = null,
@@ -135,7 +156,7 @@ export default function Farm() {
     setSelectedSlot(null);
   };
 
-  const handleSeedSelect = async (seed: any) => {
+  const handleSeedSelect = async (seed: Seed) => {
     if (selectedSlot !== null && farmId) {
       try {
         if (!seed.id) {
@@ -160,7 +181,7 @@ export default function Farm() {
     }
   };
 
-  const handleWaterSelect = async (water: any) => {
+  const handleWaterSelect = async (water: Water) => {
     if (selectedSlot !== null && farmId) {
       try {
         if (!water.id) {
@@ -194,7 +215,6 @@ export default function Farm() {
           sub: user?.sub,
         };
         const response = await harvestPlant(slotData).unwrap();
-        fetchUserData();
         console.log('Plant harvested:', response);
       } catch (e) {
         const error = e as Error;
@@ -232,7 +252,7 @@ export default function Farm() {
         : userError.message || 'Un error desconocido ocurrió'
       : farmError && 'status' in farmError
         ? `Error ${farmError.status}: ${JSON.stringify(farmError.data)}`
-        : (farmError as any)?.message || 'Un error desconocido ocurrió';
+        : (farmError as Error)?.message || 'Un error desconocido ocurrió';
 
     return (
       <Alert variant="destructive">

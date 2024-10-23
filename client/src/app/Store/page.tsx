@@ -24,16 +24,16 @@ import {
 import { Button } from '../../../components/ui/button';
 import { Info } from 'lucide-react';
 import { ScrollArea } from '../../../components/ui/scroll-area';
+import { useGetUserBySubQuery } from 'src/redux/api/users';
 
 export default function StorePage() {
   const { data: storeItems, refetch: refetchStoreItems } =
     useGetStoreItemsQuery();
   const { user } = useAuth0();
-  const {
-    fetchedUser,
-    fetchError: userError,
-    isLoading: userLoading,
-  } = useFetchUser(user);
+  const { refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
+    skip: !user || !user.sub,
+  });
+  const { fetchedUser } = useFetchUser(user);
   const userSub = fetchedUser?.sub;
 
   const socket = useSocket('http://localhost:3002');
@@ -51,8 +51,15 @@ export default function StorePage() {
         dispatch(setTimeRemaining(timeRemaining));
       });
 
+      const handleStoreBuy = () => {
+        refetchUser();
+      };
+
+      socket.on('storeItemBought', handleStoreBuy);
+
       return () => {
         socket.off('storeUpdated');
+        socket.off('storeItemBought');
       };
     }
   }, [socket, storeItems, dispatch, refetchStoreItems]);

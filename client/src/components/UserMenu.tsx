@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { FaCaretDown, FaPlus, FaCoins } from 'react-icons/fa';
-import { LogOut, User, Warehouse } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FaCaretDown, FaCoins } from 'react-icons/fa';
+import { User, Warehouse } from 'lucide-react';
 import useFetchUser from '../hooks/useFetchUser';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Button } from '../../components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +14,12 @@ import {
 import Link from 'next/link';
 import LoadingSpinner from './LoadingSpinner';
 import LogoutButton from './LogoutButton';
+import useSocket from 'src/hooks/useSocket';
 
 const UserMenu: React.FC = () => {
   const { user } = useAuth0();
   const { fetchedUser, isLoading: isUserLoading } = useFetchUser(user);
-  const [isOpen, setIsOpen] = useState(false);
+  const socket = useSocket('http://localhost:3002');
 
   if (isUserLoading) {
     return (

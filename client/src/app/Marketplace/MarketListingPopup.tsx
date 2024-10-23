@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useGetMarketListingByIdQuery } from 'src/redux/api/market';
 import BuyListing from './buyListing';
 import useFetchUser from 'src/hooks/useFetchUser';
@@ -15,7 +15,7 @@ import {
 import { Button } from '../../../components/ui/button';
 import Image from 'next/image';
 import bgPlant from '../assets/bgplant.jpg';
-import { Star, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useGetUserBySubQuery } from 'src/redux/api/users';
 import RemoveListing from './removeListing';
@@ -29,17 +29,8 @@ interface MarketListingPageProps {
   refetchMarketListings: () => void;
 }
 
-const rarityColors: { [key: string]: string } = {
-  common: '#6c6d70',
-  uncommon: '#808080',
-  rare: '#0000ff',
-  epic: '#800080',
-  legendary: '#ffd700',
-};
-
 export default function MarketListingPage({
   listingId,
-  onClose,
   refetchMarketListings,
 }: MarketListingPageProps) {
   const router = useRouter();
@@ -56,8 +47,6 @@ export default function MarketListingPage({
   const { data: owner } = useGetUserBySubQuery(listing?.sellerSub ?? '', {
     skip: !listing?.sellerSub,
   });
-
-  console.log('owner:', owner);
 
   useEffect(() => {
     setIsVisible(true);

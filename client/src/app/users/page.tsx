@@ -1,11 +1,12 @@
 'use client';
 
 import { useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import {
   useAddTokensMutation,
   useConvertUserMutation,
+  useGetUserBySubQuery,
   useGetUsersQuery,
 } from '../../redux/api/users';
 import { User } from '../../types';
@@ -13,13 +14,18 @@ import { RootState } from 'src/redux/store/store';
 import ProtectAdminRoute from 'src/components/ProtectAdminRoute';
 import { Button } from '../../../components/ui/button';
 import { Pagination } from '../../../components/ui/pagination';
+import { useAuth0 } from '@auth0/auth0-react';
+import useSocket from 'src/hooks/useSocket';
 
 const UsersPage = () => {
   const { data, error, isLoading, refetch } = useGetUsersQuery();
   const [convertUser] = useConvertUserMutation();
   const [addTokens] = useAddTokensMutation();
   const loggedUserRole = useSelector((state: RootState) => state.user.role);
-
+  const { user } = useAuth0();
+  const { refetch: refetchUser } = useGetUserBySubQuery(user?.sub || '', {
+    skip: !user || !user.sub,
+  });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [tokensToAdd, setTokensToAdd] = useState('');
@@ -30,6 +36,17 @@ const UsersPage = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+
+  const socket = useSocket('http://localhost:3002');
+
+  useEffect(() => {
+    const handleAddTokens = () => {
+      refetchUser();
+    };
+    if (socket) {
+      socket.on('updateUserBalance', handleAddTokens);
+    }
+  }, [refetchUser]);
 
   if (isLoading)
     return (
@@ -78,7 +95,6 @@ const UsersPage = () => {
           userSub: selectedUser,
           tokensToAdd: parseInt(tokensToAdd, 10),
         }).unwrap();
-        refetch();
         handleClosePopup();
       } catch (e) {
         console.error('Error al añadir tokens:', e);

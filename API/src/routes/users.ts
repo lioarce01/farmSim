@@ -144,6 +144,11 @@ router.post('/addTokens', async (req, res) => {
       },
     });
 
+    const io = req.app.locals.io;
+    if (io) {
+      io.emit('updateUserBalance', userSub, user.balanceToken + tokensToAdd);
+    }
+
     return res.status(200).json({
       message: 'Tokens agregados con exito',
       newBalance: user.balanceToken + tokensToAdd,

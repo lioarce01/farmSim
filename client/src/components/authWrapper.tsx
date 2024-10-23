@@ -19,12 +19,8 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  const {
-    fetchedUser,
-    isLoading: isUserLoading,
-    fetchUserData,
-  } = useFetchUser(user);
-  const { register, isRegistering } = useRegisterUser();
+  const { fetchedUser, fetchUserData } = useFetchUser(user);
+  const { register } = useRegisterUser();
 
   useEffect(() => {
     const handleUserAuthentication = async () => {

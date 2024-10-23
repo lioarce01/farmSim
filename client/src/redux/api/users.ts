@@ -8,14 +8,17 @@ export const usersApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3002/',
   }),
+  tagTypes: ['User'],
 
   endpoints: (builder) => ({
     getUsers: builder.query<User[], void>({
       query: () => 'users',
+      providesTags: ['User'],
     }),
 
     getUserBySub: builder.query<User, string>({
       query: (sub) => `/users/${sub}`,
+      providesTags: (result, error, sub) => [{ type: 'User', sub }],
     }),
 
     registerUser: builder.mutation({
@@ -24,6 +27,7 @@ export const usersApi = createApi({
         method: 'POST',
         body: userData,
       }),
+      invalidatesTags: ['User'],
     }),
     convertUser: builder.mutation({
       query: (body) => ({
@@ -31,6 +35,7 @@ export const usersApi = createApi({
         method: 'PUT',
         body: body,
       }),
+      invalidatesTags: ['User'],
     }),
     addTokens: builder.mutation({
       query: (body) => ({
@@ -38,6 +43,9 @@ export const usersApi = createApi({
         method: 'POST',
         body: body,
       }),
+      invalidatesTags: (result, error, body) => [
+        { type: 'User', sub: body.sub },
+      ],
     }),
   }),
 });

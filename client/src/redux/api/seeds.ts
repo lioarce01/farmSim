@@ -1,7 +1,7 @@
 'use client';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Seed, User } from '../../types';
+import { Seed } from '../../types';
 
 export const seedsApi = createApi({
   reducerPath: 'seedApi',

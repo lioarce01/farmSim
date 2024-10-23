@@ -154,6 +154,11 @@ router.post('/buy', async (req, res) => {
       };
     });
 
+    const io = req.app.locals.io;
+    if (io) {
+      io.emit('storeItemBought', result);
+    }
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
